@@ -3,6 +3,8 @@ import { Raleway } from 'next/font/google';
 import 'leaflet/dist/leaflet.css';
 import './globals.css';
 import Header from '@/components/Header';
+import ClientProviders from '@/components/client-provider';
+import { Toaster } from 'sonner';
 
 const raleway = Raleway({
   variable: '--font-geist-mono',
@@ -22,8 +24,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${raleway.variable} antialiased`}>
-        <Header />
-        {children}
+        <ClientProviders>
+          <Header />
+          {children}
+        </ClientProviders>
+        <Toaster />
       </body>
     </html>
   );

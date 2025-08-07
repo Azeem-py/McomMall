@@ -62,8 +62,8 @@ export function NavMenu() {
           <MenubarItem className="flex justify-items-start items-start gap-5 bg-white hover:bg-white">
             {businessCategories.map((category, i) => {
               return (
-                <div key={i} className="text-lg font-normal text-gray-700">
-                  <h3 className="font-medium text-xl mb-2.5">
+                <div key={i} className=" font-normal text-gray-700">
+                  <h3 className="font-medium text-lg mb-2.5">
                     {category.title}
                   </h3>
                   {category.items.map((item, i) => {

@@ -1,0 +1,29 @@
+export interface UserInterface {
+  name: string;
+  email: string;
+  phoneNumber: string;
+  password: string;
+  confirm_password: string;
+  role: UserRole;
+}
+
+export enum UserRole {
+  ADMIN = 'ADMIN',
+  OWNER = 'OWNER',
+  CUSTOMER = 'CUSTOMER',
+}
+
+export interface AuthInterface {
+  email: string;
+  password: string;
+  role?: string;
+}
+
+export interface LoginResponse {
+  auth: {
+    refreshToken: string;
+    accessToken: string;
+  };
+  name: string;
+  role: UserRole;
+}
