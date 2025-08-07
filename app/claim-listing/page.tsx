@@ -2,8 +2,10 @@
 
 import CategoryFilter from '@/components/CategoryFilter';
 import ListingCard from '@/components/listingCard';
-import MapComponent from '@/components/map';
+import dynamic from 'next/dynamic';
 import React from 'react';
+
+const MapComponent = dynamic(() => import('@/components/map'), { ssr: false });
 
 interface Listing {
   imageUrl: string;

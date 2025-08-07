@@ -50,7 +50,9 @@ export function NavMenu() {
       <MenubarMenu>
         <MenubarTrigger>Listings</MenubarTrigger>
         <MenubarContent>
-          <MenubarItem>Claim listing</MenubarItem>
+          <MenubarItem>
+            <Link href={'/claim-listing'}>Claim listing</Link>
+          </MenubarItem>
           <MenubarItem>Create new listing</MenubarItem>
         </MenubarContent>
       </MenubarMenu>
