@@ -17,7 +17,7 @@ import { TermsCondtion } from './terms-condition';
 import { RememberMe } from './remember-me';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { ErrorResponse, useCreateUser } from '@/service/auth/hook';
+import { ErrorResponse, useCreateUser, useLogin } from '@/service/auth/hook';
 import { UserRole } from '@/service/auth/types';
 
 const Auth = ({ children }: { children?: React.ReactNode }) => {
@@ -41,6 +41,7 @@ const Auth = ({ children }: { children?: React.ReactNode }) => {
   });
   const [termsAccepted, setTermsAccepted] = useState(false);
   const { isPending, mutateAsync } = useCreateUser();
+  const { isPending: loginPending, mutateAsync: loginAsync } = useLogin();
 
   const handleToggleMode = (mode: boolean) => {
     setNewAccount(mode);
@@ -211,6 +212,22 @@ const Auth = ({ children }: { children?: React.ReactNode }) => {
         email: formData.email,
         password: formData.password,
       });
+      try {
+        const response = await loginAsync({
+          email: formData.email,
+          password: formData.password,
+        });
+
+        toast.success('Account created successfully!', {
+          description: `Welcome, ${response.name}!`,
+        });
+        handleToggleMode(false); // Switch to login mode after successful signup
+      } catch (error: unknown) {
+        const err = error as ErrorResponse;
+        toast.error('Failed to login', {
+          description: err?.message || 'An unexpected error occurred.',
+        });
+      }
     }
   };
 
@@ -421,9 +438,9 @@ const Auth = ({ children }: { children?: React.ReactNode }) => {
             type="button"
             className="justify-start w-fit bg-red-500 hover:bg-red-600"
             onClick={handleSubmit}
-            disabled={isPending}
+            disabled={isPending || loginPending}
           >
-            {isPending ? 'Submitting...' : 'Submit'}
+            {isPending || loginPending ? 'Submitting...' : 'Submit'}
           </Button>
         </DialogFooter>
       </DialogContent>
