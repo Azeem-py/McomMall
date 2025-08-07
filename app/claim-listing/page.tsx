@@ -1,3 +1,5 @@
+'use client';
+
 import CategoryFilter from '@/components/CategoryFilter';
 import ListingCard from '@/components/listingCard';
 import MapComponent from '@/components/map';
