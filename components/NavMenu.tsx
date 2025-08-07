@@ -1,20 +1,13 @@
 import {
   Menubar,
-  MenubarCheckboxItem,
   MenubarContent,
   MenubarItem,
   MenubarMenu,
   MenubarRadioGroup,
   MenubarRadioItem,
   MenubarSeparator,
-  MenubarShortcut,
-  MenubarSub,
-  MenubarSubContent,
-  MenubarSubTrigger,
   MenubarTrigger,
 } from '@/components/ui/menubar';
-import { Card } from './ui/card';
-import { Button } from './ui/button';
 import Link from 'next/link';
 
 export function NavMenu() {
