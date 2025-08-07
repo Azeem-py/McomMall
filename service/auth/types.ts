@@ -8,9 +8,9 @@ export interface UserInterface {
 }
 
 export enum UserRole {
-  ADMIN = 'ADMIN',
-  OWNER = 'OWNER',
-  CUSTOMER = 'CUSTOMER',
+  ADMIN = 'admin',
+  OWNER = 'owner',
+  CUSTOMER = 'customer',
 }
 
 export interface AuthInterface {

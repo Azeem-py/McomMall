@@ -218,7 +218,7 @@ const Auth = ({ children }: { children?: React.ReactNode }) => {
           password: formData.password,
         });
 
-        toast.success('Account created successfully!', {
+        toast.success('Login successful', {
           description: `Welcome, ${response.name}!`,
         });
         handleToggleMode(false); // Switch to login mode after successful signup
