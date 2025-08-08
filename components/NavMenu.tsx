@@ -27,7 +27,7 @@ export function NavMenu() {
     },
   ];
   return (
-    <Menubar className="gap-7 bg-transparent border-0">
+    <Menubar className="gap-7 bg-transparent border-0 h-[5rem] rounded-none md:pl-4">
       <MenubarMenu>
         <MenubarTrigger>Home</MenubarTrigger>
         <MenubarContent>

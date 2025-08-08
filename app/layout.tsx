@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { Raleway } from 'next/font/google';
 import 'leaflet/dist/leaflet.css';
 import './globals.css';
-import Header from '@/components/Header';
 import ClientProviders from '@/components/client-provider';
 import { Toaster } from 'sonner';
 
@@ -24,10 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${raleway.variable} antialiased`}>
-        <ClientProviders>
-          <Header />
-          {children}
-        </ClientProviders>
+        <ClientProviders>{children}</ClientProviders>
         <Toaster />
       </body>
     </html>
