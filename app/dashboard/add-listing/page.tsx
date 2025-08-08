@@ -4,6 +4,7 @@ import { ArrowRight } from 'lucide-react';
 import { PricingPlan } from './components/PricingPlans';
 import { useState } from 'react';
 import ListingTypeSelector from './components/ListCategory';
+import AddListingForm from '@/components/AddListingForm';
 
 const Page = () => {
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
@@ -33,6 +34,8 @@ const Page = () => {
       ) : (
         <ListingTypeSelector />
       )}
+
+      <AddListingForm />
     </section>
   );
 };

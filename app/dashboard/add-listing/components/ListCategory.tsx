@@ -37,8 +37,8 @@ const CategoryCard: React.FC<{
         }`}
       >
         {React.cloneElement(icon as React.ReactElement, {
-          stroke: 'black', // Force icon to stay black
-          size: 24,
+          // stroke: 'black', // Force icon to stay black
+          // size: 24,
         })}
       </div>
       <span
