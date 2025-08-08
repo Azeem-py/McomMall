@@ -1,4 +1,9 @@
-import { Map } from 'lucide-react';
+import {
+  BookMarked,
+  ChartNoAxesCombined,
+  Map,
+  MessageSquareQuote,
+} from 'lucide-react';
 
 const ListingSummaryCard = () => {
   return (
@@ -22,7 +27,7 @@ const ViewsSummaryCard = () => {
         <p className="text-lg">Total Views</p>
       </div>
       <div className="text-[5rem] font-normal">
-        <Map size={80} />
+        <ChartNoAxesCombined size={80} />
       </div>
     </div>
   );
@@ -35,7 +40,7 @@ const ReviewSummaryCard = () => {
         <p className="text-lg">Total Reviews</p>
       </div>
       <div className="text-[5rem] font-normal">
-        <Map size={80} />
+        <BookMarked size={80} />
       </div>
     </div>
   );

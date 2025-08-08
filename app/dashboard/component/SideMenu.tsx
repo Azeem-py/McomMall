@@ -12,6 +12,7 @@ import {
   List,
   ChevronDown,
   Store,
+  Wallet,
 } from 'lucide-react';
 
 const SideMenu = () => {
@@ -24,6 +25,7 @@ const SideMenu = () => {
     { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { title: 'My Bookings', href: '/dashboard/my-bookings', icon: Calendar },
     { title: 'Messages', href: '/dashboard/messages', icon: MessageSquare },
+    { title: 'Wallet', href: '/dashboard/wallet', icon: Wallet },
     {
       title: 'Bookings',
       href: '/dashboard/bookings',
