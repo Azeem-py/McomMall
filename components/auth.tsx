@@ -19,6 +19,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { ErrorResponse, useCreateUser, useLogin } from '@/service/auth/hook';
 import { UserRole } from '@/service/auth/types';
+import { useRouter } from 'next/navigation';
 
 const Auth = ({ children }: { children?: React.ReactNode }) => {
   const [newAccount, setNewAccount] = useState(false);
@@ -42,6 +43,8 @@ const Auth = ({ children }: { children?: React.ReactNode }) => {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const { isPending, mutateAsync } = useCreateUser();
   const { isPending: loginPending, mutateAsync: loginAsync } = useLogin();
+
+  const router = useRouter();
 
   const handleToggleMode = (mode: boolean) => {
     setNewAccount(mode);
@@ -207,11 +210,6 @@ const Auth = ({ children }: { children?: React.ReactNode }) => {
         });
       }
     } else {
-      // Handle login (not implemented in this scope)
-      console.log('Login not implemented', {
-        email: formData.email,
-        password: formData.password,
-      });
       try {
         const response = await loginAsync({
           email: formData.email,
@@ -222,6 +220,7 @@ const Auth = ({ children }: { children?: React.ReactNode }) => {
           description: `Welcome, ${response.name}!`,
         });
         handleToggleMode(false); // Switch to login mode after successful signup
+        router.push('/dashboard'); // Redirect to dashboard after login
       } catch (error: unknown) {
         const err = error as ErrorResponse;
         toast.error('Failed to login', {
