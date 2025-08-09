@@ -1,10 +1,21 @@
 import React, { ChangeEvent, useState } from 'react';
 import { FormHeader } from './FormContainer';
-import { InputComponent } from './Input';
-import { Book, BookImage, FileUser, Locate, ReceiptText } from 'lucide-react';
+import { InputComponent, InputLabel } from './Input';
+import {
+  Book,
+  BookImage,
+  FileUser,
+  Locate,
+  ReceiptText,
+  Edit,
+  Trash,
+} from 'lucide-react';
 import MapComponent from './map';
 import UploadBox from './UploadBox';
 import DescriptionInput from './DescriptionInput';
+import SingleImageInput from './SingleImageInput';
+import { Switch } from './ui/switch';
+import { Button } from './ui/button';
 
 const AddListingForm = () => {
   // Basic Information State
@@ -70,6 +81,85 @@ const AddListingForm = () => {
 
   // Step State
   const [activeStep, setActiveStep] = useState(1);
+
+  // Step 2 State
+  const [services, setServices] = useState<
+    {
+      id: number;
+      image: string | null;
+      title: string;
+      description: string;
+      price: string;
+      isBookable: boolean;
+    }[]
+  >([]);
+  const [editingServiceId, setEditingServiceId] = useState<number | null>(null);
+  const [tempImage, setTempImage] = useState<string | null>(null);
+  const [tempTitle, setTempTitle] = useState('');
+  const [tempDescription, setTempDescription] = useState('');
+  const [tempPrice, setTempPrice] = useState('');
+  const [isBookable, setIsBookable] = useState(false);
+
+  const handleAddOrUpdateService = () => {
+    if (editingServiceId !== null) {
+      setServices(
+        services.map(service =>
+          service.id === editingServiceId
+            ? {
+                ...service,
+                image: tempImage,
+                title: tempTitle,
+                description: tempDescription,
+                price: tempPrice,
+                isBookable,
+              }
+            : service
+        )
+      );
+      setEditingServiceId(null);
+    } else {
+      setServices([
+        ...services,
+        {
+          id: Date.now(),
+          image: tempImage,
+          title: tempTitle,
+          description: tempDescription,
+          price: tempPrice,
+          isBookable,
+        },
+      ]);
+    }
+    setTempImage(null);
+    setTempTitle('');
+    setTempDescription('');
+    setTempPrice('');
+    setIsBookable(false);
+  };
+
+  const handleEditService = (id: number) => {
+    const service = services.find(s => s.id === id);
+    if (service) {
+      setEditingServiceId(id);
+      setTempImage(service.image);
+      setTempTitle(service.title);
+      setTempDescription(service.description);
+      setTempPrice(service.price);
+      setIsBookable(service.isBookable);
+    }
+  };
+
+  const handleDeleteService = (id: number) => {
+    setServices(services.filter(service => service.id !== id));
+    if (editingServiceId === id) {
+      setEditingServiceId(null);
+      setTempImage(null);
+      setTempTitle('');
+      setTempDescription('');
+      setTempPrice('');
+      setIsBookable(false);
+    }
+  };
 
   return (
     <section className="w-full mx-auto p-4">
@@ -308,7 +398,119 @@ const AddListingForm = () => {
       {activeStep === 2 && (
         <div className="w-full border rounded-md mt-6">
           <FormHeader title="Pricing & Bookable Services" icon={Book} />
-          <p>Step 2</p>
+          <div className="p-4">
+            {/* Added Services Table */}
+            {services.length > 0 && (
+              <div className="overflow-x-auto mb-6">
+                <table className="w-full text-sm text-left text-gray-700 border-collapse">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="py-2 px-4 border-b">Image</th>
+                      <th className="py-2 px-4 border-b">Title</th>
+                      <th className="py-2 px-4 border-b">Description</th>
+                      <th className="py-2 px-4 border-b">Price</th>
+                      <th className="py-2 px-4 border-b">Bookable</th>
+                      <th className="py-2 px-4 border-b">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {services.map(service => (
+                      <tr key={service.id} className="hover:bg-gray-50">
+                        <td className="py-2 px-4 border-b">
+                          {service.image ? (
+                            <img
+                              src={service.image}
+                              alt="Service"
+                              className="w-12 h-12 object-cover rounded"
+                            />
+                          ) : (
+                            <span className="text-gray-400">No Image</span>
+                          )}
+                        </td>
+                        <td className="py-2 px-4 border-b">{service.title}</td>
+                        <td className="py-2 px-4 border-b">
+                          {service.description}
+                        </td>
+                        <td className="py-2 px-4 border-b">{service.price}</td>
+                        <td className="py-2 px-4 border-b">
+                          {service.isBookable ? 'Yes' : 'No'}
+                        </td>
+                        <td className="py-2 px-4 border-b flex space-x-2">
+                          <button
+                            onClick={() => handleEditService(service.id)}
+                            className="text-blue-500 hover:text-blue-700"
+                          >
+                            <Edit size={16} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteService(service.id)}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            <Trash size={16} />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Input Section */}
+            <section className="flex flex-col md:flex-row items-center gap-3 p-5 bg-gray-50 rounded-lg">
+              <div className="w-[4rem] h-[4rem] flex-shrink-0">
+                <SingleImageInput
+                  onImageChange={image => setTempImage(image)}
+                />
+              </div>
+
+              <InputComponent
+                inputType="text"
+                labelText="Title"
+                tooltipText="Title of the service"
+                value={tempTitle}
+                onChange={e => setTempTitle(e.target.value)}
+                fileInput={false}
+              />
+
+              <InputComponent
+                inputType="text"
+                labelText="Description"
+                tooltipText="Description of the service"
+                value={tempDescription}
+                onChange={e => setTempDescription(e.target.value)}
+                fileInput={false}
+              />
+
+              <InputComponent
+                inputType="text"
+                labelText="Price"
+                tooltipText="Price of the service"
+                value={tempPrice}
+                onChange={e => setTempPrice(e.target.value)}
+                fileInput={false}
+              />
+
+              <div className="flex items-center gap-2">
+                <InputLabel
+                  labelText="Enable Booking Widget"
+                  tooltipText="Will make it bookable in the booking widget"
+                />
+                <Switch
+                  className="w-[3rem] h-[1.5rem]"
+                  checked={isBookable}
+                  onCheckedChange={setIsBookable}
+                />
+              </div>
+            </section>
+
+            <Button
+              className="bg-red-500 hover:bg-red-600 h-[3rem] w-[5rem] rounded-2xl mt-4 md:mt-6"
+              onClick={handleAddOrUpdateService}
+            >
+              {editingServiceId ? 'Update' : 'Add'}
+            </Button>
+          </div>
         </div>
       )}
       {activeStep === 3 && (
