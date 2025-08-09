@@ -1,3 +1,5 @@
+'use client';
+
 import React, { ChangeEvent, useState } from 'react';
 import { FormHeader } from './FormContainer';
 import { InputComponent, InputLabel } from './Input';
@@ -10,12 +12,15 @@ import {
   Edit,
   Trash,
 } from 'lucide-react';
-import MapComponent from './map';
+
 import UploadBox from './UploadBox';
 import DescriptionInput from './DescriptionInput';
 import SingleImageInput from './SingleImageInput';
 import { Switch } from './ui/switch';
 import { Button } from './ui/button';
+import dynamic from 'next/dynamic';
+
+const MapComponent = dynamic(() => import('@/components/map'), { ssr: false });
 
 const AddListingForm = () => {
   // Basic Information State

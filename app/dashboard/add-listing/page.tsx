@@ -35,7 +35,7 @@ const Page = () => {
         <ListingTypeSelector />
       )}
 
-      <AddListingForm />
+      {selectedPlan && <AddListingForm />}
     </section>
   );
 };

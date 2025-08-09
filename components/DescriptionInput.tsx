@@ -25,7 +25,7 @@ const DescriptionInput: React.FC = () => {
         className="rounded-md"
       >
         <Editor
-          apiKey="4ux6dijfbh20ycphdxwp7f1fzjbu7uaiga53zzhji5eq069d" // Replace with your TinyMCE API key or use a free trial
+          apiKey={process.env.NEXT_PUBLIC_EDITOR_KEY}
           value={content}
           onEditorChange={handleEditorChange}
           init={{
