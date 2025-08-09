@@ -19,6 +19,7 @@ import SingleImageInput from './SingleImageInput';
 import { Switch } from './ui/switch';
 import { Button } from './ui/button';
 import dynamic from 'next/dynamic';
+import { OpeningHours } from './TimeControl';
 
 const MapComponent = dynamic(() => import('@/components/map'), { ssr: false });
 
@@ -520,6 +521,7 @@ const AddListingForm = () => {
       )}
       {activeStep === 3 && (
         <div>
+          <OpeningHours />
           <p>Step 3</p>
         </div>
       )}
