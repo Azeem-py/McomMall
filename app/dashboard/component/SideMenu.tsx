@@ -13,6 +13,9 @@ import {
   ChevronDown,
   Store,
   Wallet,
+  ShoppingCart,
+  UserStar,
+  Bookmark,
 } from 'lucide-react';
 
 const SideMenu = () => {
@@ -54,6 +57,9 @@ const SideMenu = () => {
         { title: 'Expired', href: '/dashboard/my-listings/expired' },
       ],
     },
+    { title: 'Coupons', href: '/dashboard/coupons', icon: ShoppingCart },
+    { title: 'Reviews', href: '/dashboard/reviews', icon: UserStar },
+    { title: 'Boomarks', href: '/dashboard/bookmarks', icon: Bookmark },
   ];
 
   // Toggle submenu visibility
