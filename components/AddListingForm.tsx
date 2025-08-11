@@ -11,6 +11,7 @@ import {
   ReceiptText,
   Edit,
   Trash,
+  Calendar,
 } from 'lucide-react';
 
 import UploadBox from './UploadBox';
@@ -20,6 +21,7 @@ import { Switch } from './ui/switch';
 import { Button } from './ui/button';
 import dynamic from 'next/dynamic';
 import { OpeningHours } from './TimeControl';
+import Image from 'next/image';
 
 const MapComponent = dynamic(() => import('@/components/map'), { ssr: false });
 
@@ -424,7 +426,7 @@ const AddListingForm = () => {
                       <tr key={service.id} className="hover:bg-gray-50">
                         <td className="py-2 px-4 border-b">
                           {service.image ? (
-                            <img
+                            <Image
                               src={service.image}
                               alt="Service"
                               className="w-12 h-12 object-cover rounded"
@@ -520,10 +522,92 @@ const AddListingForm = () => {
         </div>
       )}
       {activeStep === 3 && (
-        <div>
-          <OpeningHours />
-          <p>Step 3</p>
-        </div>
+        <section>
+          <div className="w-full border rounded-md mt-6">
+            <FormHeader title="Availability" icon={Calendar} />
+            <OpeningHours />
+          </div>
+
+          <div className="w-full border rounded-md mt-6">
+            <FormHeader title="Booking pricing and settings" icon={Calendar} />
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4  p-5">
+              <InputComponent
+                inputType="text"
+                labelText="Regular Price (optional) "
+                tooltipText="Regular Price (optional) "
+                value={tempDescription}
+                onChange={e => setTempDescription(e.target.value)}
+                fileInput={false}
+              />
+              <InputComponent
+                inputType="text"
+                labelText="Weekend Price (optional) "
+                tooltipText="Weekend Price (optional) "
+                value={tempDescription}
+                onChange={e => setTempDescription(e.target.value)}
+                fileInput={false}
+              />
+              <InputComponent
+                inputType="text"
+                labelText="Reservation Fee (optional) "
+                tooltipText="Reservation Fee (optional) "
+                value={tempDescription}
+                onChange={e => setTempDescription(e.target.value)}
+                fileInput={false}
+              />
+              <div className="flex flex-col gap-3 justify-center">
+                <InputLabel
+                  labelText="Enable instant booking"
+                  tooltipText="Enable instant booking"
+                />
+                <Switch
+                  className="w-[3rem] h-[1.5rem]"
+                  checked={isBookable}
+                  onCheckedChange={setIsBookable}
+                />
+              </div>
+
+              <div className="flex flex-col gap-3 justify-center">
+                <InputLabel
+                  labelText="Enable Price per Hour (optional) "
+                  tooltipText="Enable Price per Hour (optional) "
+                />
+                <Switch
+                  className="w-[3rem] h-[1.5rem]"
+                  checked={isBookable}
+                  onCheckedChange={setIsBookable}
+                />
+              </div>
+              <div className="flex flex-col gap-3 justify-center">
+                <InputLabel
+                  labelText="Enable Price per Guest (optional) "
+                  tooltipText="Enable Price per Guest (optional) "
+                />
+                <Switch
+                  className="w-[3rem] h-[1.5rem]"
+                  checked={isBookable}
+                  onCheckedChange={setIsBookable}
+                />
+              </div>
+              <InputComponent
+                inputType="text"
+                labelText="Minimum number of guests (optional) "
+                tooltipText="Minimum number of guests (optional) "
+                value={tempDescription}
+                onChange={e => setTempDescription(e.target.value)}
+                fileInput={false}
+              />
+              <InputComponent
+                inputType="number"
+                labelText="Maximum number of guests (optional) "
+                tooltipText="Maximum number of guests (optional) "
+                value={tempDescription}
+                onChange={e => setTempDescription(e.target.value)}
+                fileInput={false}
+              />
+            </div>
+          </div>
+        </section>
       )}
     </section>
   );
