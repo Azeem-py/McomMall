@@ -85,11 +85,11 @@ export const storeMenuItems: MenuItem[] = [
   },
   {
     title: 'Settings',
-    href: '/dashboard/store/settings',
+    href: '/dashboard/settings',
     icon: Settings,
     subMenu: [
-      { title: 'Store', href: '/dashboard/store/settings' },
-      { title: 'Payment', href: '/dashboard/store/settings/payment' },
+      { title: 'Store', href: '/dashboard/settings' },
+      { title: 'Payment', href: '/dashboard/settings/payment' },
     ],
   },
 ];
