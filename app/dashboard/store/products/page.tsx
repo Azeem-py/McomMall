@@ -22,7 +22,6 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { ChevronRight, PlusCircle, Search, MoreHorizontal } from 'lucide-react';
-import Image from 'next/image';
 
 // --- MOCK DATA ---
 // Expanded mock data for better filtering examples
