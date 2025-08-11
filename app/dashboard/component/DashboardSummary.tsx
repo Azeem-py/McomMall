@@ -1,9 +1,4 @@
-import {
-  BookMarked,
-  ChartNoAxesCombined,
-  Map,
-  MessageSquareQuote,
-} from 'lucide-react';
+import { BookMarked, ChartNoAxesCombined, Map } from 'lucide-react';
 
 const ListingSummaryCard = () => {
   return (

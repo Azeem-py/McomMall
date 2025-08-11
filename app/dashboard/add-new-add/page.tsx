@@ -10,7 +10,6 @@ import {
   MapPin,
   CheckCircle2,
   AlertCircle,
-  Calendar as CalendarIcon,
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 

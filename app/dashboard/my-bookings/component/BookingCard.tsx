@@ -5,7 +5,6 @@ import {
   LucidePhone,
   LucideMapPin,
 } from 'lucide-react';
-import { motion } from 'framer-motion';
 import React from 'react';
 
 interface BookingDetails {

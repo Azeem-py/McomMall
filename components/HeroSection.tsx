@@ -10,16 +10,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import {
-  MapPin,
-  Search,
-  Utensils,
-  Home,
-  Briefcase,
-  Calendar,
-} from 'lucide-react';
+import { MapPin, Utensils, Home, Briefcase, Calendar } from 'lucide-react';
 import TypingEffect from './Typing';
-import Auth from './auth';
 
 export default function HeroSection() {
   return (
