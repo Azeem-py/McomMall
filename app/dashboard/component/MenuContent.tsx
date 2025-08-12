@@ -8,6 +8,7 @@ import {
   mainMenuItems,
   listingMenuItems,
   storeMenuItems,
+  accountMenuItems,
 } from '@/lib/menu-items';
 
 // An optional prop to close the menu on link click (for mobile)
@@ -101,6 +102,12 @@ export const MenuContent = ({ onLinkClick }: MenuContentProps) => {
           Store
         </h3>
         {renderMenuItems(storeMenuItems)}
+      </nav>
+      <nav className="mt-6">
+        <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2 px-2">
+          Account
+        </h3>
+        {renderMenuItems(accountMenuItems)}
       </nav>
     </>
   );
