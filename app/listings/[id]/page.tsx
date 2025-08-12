@@ -13,12 +13,16 @@ import ImageGallery from '@/components/ImageGallery';
 import BookingSidebar from '@/components/BookingSidebar';
 import ContentTabs from '@/components/ContentTabs';
 
-export default async function ListingDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const listing = await getListingById(params.id);
+// Define the expected params type
+type PageProps = {
+  params: Promise<{ id: string }>; // Update to account for Promise
+};
+
+export default async function ListingDetailPage({ params }: PageProps) {
+  // Resolve the params Promise to get the id
+  const { id } = await params;
+
+  const listing = await getListingById(id);
 
   if (!listing) {
     notFound();
