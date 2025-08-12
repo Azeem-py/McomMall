@@ -14,14 +14,26 @@ import {
 } from '@/components/ui/select';
 import { List, LayoutGrid, SlidersHorizontal } from 'lucide-react';
 import { categories, listings } from '@/lib/listing-data';
-import FilterSidebar from '@/components/FilterSidebar';
+import FilterSidebar, { type FilterState } from '@/components/FilterSidebar';
 import CategoryFilter from '@/components/CategoryFilter';
 import ListingCard from '@/components/listingCard';
 
+const initialFilters: FilterState = {
+  searchTerm: '',
+  category: 'all',
+  location: '',
+  radius: 100,
+  priceRange: [0, 1000],
+};
+
 export default function DirectoryPage() {
-  const [filtersVisible, setFiltersVisible] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  // The sidebar is off by default
+  const [filtersVisible, setFiltersVisible] = useState(false);
+
   const [currentPage, setCurrentPage] = useState(1);
+  const [activeFilters, setActiveFilters] =
+    useState<FilterState>(initialFilters);
+  const [selectedCategory, setSelectedCategory] = useState('All');
   const listingsPerPage = 4;
 
   const MapComponent = useMemo(
@@ -35,10 +47,37 @@ export default function DirectoryPage() {
     []
   );
 
+  const handleFilterChange = (newFilters: FilterState) => {
+    setActiveFilters(newFilters);
+    setCurrentPage(1);
+  };
+
   const filteredListings = useMemo(() => {
-    if (selectedCategory === 'All') return listings;
-    return listings.filter(l => l.category === selectedCategory);
-  }, [selectedCategory]);
+    return listings.filter(listing => {
+      if (selectedCategory !== 'All' && listing.category !== selectedCategory)
+        return false;
+      if (
+        activeFilters.searchTerm &&
+        !listing.title
+          .toLowerCase()
+          .includes(activeFilters.searchTerm.toLowerCase())
+      )
+        return false;
+      if (
+        activeFilters.category !== 'all' &&
+        listing.category.toLowerCase() !== activeFilters.category.toLowerCase()
+      )
+        return false;
+      if (
+        activeFilters.location &&
+        !listing.location
+          .toLowerCase()
+          .includes(activeFilters.location.toLowerCase())
+      )
+        return false;
+      return true;
+    });
+  }, [selectedCategory, activeFilters]);
 
   const totalPages = Math.ceil(filteredListings.length / listingsPerPage);
   const paginatedListings = filteredListings.slice(
@@ -48,7 +87,6 @@ export default function DirectoryPage() {
 
   return (
     <div className="flex h-screen bg-white overflow-hidden">
-      {/* Animated Filter Sidebar */}
       <AnimatePresence>
         {filtersVisible && (
           <motion.div
@@ -56,15 +94,20 @@ export default function DirectoryPage() {
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: '-100%', opacity: 0 }}
             transition={{ duration: 0.3, ease: 'easeInOut' }}
-            className="w-full md:w-80 h-full flex-shrink-0"
+            // This className is key:
+            // - `fixed inset-0 z-40`: Makes it a full-screen overlay on mobile.
+            // - `md:relative md:w-80 ...`: Makes it a normal sidebar on desktop.
+            className="fixed inset-0 z-40 md:relative md:w-80 md:h-full md:flex-shrink-0"
           >
-            <FilterSidebar />
+            <FilterSidebar
+              onFilterChange={handleFilterChange}
+              onClose={() => setFiltersVisible(false)}
+            />
           </motion.div>
         )}
       </AnimatePresence>
 
       <main className="flex-1 flex flex-col">
-        {/* Top Controls */}
         <div className="flex-shrink-0 p-4 border-b bg-white z-10">
           <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
             <div className="flex items-center gap-2">
@@ -97,11 +140,13 @@ export default function DirectoryPage() {
           </div>
           <CategoryFilter
             categories={categories}
-            onCategoryChange={setSelectedCategory}
+            onCategoryChange={category => {
+              setSelectedCategory(category);
+              setCurrentPage(1);
+            }}
           />
         </div>
 
-        {/* Content Area */}
         <div className="flex-1 flex overflow-hidden">
           <div className="flex-1 p-4 overflow-y-auto">
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
@@ -109,8 +154,6 @@ export default function DirectoryPage() {
                 <ListingCard key={listing.id} listing={listing} />
               ))}
             </div>
-
-            {/* Numbered Pagination */}
             <div className="flex justify-center items-center mt-8 space-x-2">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
                 <Button

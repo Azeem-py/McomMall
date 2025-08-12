@@ -7,7 +7,6 @@ import {
   MenubarMenu,
   MenubarRadioGroup,
   MenubarRadioItem,
-  MenubarSeparator,
   MenubarTrigger,
 } from '@/components/ui/menubar';
 import Link from 'next/link';
@@ -34,7 +33,7 @@ export function NavMenu() {
           <MenubarTrigger>Listings</MenubarTrigger>
           <MenubarContent>
             <MenubarItem>
-              <Link href={'/claim-listing'}>Claim listing</Link>
+              <Link href={'/listings'}>Claim listing</Link>
             </MenubarItem>
             <MenubarItem>Create new listing</MenubarItem>
           </MenubarContent>
