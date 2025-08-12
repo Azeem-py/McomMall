@@ -29,15 +29,15 @@ export default function DashboardLayout({
   return (
     <section className="flex w-screen h-screen overflow-hidden bg-[#F6F6F6]">
       {/* --- DESKTOP SIDEBAR (Left) --- */}
-      <div className="hidden md:block w-[18rem] p-5">
+      <div className="hidden md:block w-[19rem] p-5">
         <div className="flex flex-col h-full">
-          <Link href="/" className="flex items-center space-x-2 mb-5">
+          <Link href="/" className="flex items-center space-x-2 mb-5 h-[5rem]">
             <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
               <span className="text-white font-bold text-sm">M</span>
             </div>
             <span className="text-3xl font-semibold">McomMall</span>
           </Link>
-          <div className="flex-grow">
+          <div className="flex-grow h-calc[(100vh-5rem)] overflow-y-auto">
             <SideMenu />
           </div>
         </div>

@@ -22,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${raleway.variable} antialiased`}>
+      <body className={`${raleway.variable} antialiased overflow-hidden`}>
         <ClientProviders>{children}</ClientProviders>
         <Toaster />
       </body>
