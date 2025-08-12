@@ -1,80 +1,138 @@
+// app/page.tsx
 'use client';
 
+import { useState, useMemo } from 'react';
+import dynamic from 'next/dynamic';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { List, LayoutGrid, SlidersHorizontal } from 'lucide-react';
+import { categories, listings } from '@/lib/listing-data';
+import FilterSidebar from '@/components/FilterSidebar';
 import CategoryFilter from '@/components/CategoryFilter';
 import ListingCard from '@/components/listingCard';
-import dynamic from 'next/dynamic';
-import React from 'react';
 
-const MapComponent = dynamic(() => import('@/components/map'), { ssr: false });
+export default function DirectoryPage() {
+  const [filtersVisible, setFiltersVisible] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [currentPage, setCurrentPage] = useState(1);
+  const listingsPerPage = 4;
 
-interface Listing {
-  imageUrl: string;
-  name: string;
-  location: string;
-  category: string;
-  price: number;
-  rating: number;
-  reviews: number;
-}
+  const MapComponent = useMemo(
+    () =>
+      dynamic(() => import('@/components/MapComponent'), {
+        loading: () => (
+          <div className="bg-gray-200 w-full h-full animate-pulse" />
+        ),
+        ssr: false,
+      }),
+    []
+  );
 
-const Page = () => {
-  const dummyData: Listing[] = [
-    {
-      imageUrl:
-        'https://listeo.pro/wp-content/uploads/2021/10/4002886-520x397.jpg',
-      name: 'George Burton - Life Coach',
-      location: 'Ocean Avenue, New York',
-      category: 'Business Coach, Coaching, Life Coach',
-      price: 100,
-      rating: 3.8,
-      reviews: 38,
-    },
-    {
-      imageUrl:
-        'https://listeo.pro/wp-content/uploads/2021/10/4002886-520x397.jpg',
-      name: 'Jane Doe - Career Coach',
-      location: 'Main Street, Los Angeles',
-      category: 'Career Coaching',
-      price: 120,
-      rating: 4.2,
-      reviews: 25,
-    },
-    {
-      imageUrl:
-        'https://listeo.pro/wp-content/uploads/2021/10/4002886-520x397.jpg',
-      name: 'John Smith - Fitness Coach',
-      location: 'Park Avenue, Chicago',
-      category: 'Fitness Coach, Coaching',
-      price: 80,
-      rating: 4.5,
-      reviews: 15,
-    },
-  ];
+  const filteredListings = useMemo(() => {
+    if (selectedCategory === 'All') return listings;
+    return listings.filter(l => l.category === selectedCategory);
+  }, [selectedCategory]);
+
+  const totalPages = Math.ceil(filteredListings.length / listingsPerPage);
+  const paginatedListings = filteredListings.slice(
+    (currentPage - 1) * listingsPerPage,
+    currentPage * listingsPerPage
+  );
 
   return (
-    <div className="flex w-screen h-[calc(100vh-64px)]">
-      <section className="h-full w-full overflow-auto py-3 px-1">
-        <CategoryFilter />
-        {dummyData.map((item, index) => (
-          <div key={index} className="mb-5">
-            <ListingCard
-              imageUrl={item.imageUrl}
-              name={item.name}
-              location={item.location}
-              category={item.category}
-              price={item.price}
-              rating={item.rating}
-              reviews={item.reviews}
-            />
+    <div className="flex h-screen bg-white overflow-hidden">
+      {/* Animated Filter Sidebar */}
+      <AnimatePresence>
+        {filtersVisible && (
+          <motion.div
+            initial={{ x: '-100%', opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: '-100%', opacity: 0 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            className="w-full md:w-80 h-full flex-shrink-0"
+          >
+            <FilterSidebar />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <main className="flex-1 flex flex-col">
+        {/* Top Controls */}
+        <div className="flex-shrink-0 p-4 border-b bg-white z-10">
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={() => setFiltersVisible(!filtersVisible)}
+                className="bg-red-500 text-white hover:bg-red-600"
+              >
+                <SlidersHorizontal className="mr-2 h-4 w-4" />
+                {filtersVisible ? 'Hide Filters' : 'Show Filters'}
+              </Button>
+              <div className="hidden md:flex items-center border rounded-md">
+                <Button variant="ghost" size="icon">
+                  <LayoutGrid className="h-5 w-5 text-gray-400" />
+                </Button>
+                <Button variant="ghost" size="icon" className="bg-gray-100">
+                  <List className="h-5 w-5 text-red-500" />
+                </Button>
+              </div>
+            </div>
+            <Select defaultValue="newest">
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">Newest Listings</SelectItem>
+                <SelectItem value="popular">Most Popular</SelectItem>
+                <SelectItem value="rating">Highest Rated</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-        ))}
-      </section>
-      <section className="overflow-auto h-full w-full">
-        <MapComponent />
-      </section>
-      {/* <section className="border border-black">section 2</section> */}
+          <CategoryFilter
+            categories={categories}
+            onCategoryChange={setSelectedCategory}
+          />
+        </div>
+
+        {/* Content Area */}
+        <div className="flex-1 flex overflow-hidden">
+          <div className="flex-1 p-4 overflow-y-auto">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+              {paginatedListings.map(listing => (
+                <ListingCard key={listing.id} listing={listing} />
+              ))}
+            </div>
+
+            {/* Numbered Pagination */}
+            <div className="flex justify-center items-center mt-8 space-x-2">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                <Button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  size="icon"
+                  className={
+                    currentPage === page
+                      ? 'bg-red-500 text-white hover:bg-red-600'
+                      : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'
+                  }
+                >
+                  {page}
+                </Button>
+              ))}
+            </div>
+          </div>
+          <div className="w-1/3 h-full flex-shrink-0 hidden lg:block">
+            <MapComponent listings={filteredListings} />
+          </div>
+        </div>
+      </main>
     </div>
   );
-};
-
-export default Page;
+}
