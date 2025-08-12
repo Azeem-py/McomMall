@@ -15,7 +15,9 @@ import {
   ShoppingBag,
   SquareDashedKanban,
   Settings,
-  LucideIcon, // Import the type for the icon
+  LucideIcon,
+  UserPen,
+  LogOut, // Import the type for the icon
 } from 'lucide-react';
 
 // Define a reusable type for menu items
@@ -108,4 +110,9 @@ export const businessCategories = [
     title: 'Education and training',
     items: ['Tutors', 'Courses', 'Workshops'],
   },
+];
+
+export const accountMenuItems: MenuItem[] = [
+  { title: 'My Profile', href: '/dashboard/my-profile', icon: UserPen },
+  { title: 'Logout', href: '/', icon: LogOut },
 ];

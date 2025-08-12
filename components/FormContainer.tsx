@@ -2,10 +2,9 @@ import { FileUser, LucideIcon } from 'lucide-react';
 import React, { ChangeEvent, useState } from 'react';
 import { InputComponent } from './Input';
 
-// Reusable FormHeader component
 interface FormHeaderProps {
   title: string;
-  icon: LucideIcon; // Dynamic icon prop
+  icon: LucideIcon;
 }
 
 export const FormHeader: React.FC<FormHeaderProps> = ({
