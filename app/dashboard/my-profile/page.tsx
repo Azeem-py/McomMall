@@ -14,8 +14,6 @@ import {
 import React, { useState, useRef, ChangeEvent, FormEvent } from 'react';
 import Image from 'next/image';
 
-// --- Component Props and Type Definitions ---
-
 type SocialPlatform =
   | 'Twitter'
   | 'Facebook'

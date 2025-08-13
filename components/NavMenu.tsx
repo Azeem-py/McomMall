@@ -259,7 +259,7 @@ export function NavMenu() {
 
   // --- Desktop Menu ---
   const DesktopMenu = () => (
-    <nav className="hidden items-center space-x-2 md:flex">
+    <nav className="hidden items-center space-x-2 md:flex bg-slate-800">
       {menuItems.map((item, index) => (
         <div
           key={item.title}

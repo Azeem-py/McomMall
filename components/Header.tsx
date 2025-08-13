@@ -7,8 +7,15 @@ import { Badge } from '@/components/ui/badge';
 import { ShoppingCart, User } from 'lucide-react';
 import Auth from './auth';
 import { NavMenu } from './NavMenu';
+import { usePathname } from 'next/navigation';
 
 export default function Header() {
+  const pathname = usePathname();
+
+  if (pathname.startsWith('/dashboard')) {
+    return null;
+  }
+
   return (
     <header className="bg-slate-800 text-white">
       <div className="container mx-auto px-4">

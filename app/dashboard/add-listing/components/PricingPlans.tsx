@@ -1,137 +1,282 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+// app/pricing/page.tsx
 
-// Define the shape of a single plan
-interface Plan {
+'use client';
+
+import { useState, useEffect } from 'react';
+import type { NextPage } from 'next';
+import { Check, ChevronDown } from 'lucide-react';
+
+// --- TYPE DEFINITIONS ---
+// Defines the structure for a single benefit item
+interface Benefit {
+  text: string;
+}
+
+// Defines a group of benefits, often under a subtitle
+interface BenefitGroup {
   title: string;
-  price: string;
-  features: string[];
-  isBestValue?: boolean;
+  benefits: Benefit[];
 }
 
-// Define the props for PricingPlans component
-interface PricingPlansProps {
-  plans: Plan[];
-  selectedPlan: string | null;
-  setSelectedPlan: (plan: string) => void; // Updated to match the handlePlanSelection function
+// Defines the overall structure for a pricing plan
+interface Plan {
+  id: 'PAYG' | 'COBRANDED';
+  name: string;
+  tierType: string;
+  description: string;
+  benefitGroups: BenefitGroup[];
 }
 
+// --- DATA ---
+// An array containing the details for the two plans
 const plans: Plan[] = [
   {
-    title: 'Basic',
-    price: '$4.99',
-    features: [
-      'Includes 1 listing',
-      'Listings are visible for 30 days',
-      'Booking Module enabled',
-      'Reviews Module enabled',
-      'Social Links Module enabled',
-      'Gallery Module enabled',
+    id: 'PAYG',
+    name: 'PAY-AS-YOU-GO (PAYG) BUSINESS OWNER',
+    tierType: 'Lowest tier, seasonal package: 90, 180, or 270 days',
+    description:
+      'Basic Access to MCOM Ecosystem – Limited to services in the purchased seasonal package (Winter, Spring, Summer, Autumn).',
+    benefitGroups: [
+      {
+        title: 'Benefits & Access',
+        benefits: [
+          {
+            text: 'External Evergreen Reward Programme QR Code – One code for the main store; additional codes can be purchased.',
+          },
+          {
+            text: 'Directory Listing – Business listing on 247GBS Business Directories & MCOM Lead Traffic Hub.',
+          },
+          {
+            text: 'MCOM Wallet Access – Limited features for payment acceptance & reward credits.',
+          },
+          {
+            text: 'Seasonal Campaign Participation – Eligible to join network-wide promotions.',
+          },
+          {
+            text: 'Spare Capacity & Stock Audit Tool – Use to identify excess stock and create simple offers.',
+          },
+          {
+            text: 'Basic Consumer Rewards – Offer rewards via the Evergreen Programme (run by 247GBS, not customisable).',
+          },
+          {
+            text: '7-day, 15-day, or 21-day Challenges – Opportunity to earn credits to reduce future subscription costs.',
+          },
+          {
+            text: 'Referral Credits – Limited ability to refer other businesses and earn credits.',
+          },
+          {
+            text: 'Access to Smart Money Solutions – Limited package (VoIP, POS devices, Elavon payment solutions).',
+          },
+          {
+            text: 'Marketing Exposure – Inclusion in seasonal directory promotions.',
+          },
+        ],
+      },
     ],
   },
   {
-    title: 'Extended',
-    price: '$9.99',
-    isBestValue: true,
-    features: [
-      'Includes 3 listings',
-      'Unlimited availability of listings',
-      'Booking Module enabled',
-      'Reviews Module enabled',
-      'Social Links Module enabled',
-      'Opening Hours Module enabled',
-      'Video option enabled',
-      'Coupons option enabled',
-      'Gallery Module enabled',
-    ],
-  },
-  {
-    title: 'Professional',
-    price: '$29.99',
-    features: [
-      'Unlimited number of listings',
-      'Unlimited availability of listings',
-      'Booking Module enabled',
-      'Reviews Module enabled',
-      'Social Links Module enabled',
-      'Opening Hours Module enabled',
-      'Video option enabled',
-      'Coupons option enabled',
-      'Gallery Module enabled',
+    id: 'COBRANDED',
+    name: 'CO-BRANDED BUSINESS OWNER',
+    tierType: 'Highest tier – Standard, Pro, or Plus',
+    description:
+      'With the Plus sub-tier, all features are activated, providing comprehensive access and control.',
+    benefitGroups: [
+      {
+        title: 'Core Co-Branded Access (All Tiers)',
+        benefits: [
+          {
+            text: 'All PAYG Benefits – Full access without seasonal limitation.',
+          },
+          {
+            text: 'Customisable Rewards & Loyalty Program – Internal loyalty program setup.',
+          },
+          {
+            text: 'White-Label Branding – Loyalty cards, eGift cards, and marketing materials in your own brand.',
+          },
+          {
+            text: 'Multiple QR Codes – For multiple branches, departments, or partner locations.',
+          },
+          {
+            text: 'Cross-Selling Network Access – Sell other businesses’ products via your loyalty system.',
+          },
+          {
+            text: 'Full Dashboard Access – Advanced analytics, customer insights, and management tools.',
+          },
+          {
+            text: 'eGift Card Creation & Sale – Create and sell pre-purchased physical or digital cards.',
+          },
+          {
+            text: 'Integration with MCOMECARD – Load rewards and cashback directly onto the consumer’s card.',
+          },
+          {
+            text: 'Run Independent Campaigns – Market and advertise with or without 247GBS support.',
+          },
+          {
+            text: 'Product & Service Sales Rights – Sell 247GBS products independently or as a licensed agent.',
+          },
+        ],
+      },
+      {
+        title: 'Extra for Co-Branded Pro',
+        benefits: [
+          {
+            text: 'Priority Marketing Campaigns – Access to 247GBS traffic leads and campaign packages.',
+          },
+          {
+            text: 'Advanced Stock Audit Integration – AI-powered DealMachine integration.',
+          },
+          {
+            text: 'Hyper-Local Partnerships – Partner with local stalls, events, and services for joint loyalty programs.',
+          },
+        ],
+      },
+      {
+        title: 'Extra for Co-Branded Plus (Full Access)',
+        benefits: [
+          { text: 'All Features Activated – No restrictions.' },
+          {
+            text: 'Hyper Local Hub Partnership Eligibility – Bid to run physical MCOM Hyper Local Support Hubs.',
+          },
+          {
+            text: 'Complete Automation – Seasonal preset campaigns auto-activated.',
+          },
+          {
+            text: 'National & Regional Campaign Control – Lead and manage campaigns in assigned territories.',
+          },
+          {
+            text: 'Unlimited Consumer Rewards – No cap on loyalty members or rewards.',
+          },
+          {
+            text: 'AI & BOT Marketing Automation – Seasonal templates and predictive consumer offers.',
+          },
+        ],
+      },
     ],
   },
 ];
 
-export const PricingPlans: React.FC<PricingPlansProps> = ({
-  plans,
-  selectedPlan,
-  setSelectedPlan,
-}) => {
+const ListingCategory: NextPage = () => {
+  const [selectedPlan, setSelectedPlan] = useState<Plan['id'] | null>(null);
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    const initialOpenState: Record<string, boolean> = {};
+    if (plans.length > 0 && plans[0].benefitGroups.length > 0) {
+      const firstSectionId = `${plans[0].id}-${plans[0].benefitGroups[0].title}`;
+      initialOpenState[firstSectionId] = true;
+    }
+    setOpenSections(initialOpenState);
+  }, []);
+
+  const handleSelectPlan = (planId: Plan['id']) => {
+    setSelectedPlan(planId);
+  };
+
+  const handleToggleSection = (sectionId: string) => {
+    setOpenSections(prevState => ({
+      ...prevState,
+      [sectionId]: !prevState[sectionId],
+    }));
+  };
+
+  // const handleContinue = () => {
+  //   if (selectedPlan) {
+  //     console.log(`Continue button clicked. Selected plan: ${selectedPlan}`);
+  //   }
+  // };
+
   return (
-    <div className="grid md:grid-cols-3 gap-6 p-6">
-      {plans.map((plan, index) => (
-        <div
-          key={index}
-          className={`border rounded-lg shadow-md p-6 flex flex-col justify-between ${
-            plan.isBestValue ? 'border-red-500' : 'border-gray-300'
-          }`}
-        >
-          <div>
-            <div className="w-full flex items-center justify-between mb-2">
-              <h2 className="text-xl font-semibold">{plan.title}</h2>
-              {plan.isBestValue && (
-                <div className="text-red-500 font-semibold rounded-2xl bg-white px-3 py-2">
-                  Best Value
+    <div className="bg-gray-50 min-h-screen font-sans text-gray-700">
+      <div className="container mx-auto px-4 py-8 sm:py-16">
+        <header className="text-center mb-12">
+          <h1 className="text-4xl sm:text-5xl font-bold text-gray-800">
+            Choose Your Plan
+          </h1>
+          <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+            Select a package to unlock benefits and grow your business with our
+            ecosystem.
+          </p>
+        </header>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+          {plans.map(plan => (
+            <div
+              key={plan.id}
+              className={`bg-white rounded-xl shadow-lg p-6 sm:p-8 border-2 transition-all duration-300 cursor-pointer h-full flex flex-col hover:shadow-2xl hover:-translate-y-2 ${
+                selectedPlan === plan.id
+                  ? 'border-red-500 ring-2 ring-red-500/50'
+                  : 'border-transparent'
+              }`}
+              onClick={() => handleSelectPlan(plan.id)}
+            >
+              <div className="flex-grow">
+                <div className="mb-6">
+                  <h2 className="text-2xl font-semibold text-gray-900">
+                    {plan.name}
+                  </h2>
+                  <p className="text-sm text-gray-500 mt-1">{plan.tierType}</p>
                 </div>
-              )}
+                <p className="text-gray-600 pb-6 border-b border-gray-200">
+                  {plan.description}
+                </p>
+
+                <div className="space-y-1 mt-6">
+                  {plan.benefitGroups.map(group => {
+                    const sectionId = `${plan.id}-${group.title}`;
+                    const isSectionOpen = !!openSections[sectionId];
+                    return (
+                      <div key={group.title} className="border-b">
+                        <h3
+                          className="text-lg font-semibold text-gray-800 flex justify-between items-center cursor-pointer select-none py-4"
+                          onClick={e => {
+                            e.stopPropagation();
+                            handleToggleSection(sectionId);
+                          }}
+                        >
+                          <span>{group.title}</span>
+                          <ChevronDown
+                            className={`transition-transform duration-300 ${
+                              isSectionOpen ? 'rotate-180' : ''
+                            }`}
+                          />
+                        </h3>
+                        {isSectionOpen && (
+                          <ul className="pb-4 space-y-3 pl-1">
+                            {group.benefits.map((benefit, index) => (
+                              <li
+                                key={index}
+                                className="flex items-start gap-3"
+                              >
+                                <Check className="h-5 w-5 flex-shrink-0 text-green-500 mt-1" />
+                                <span className="text-gray-600">
+                                  {benefit.text}
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
-            <p className="text-3xl text-center w-full py-3 bg-gray-100 rounded-md font-semibold mb-4">
-              {plan.price}
-            </p>
-            <p className="text-lg text-black font-medium mb-4">
-              Basic Features
-            </p>
-            <ul className="list-disc list-inside text-sm mb-6 space-y-1 flex flex-col gap-3 text-gray-600">
-              {plan.features.map((feature, i) => (
-                <li key={i}>{feature}</li>
-              ))}
-            </ul>
-          </div>
-          <motion.button
-            className={`mt-auto py-3 px-4 rounded-2xl text-black border ${
-              selectedPlan === plan.title
-                ? plan.isBestValue
-                  ? 'bg-red-600 text-white border-red-500'
-                  : 'bg-blue-700 text-white border-blue-600'
-                : plan.isBestValue
-                ? 'border-red-500 hover:bg-red-600 hover:text-white'
-                : 'border-blue-600 hover:bg-blue-700 hover:text-white'
-            }`}
-            aria-label={`Select ${plan.title} Package`}
-            onClick={() => setSelectedPlan(plan.title)}
-            whileHover={{
-              scale: 1.05,
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-            }}
-            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-          >
-            {selectedPlan === plan.title ? 'Selected' : 'Select This Package'}
-          </motion.button>
+          ))}
         </div>
-      ))}
+
+        {/* {selectedPlan && (
+          <div className="mt-12 text-center">
+            <button
+              className="bg-gray-800 text-white font-bold text-lg py-3 px-10 rounded-lg shadow-md hover:bg-gray-900 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-gray-800/50"
+              onClick={handleContinue}
+            >
+              Continue
+            </button>
+          </div>
+        )} */}
+      </div>
     </div>
   );
 };
 
-export const PricingPlan: React.FC<{
-  selectedPlan: string | null;
-  setSelectedPlan: (plan: string) => void; // Updated to match the handlePlanSelection function
-}> = ({ selectedPlan, setSelectedPlan }) => {
-  return (
-    <PricingPlans
-      plans={plans}
-      selectedPlan={selectedPlan}
-      setSelectedPlan={setSelectedPlan}
-    />
-  );
-};
+export default ListingCategory;
