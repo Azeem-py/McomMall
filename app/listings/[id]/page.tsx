@@ -12,6 +12,7 @@ import {
 import ImageGallery from '@/components/ImageGallery';
 import BookingSidebar from '@/components/BookingSidebar';
 import ContentTabs from '@/components/ContentTabs';
+import { ClaimBusinessModal } from '@/components/ClaimBusinessModal';
 
 // Define the expected params type
 type PageProps = {
@@ -68,25 +69,7 @@ export default async function ListingDetailPage({ params }: PageProps) {
                   </span>
                 </div>
               ) : (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="border-yellow-500 text-yellow-600 hover:bg-yellow-50 hover:text-yellow-700"
-                      >
-                        <AlertTriangle className="mr-2 h-4 w-4" />
-                        Not Verified - Claim Listing
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>
-                        This listing has not been verified. Claim it to add more
-                        details.
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                <ClaimBusinessModal />
               )}
             </div>
           </div>
