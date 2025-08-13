@@ -1,81 +1,124 @@
 // components/NavMenu.tsx
 
-import {
-  Menubar,
-  MenubarContent,
-  MenubarItem,
-  MenubarMenu,
-  MenubarRadioGroup,
-  MenubarRadioItem,
-  MenubarTrigger,
-} from '@/components/ui/menubar';
+'use client';
+
+import * as React from 'react';
 import Link from 'next/link';
-import { businessCategories } from '@/lib/menu-items'; // Import the data
+import { cn } from '@/lib/utils'; // Make sure you have this utility from shadcn/ui
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from '@/components/ui/navigation-menu';
+import { businessCategories } from '@/lib/menu-items'; // Your data import remains the same
 
 export function NavMenu() {
   return (
     // This div hides the component on mobile and shows it on medium screens and up
     <div className="hidden md:flex">
-      <Menubar className="gap-7 bg-transparent border-0 h-[5rem] rounded-none md:pl-4">
-        {/* Home */}
-        <MenubarMenu>
-          <MenubarTrigger>Home</MenubarTrigger>
-          <MenubarContent>
-            <MenubarItem>Winter</MenubarItem>
-            <MenubarItem>Spring</MenubarItem>
-            <MenubarItem>Summer</MenubarItem>
-            <MenubarItem>Autumn</MenubarItem>
-          </MenubarContent>
-        </MenubarMenu>
+      <NavigationMenu>
+        <NavigationMenuList>
+          {/* Home */}
+          <NavigationMenuItem>
+            <NavigationMenuTrigger className="bg-transparent">
+              Home
+            </NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <ul className="grid w-[400px] gap-3 p-4 md:w-[200px] lg:w-[300px]">
+                <ListItem href="/home/winter" title="Winter">
+                  Seasonal specials and winter collections.
+                </ListItem>
+                <ListItem href="/home/spring" title="Spring">
+                  Fresh arrivals for the spring season.
+                </ListItem>
+                <ListItem href="/home/summer" title="Summer">
+                  Explore our summer sales and new items.
+                </ListItem>
+              </ul>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
 
-        {/* Listings */}
-        <MenubarMenu>
-          <MenubarTrigger>Listings</MenubarTrigger>
-          <MenubarContent>
-            <MenubarItem>
-              <Link href={'/listings'}>Claim listing</Link>
-            </MenubarItem>
-            <MenubarItem>Create new listing</MenubarItem>
-          </MenubarContent>
-        </MenubarMenu>
-
-        {/* Business Category */}
-        <MenubarMenu>
-          <MenubarTrigger>Business Category</MenubarTrigger>
-          <MenubarContent align="center">
-            <MenubarItem className="flex justify-items-start items-start gap-5 bg-white hover:bg-white focus:bg-white">
-              {businessCategories.map((category, i) => (
-                <div key={i} className="font-normal text-gray-700">
-                  <h3 className="font-medium text-lg mb-2.5">
-                    {category.title}
-                  </h3>
-                  {category.items.map((item, j) => (
-                    <ul key={j}>
-                      <li>
-                        <Link href="/" className="hover:text-red-500">
-                          {item}
-                        </Link>
-                      </li>
+          {/* Business Category (Mega Menu) */}
+          <NavigationMenuItem>
+            <NavigationMenuTrigger className="bg-transparent">
+              Business Category
+            </NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <div className="grid w-[400px] grid-cols-2 gap-5 p-4 md:w-[600px] lg:w-[700px]">
+                {businessCategories.map(category => (
+                  <div key={category.title}>
+                    <h3 className="mb-2.5 font-medium text-lg text-slate-900">
+                      {category.title}
+                    </h3>
+                    <ul>
+                      {category.items.map(item => (
+                        <li key={item}>
+                          <ListItem
+                            href={`/categories/${item
+                              .toLowerCase()
+                              .replace(' ', '-')}`}
+                            title={item}
+                          >
+                            {/* You can add a description here if needed */}
+                          </ListItem>
+                        </li>
+                      ))}
                     </ul>
-                  ))}
-                </div>
-              ))}
-            </MenubarItem>
-          </MenubarContent>
-        </MenubarMenu>
+                  </div>
+                ))}
+              </div>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
 
-        {/* Pages */}
-        <MenubarMenu>
-          <MenubarTrigger>Pages</MenubarTrigger>
-          <MenubarContent>
-            <MenubarRadioGroup value="benoit">
-              <MenubarRadioItem value="andy">Andy</MenubarRadioItem>
-              <MenubarRadioItem value="benoit">Benoit</MenubarRadioItem>
-              <MenubarRadioItem value="Luis">Luis</MenubarRadioItem>
-            </MenubarRadioGroup>
-          </MenubarContent>
-        </MenubarMenu>
-      </Menubar>
+          {/* Listings */}
+          <NavigationMenuItem>
+            <NavigationMenuTrigger className="bg-transparent">
+              Listings
+            </NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <ul className="grid w-[400px] gap-3 p-4 md:w-[250px]">
+                <ListItem href="/listings/claim" title="Claim Listing">
+                  Find and claim your business profile.
+                </ListItem>
+                <ListItem href="/listings/new" title="Create New Listing">
+                  Add your business to our directory.
+                </ListItem>
+              </ul>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>
     </div>
   );
 }
+
+// Reusable ListItem component for consistent styling
+const ListItem = React.forwardRef<
+  React.ElementRef<'a'>,
+  React.ComponentPropsWithoutRef<'a'>
+>(({ className, title, children, ...props }, ref) => {
+  return (
+    <li>
+      <NavigationMenuLink asChild>
+        <a
+          ref={ref}
+          className={cn(
+            'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
+            className
+          )}
+          {...props}
+        >
+          <div className="text-sm font-medium leading-none">{title}</div>
+          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+            {children}
+          </p>
+        </a>
+      </NavigationMenuLink>
+    </li>
+  );
+});
+ListItem.displayName = 'ListItem';
