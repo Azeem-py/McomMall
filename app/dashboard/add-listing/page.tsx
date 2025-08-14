@@ -1,7 +1,7 @@
 'use client';
 
 import { ArrowRight } from 'lucide-react';
-import { PricingPlan } from './components/PricingPlans';
+import ListingCategory from './components/PricingPlans';
 import { useState } from 'react';
 import ListingTypeSelector from './components/ListCategory';
 import AddListingForm from '@/components/AddListingForm';
@@ -20,12 +20,12 @@ const Page = () => {
       <h3>Buy New Package</h3>
       {!selectedPlan ? (
         <section>
-          <PricingPlan
-            selectedPlan={selectedPlan}
-            setSelectedPlan={handlePlanSelection}
-          />
+          <ListingCategory />
           <div className="w-full flex items-center justify-center">
-            <button className="flex items-center gap-2 bg-red-500 text-xl py-4 px-5 rounded-4xl text-white">
+            <button
+              className="flex items-center gap-2 bg-red-500 text-xl py-4 px-5 rounded-4xl text-white"
+              onClick={() => handlePlanSelection('housing')}
+            >
               Submit Listing
               <ArrowRight />
             </button>

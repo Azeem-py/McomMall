@@ -45,7 +45,7 @@ export default function DashboardLayout({
 
       {/* --- MAIN CONTENT AREA --- */}
       <main className="flex-1 flex flex-col">
-        <header className="flex items-center justify-between w-full h-20 py-3 px-5 border-b bg-white">
+        <header className="flex items-center justify-between w-full h-20 py-3 px-5 border-b bg-slate-800">
           {/* --- LEFT SIDE: MOBILE MENU TRIGGER (for SideMenu) --- */}
           <div className="md:hidden">
             <Sheet open={isSideMenuOpen} onOpenChange={setIsSideMenuOpen}>

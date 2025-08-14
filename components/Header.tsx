@@ -1,19 +1,21 @@
+// components/Header.tsx (Updated)
 'use client';
 
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button'; // Assuming you still want these ui components
 import { Badge } from '@/components/ui/badge';
-import { Menu, ShoppingCart, User } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { ShoppingCart, User } from 'lucide-react';
 import Auth from './auth';
 import { NavMenu } from './NavMenu';
+import { usePathname } from 'next/navigation';
 
 export default function Header() {
+  const pathname = usePathname();
+
+  if (pathname.startsWith('/dashboard')) {
+    return null;
+  }
+
   return (
     <header className="bg-slate-800 text-white">
       <div className="container mx-auto px-4">
@@ -26,11 +28,13 @@ export default function Header() {
             <span className="text-xl font-semibold">McomMall</span>
           </Link>
 
-          <NavMenu />
+          {/* Desktop Nav - Placed in the middle for better layout */}
+          <div className="hidden md:flex flex-1 items-center justify-center">
+            <NavMenu />
+          </div>
 
           {/* Right Side Actions */}
-          <div className="flex items-center space-x-4">
-            {/* Cart */}
+          <div className="flex items-center space-x-2 md:space-x-4">
             <Button
               variant="ghost"
               size="sm"
@@ -44,31 +48,15 @@ export default function Header() {
                 0
               </Badge>
             </Button>
-
-            {/* Sign In */}
             <Auth>
               <User className="w-4 h-4 mr-2" />
               Sign In
             </Auth>
 
-            {/* Mobile Menu */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="lg:hidden text-white"
-                >
-                  <Menu className="w-5 h-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem>Home</DropdownMenuItem>
-                <DropdownMenuItem>Listings</DropdownMenuItem>
-                <DropdownMenuItem>User Panel</DropdownMenuItem>
-                <DropdownMenuItem>Pages</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {/* Mobile Nav Trigger is now inside NavMenu */}
+            <div className="md:hidden">
+              <NavMenu />
+            </div>
           </div>
         </div>
       </div>
