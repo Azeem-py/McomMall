@@ -14,12 +14,14 @@ import {
 
 interface BookingSidebarProps {
   priceDisplay: string;
+  phoneNumber: string;
   author: { name: string; avatarUrl: string; bio: string };
   isVerified?: boolean;
 }
 
 export default function BookingSidebar({
   priceDisplay,
+  phoneNumber,
   author,
   isVerified,
 }: BookingSidebarProps) {
@@ -76,7 +78,7 @@ export default function BookingSidebar({
           <p className="text-gray-600 mt-4">{author.bio}</p>
           <div className="mt-4 space-y-2 text-sm text-gray-700">
             <p className="flex items-center">
-              <Phone className="mr-2 h-4 w-4 text-gray-400" /> 123456789
+              <Phone className="mr-2 h-4 w-4 text-gray-400" /> {phoneNumber}
             </p>
             <p className="flex items-center">
               <MessageSquare className="mr-2 h-4 w-4 text-gray-400" />{' '}
