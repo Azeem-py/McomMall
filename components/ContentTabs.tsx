@@ -5,6 +5,7 @@ import { ParkingCircle, Briefcase, PawPrint } from 'lucide-react';
 import type { DetailedListing } from '@/lib/listing-data';
 import ReviewsSection from './ReviewSection';
 import LocationSection from './locationSection';
+import { GooglePlaceResult } from '@/service/listings/types';
 
 // You would create more detailed components for each tab
 function OverviewSection({ listing }: { listing: DetailedListing }) {
@@ -32,7 +33,11 @@ function OverviewSection({ listing }: { listing: DetailedListing }) {
   );
 }
 
-export default function ContentTabs({ listing }: { listing: DetailedListing }) {
+export default function ContentTabs({
+  listing,
+}: {
+  listing: GooglePlaceResult;
+}) {
   return (
     <Tabs defaultValue="overview" className="w-full">
       <TabsList className="grid w-full grid-cols-3 md:grid-cols-5 mb-6">
@@ -43,17 +48,20 @@ export default function ContentTabs({ listing }: { listing: DetailedListing }) {
         <TabsTrigger value="reviews">Reviews</TabsTrigger>
       </TabsList>
       <TabsContent value="overview">
-        <OverviewSection listing={listing} />
+        {/* <OverviewSection listing={listing} /> */}
       </TabsContent>
       <TabsContent value="location">
-        <LocationSection listing={listing} />
+        <LocationSection
+          listing={listing.geometry}
+          address={listing.formatted_address || listing.vicinity}
+        />
       </TabsContent>
       <TabsContent value="reviews">
-        <ReviewsSection
+        {/* <ReviewsSection
           reviews={listing.reviews}
           overallRating={listing.rating}
           breakdown={listing.ratingBreakdown}
-        />
+        /> */}
       </TabsContent>
     </Tabs>
   );

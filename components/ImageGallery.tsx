@@ -21,7 +21,7 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
       <div className="h-full hidden md:grid grid-cols-1 grid-rows-2 gap-2">
         <div className="h-full w-full relative">
           <Image
-            src={images[1] || images[0]}
+            src={images[0]}
             alt="Listing image 2"
             layout="fill"
             objectFit="cover"
@@ -29,7 +29,7 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
         </div>
         <div className="h-full w-full relative">
           <Image
-            src={images[2] || images[0]}
+            src={images[0]}
             alt="Listing image 3"
             layout="fill"
             objectFit="cover"

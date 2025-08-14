@@ -1,4 +1,4 @@
-interface Geometry {
+export interface Geometry {
   location: {
     lat: number;
     lng: number;
@@ -49,6 +49,8 @@ export interface GooglePlaceResult {
   types: string[];
   user_ratings_total?: number;
   vicinity: string;
+
+  formatted_address?: string;
 }
 
 export type GooglePlaceResults = GooglePlaceResult[];
