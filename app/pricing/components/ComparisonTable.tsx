@@ -1,15 +1,7 @@
-// components/ui/ComparisonTable.tsx
 'use client';
 
-import { motion } from 'framer-motion';
-import { Info, CheckCircle2, XCircle } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
 import {
   Table,
   TableBody,
@@ -18,155 +10,135 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { Check, X, Info, ChevronDown } from 'lucide-react';
+import { FeatureGroup } from '../types/index';
+import { useState } from 'react';
 
-import type { FeatureCategory, PlanSummary } from '../types';
-
-export interface ComparisonTableProps {
-  plans: PlanSummary[]; // id + name (+ isFeatured)
-  categories: FeatureCategory[];
+interface ComparisonTableProps {
+  plans: string[];
+  featureGroups: FeatureGroup[];
+  accentHeaders: string[];
 }
 
-export function ComparisonTable({ plans, categories }: ComparisonTableProps) {
-  return (
-    <section aria-labelledby="comparison-heading">
-      <div className="mb-6 text-left md:text-center">
-        <h2
-          id="comparison-heading"
-          className="text-2xl font-semibold tracking-tight text-slate-900"
-        >
-          Compare pricing plans
-        </h2>
-        <p className="mt-2 text-slate-600">
-          See what’s included with PAYG and Co-Branded tiers.
-        </p>
-      </div>
-
-      {/* Scroll on small screens with sticky first column */}
-      <div className="overflow-x-auto rounded-2xl border bg-white">
-        <Accordion type="multiple" defaultValue={categories.map(c => c.id)}>
-          {categories.map((category, idx) => (
-            <AccordionItem
-              key={category.id}
-              value={category.id}
-              className="border-b"
-            >
-              <AccordionTrigger className="px-4 py-3 text-left hover:no-underline">
-                <span className="text-base font-medium">{category.label}</span>
-              </AccordionTrigger>
-              <AccordionContent className="p-0">
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.25, delay: idx * 0.03 }}
-                >
-                  <Table className="w-[1000px] min-w-full">
-                    <TableHeader>
-                      <TableRow className="bg-slate-50">
-                        <TableHead className="sticky left-0 z-10 w-80 bg-slate-50 text-slate-700">
-                          Feature
-                        </TableHead>
-                        {plans.map(p => (
-                          <TableHead key={p.id} className="text-slate-700">
-                            <div className="flex items-center justify-center gap-2">
-                              <span className="text-sm md:text-base">
-                                {p.name}
-                              </span>
-                              {p.isFeatured && (
-                                <Badge className="bg-sky-100 text-sky-700">
-                                  Best value
-                                </Badge>
-                              )}
-                            </div>
-                          </TableHead>
-                        ))}
-                      </TableRow>
-                    </TableHeader>
-
-                    <TableBody>
-                      {category.features.map(
-                        (
-                          row: {
-                            id: string;
-                            name: string;
-                            tooltip?: string;
-                            values: Record<
-                              string,
-                              boolean | string | number | undefined
-                            >;
-                          },
-                          rIdx: number
-                        ) => (
-                          <TableRow
-                            key={row.id}
-                            className={
-                              rIdx % 2 === 1 ? 'bg-slate-50/40' : undefined
-                            }
-                          >
-                            <TableCell className="sticky left-0 z-10 w-80 bg-white pr-6 text-slate-800">
-                              <div className="flex items-center gap-2">
-                                <span>{row.name}</span>
-                                {row.tooltip && (
-                                  <TooltipProvider delayDuration={100}>
-                                    <Tooltip>
-                                      <TooltipTrigger
-                                        aria-label={`More info about ${row.name}`}
-                                        className="text-slate-500 hover:text-slate-700"
-                                      >
-                                        <Info className="h-4 w-4" />
-                                      </TooltipTrigger>
-                                      <TooltipContent className="max-w-xs">
-                                        <p className="text-xs">{row.tooltip}</p>
-                                      </TooltipContent>
-                                    </Tooltip>
-                                  </TooltipProvider>
-                                )}
-                              </div>
-                            </TableCell>
-
-                            {plans.map(p => (
-                              <TableCell key={p.id} className="text-center">
-                                <Cell value={row.values[p.id]} />
-                              </TableCell>
-                            ))}
-                          </TableRow>
-                        )
-                      )}
-                    </TableBody>
-                  </Table>
-                </motion.div>
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
-      </div>
-    </section>
+export default function ComparisonTable({
+  plans,
+  featureGroups,
+  accentHeaders,
+}: ComparisonTableProps) {
+  const [openGroups, setOpenGroups] = useState<string[]>(
+    featureGroups.map(g => g.name)
   );
-}
 
-/** Render booleans as icons, otherwise print string/number nicely. */
-function Cell({ value }: { value: boolean | string | number | undefined }) {
-  if (typeof value === 'boolean') {
-    return value ? (
-      <CheckCircle2
-        aria-label="Included"
-        className="mx-auto h-5 w-5 text-sky-600"
-      />
-    ) : (
-      <XCircle
-        aria-label="Not included"
-        className="mx-auto h-5 w-5 text-slate-300"
-      />
+  const toggleGroup = (groupName: string) => {
+    setOpenGroups(prev =>
+      prev.includes(groupName)
+        ? prev.filter(g => g !== groupName)
+        : [...prev, groupName]
     );
-  }
-  if (value === undefined || value === null)
-    return <span className="text-slate-400">—</span>;
-  return <span className="text-sm text-slate-800">{String(value)}</span>;
+  };
+
+  return (
+    <div className="overflow-x-auto scroll-smooth">
+      <Table>
+        <TableHeader className="sticky top-0 bg-blue-50 z-10">
+          <TableRow>
+            <TableHead className="min-w-[300px] font-bold text-blue-900">
+              Feature
+            </TableHead>
+            {plans.map((plan, index) => (
+              <TableHead
+                key={plan}
+                className={`text-center min-w-[150px] font-bold text-${
+                  accentHeaders[index].split('-')[0]
+                }-700 bg-${accentHeaders[index].split('-')[0]}-50`}
+              >
+                {plan}
+              </TableHead>
+            ))}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {featureGroups.map(group => (
+            <>
+              <TableRow
+                key={group.name}
+                className="cursor-pointer bg-blue-50 h-12"
+                onClick={() => toggleGroup(group.name)}
+              >
+                <TableCell
+                  colSpan={plans.length + 1}
+                  className="font-bold text-lg"
+                >
+                  <div className="flex items-center">
+                    {group.name}
+                    <ChevronDown
+                      className={`ml-auto h-5 w-5 transition-transform ${
+                        openGroups.includes(group.name) ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </div>
+                </TableCell>
+              </TableRow>
+              {openGroups.includes(group.name) && (
+                <AnimatePresence>
+                  {group.features.map((feature, index) => (
+                    <motion.tr
+                      key={feature.name}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.2, delay: index * 0.05 }}
+                      className={`h-12 ${
+                        index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                      }`}
+                    >
+                      <TableCell className="font-medium text-base p-4 min-w-[300px]">
+                        <div className="flex items-center">
+                          {feature.name}
+                          {feature.tooltip && (
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Info className="ml-2 h-4 w-4 text-blue-500 cursor-help" />
+                                </TooltipTrigger>
+                                <TooltipContent className="bg-blue-900 text-white">
+                                  <p>{feature.tooltip}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          )}
+                        </div>
+                      </TableCell>
+                      {feature.availability.map((has, idx) => (
+                        <TableCell
+                          key={idx}
+                          className="text-center p-4 min-w-[150px]"
+                        >
+                          {has ? (
+                            <Check
+                              className={`mx-auto h-6 w-6 text-${
+                                accentHeaders[idx].split('-')[0]
+                              }-500`}
+                            />
+                          ) : (
+                            <X className="mx-auto h-6 w-6 text-red-500" />
+                          )}
+                        </TableCell>
+                      ))}
+                    </motion.tr>
+                  ))}
+                </AnimatePresence>
+              )}
+            </>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
 }
