@@ -31,7 +31,9 @@ export default function ClientListingDetail({
   if (isSuccess && listing) {
     if (listing.photos) {
       const { photo_reference } = listing?.photos[0];
-      imgUrl = `http://localhost:3009/api/v1/listings/photo/${photo_reference}`;
+      const API_URL =
+        process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3009/api/v1';
+      imgUrl = `${API_URL}/listings/photo/${photo_reference}`;
     } else {
       imgUrl =
         'https://images.unsplash.com/photo-1543269865-cbf427effbad?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80';
