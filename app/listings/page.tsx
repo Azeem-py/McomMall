@@ -1,7 +1,6 @@
-// app/page.tsx
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -28,11 +27,35 @@ const initialFilters: FilterState = {
 };
 
 export default function DirectoryPage() {
-  const { isLoading, isSuccess, data } = useGetGoogleListings();
+  // Default to Lagos, Nigeria
+  const [coords, setCoords] = useState<{ lat: number; lng: number }>({
+    lat: 6.454075,
+    lng: 3.394673,
+  });
 
-  // The sidebar is off by default
+  // Fetch user's location on mount
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          setCoords({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        },
+        () => {
+          // Keep default Lagos coordinates if permission denied
+        }
+      );
+    }
+  }, []);
+
+  const { isLoading, isSuccess, data } = useGetGoogleListings({
+    lat: coords.lat,
+    lng: coords.lng,
+  });
+
   const [filtersVisible, setFiltersVisible] = useState(false);
-
   const [currentPage, setCurrentPage] = useState(1);
   const [activeFilters, setActiveFilters] =
     useState<FilterState>(initialFilters);
@@ -83,10 +106,6 @@ export default function DirectoryPage() {
   }, [selectedCategory, activeFilters]);
 
   const totalPages = Math.ceil(filteredListings.length / listingsPerPage);
-  const paginatedListings = filteredListings.slice(
-    (currentPage - 1) * listingsPerPage,
-    currentPage * listingsPerPage
-  );
 
   if (isLoading) return <p>Loading...</p>;
 
