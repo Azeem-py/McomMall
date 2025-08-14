@@ -1,28 +1,17 @@
-// types/index.ts
-export interface PlanCardData {
-  planName: string;
-  price: string; // keep string to allow "Let's talk" or "Seasonal"
-  description: string;
+export interface PricingTier {
+  name: string;
+  price: string;
   features: string[];
-  isFeatured?: boolean;
+  accent?: 'teal' | 'purple' | 'yellow';
 }
 
-export interface PlanSummary {
-  id: 'payg' | 'standard' | 'pro' | 'plus';
+export interface TableFeature {
   name: string;
-  isFeatured?: boolean;
-}
-
-export interface FeatureRow {
-  id: string;
-  name: string;
+  availability: boolean[];
   tooltip?: string;
-  // map planId -> either boolean for ✓/✗ or a label/value
-  values: Record<PlanSummary['id'], boolean | string | number>;
 }
 
-export interface FeatureCategory {
-  id: string;
-  label: string;
-  features: FeatureRow[];
+export interface FeatureGroup {
+  name: string;
+  features: TableFeature[];
 }
