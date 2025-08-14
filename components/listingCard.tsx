@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { Amenity, Listing } from '@/lib/listing-data';
 import Link from 'next/link';
+import { GooglePlaceResult } from '@/service/listings/types';
 
 // Helper objects to map amenities to icons and tooltips
 const amenityIcons: Record<Amenity, React.ReactNode> = {
@@ -43,15 +44,30 @@ const amenityTooltips: Record<Amenity, string> = {
   pets: 'Pet Friendly',
 };
 
-export default function ListingCard({ listing }: { listing: Listing }) {
+export default function ListingCard({
+  listing,
+}: {
+  listing: GooglePlaceResult;
+}) {
+  let imgUrl;
+
+  if (listing.photos) {
+    const { photo_reference } = listing?.photos[0];
+    imgUrl = `http://localhost:3009/api/v1/listings/photo/${photo_reference}`;
+  } else {
+    imgUrl =
+      'https://images.unsplash.com/photo-1543269865-cbf427effbad?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80';
+  }
+
+  console.log(listing.photos);
   return (
-    <Link href={`/listings/${listing.id}`} className="block">
+    <Link href={`/listings/${listing.place_id}`} className="block">
       <Card className="w-full overflow-hidden shadow-md border rounded-xl hover:shadow-xl transition-shadow duration-300">
         <div className="relative">
           {/* Category Tag */}
           <div className="absolute top-4 left-4 z-10">
             <span className="px-3 py-1 text-xs text-white bg-red-500 rounded-md">
-              {listing.categoryTag}
+              {listing.types[0]}
             </span>
           </div>
 
@@ -71,8 +87,8 @@ export default function ListingCard({ listing }: { listing: Listing }) {
 
           {/* Listing Image */}
           <Image
-            src={listing.imageUrl}
-            alt={listing.title}
+            src={imgUrl}
+            alt={listing.name}
             width={400}
             height={250}
             className="object-cover w-full h-56"
@@ -82,9 +98,9 @@ export default function ListingCard({ listing }: { listing: Listing }) {
         {/* Card Content */}
         <CardContent className="p-4 bg-white">
           <h3 className="text-lg font-bold truncate text-gray-800">
-            {listing.title}
+            {listing.name}
           </h3>
-          {listing.isVerified && (
+          {false && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
@@ -98,11 +114,11 @@ export default function ListingCard({ listing }: { listing: Listing }) {
           )}
           <div className="flex items-center text-sm text-gray-500 mt-1">
             <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
-            <span className="truncate">{listing.location}</span>
+            <span className="truncate">{listing.vicinity}</span>
           </div>
 
           {/* Amenities */}
-          <div className="flex items-center space-x-3 my-4">
+          {/* <div className="flex items-center space-x-3 my-4">
             <TooltipProvider>
               {listing.amenities.map(amenity => (
                 <Tooltip key={amenity}>
@@ -113,21 +129,21 @@ export default function ListingCard({ listing }: { listing: Listing }) {
                 </Tooltip>
               ))}
             </TooltipProvider>
-          </div>
+          </div> */}
 
           {/* Rating and Price */}
           <div className="flex justify-between items-center pt-3 border-t">
             <div className="flex items-center">
               <Star className="w-5 h-5 text-yellow-400 fill-current" />
               <span className="text-sm font-semibold ml-1">
-                {listing.rating.toFixed(1)}
+                {listing.rating?.toFixed(1)}
               </span>
               <span className="text-sm text-gray-500 ml-1">
-                ({listing.reviewCount})
+                ({listing.user_ratings_total})
               </span>
             </div>
             <p className="text-base font-semibold text-gray-900">
-              {listing.priceDisplay}
+              {listing.price_level}
             </p>
           </div>
         </CardContent>

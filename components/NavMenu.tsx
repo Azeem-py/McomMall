@@ -120,7 +120,7 @@ const menuItems = [
     title: 'Listings',
     content: (
       <div className="w-64 p-4">
-        <ListItem href="/listings/claim" title="Claim Listing">
+        <ListItem href="/listings" title="Claim Listing">
           Find and claim your business profile.
         </ListItem>
         <ListItem href="/listings/new" title="Create New Listing">

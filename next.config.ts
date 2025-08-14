@@ -32,6 +32,11 @@ const nextConfig: NextConfig = {
         hostname: 'ugc.same-assets.com',
         pathname: '/**',
       },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        pathname: '/**',
+      },
     ],
   },
 };
