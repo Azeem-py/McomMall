@@ -51,6 +51,7 @@ export interface GooglePlaceResult {
   vicinity: string;
 
   formatted_address?: string;
+  formatted_phone_number?: string;
 }
 
 export type GooglePlaceResults = GooglePlaceResult[];

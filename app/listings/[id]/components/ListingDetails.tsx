@@ -103,6 +103,7 @@ export default function ClientListingDetail({
             <div className="lg:col-span-1">
               <div className="sticky top-8">
                 <BookingSidebar
+                  phoneNumber={listing.formatted_phone_number || ''}
                   priceDisplay={String(listing?.price_level ?? '')}
                   author={{
                     name: listing?.name ?? '',
