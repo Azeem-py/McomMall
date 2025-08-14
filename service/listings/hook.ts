@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import api from '../api';
-import { GooglePlaceResults } from './types';
+import { GooglePlaceResult, GooglePlaceResults } from './types';
 
 export interface ErrorResponse {
   response?: {
@@ -21,7 +21,7 @@ export const useGetGoogleListings = () => {
       throw new Error(
         err.response?.data?.message ||
           err.message ||
-          'Failed to create user account'
+          'Failed to fetch businesses'
       );
     }
   };
@@ -30,6 +30,28 @@ export const useGetGoogleListings = () => {
     queryFn: fetch,
     queryKey: ['FETCH_GOOGLE_BUSINESSES'],
     refetchOnMount: false,
+  });
+  return query;
+};
+
+export const useGetGoogleListing = ({ place_id }: { place_id: string }) => {
+  const fetch = async () => {
+    try {
+      const response = await api.get(`listings/google-business/${place_id}`);
+      return response.data.result as GooglePlaceResult;
+    } catch (error: unknown) {
+      const err = error as ErrorResponse;
+      throw new Error(
+        err.response?.data?.message || err.message || 'Failed to fetch business'
+      );
+    }
+  };
+
+  const query = useQuery({
+    queryFn: fetch,
+    queryKey: ['FETCH_GOOGLE_BUSINESS', place_id],
+    refetchOnMount: false,
+    staleTime: Infinity,
   });
   return query;
 };

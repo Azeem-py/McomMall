@@ -17,11 +17,7 @@ import { categories, listings } from '@/lib/listing-data';
 import FilterSidebar, { type FilterState } from '@/components/FilterSidebar';
 import CategoryFilter from '@/components/CategoryFilter';
 import ListingCard from '@/components/listingCard';
-import {
-  useGetGoogleListings,
-  useGetPlacePhoto,
-} from '@/service/listings/hook';
-import Image from 'next/image';
+import { useGetGoogleListings } from '@/service/listings/hook';
 
 const initialFilters: FilterState = {
   searchTerm: '',

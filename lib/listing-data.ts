@@ -221,9 +221,7 @@ export const extraDetailedData = {
 // ==================================
 
 // Simulates fetching detailed data for a specific listing ID
-export async function getListingById(
-  id: string
-): Promise<DetailedListing | null> {
+export function getListingById(id: string) {
   const listingId = parseInt(id, 10);
   // Find the basic listing info from our main array
   const baseListing = listings.find(l => l.id === listingId);
