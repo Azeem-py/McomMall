@@ -129,6 +129,10 @@ const menuItems = [
       </div>
     ),
   },
+  {
+    title: 'Pricing',
+    href: '/pricing',
+  },
 ];
 
 // --- Animation Variants ---
