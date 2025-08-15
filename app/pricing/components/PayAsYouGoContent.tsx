@@ -6,8 +6,8 @@ import { PricingTier, TableFeature, FeatureGroup } from '../types/index';
 
 const paygTiers: PricingTier[] = [
   {
-    name: '30 Days',
-    price: '£30',
+    name: '90 Days',
+    price: '£90',
     primaryFeatures: [
       'Basic Access to MCOM Ecosystem – Limited to services in the purchased seasonal package (Winter, Spring, Summer, or Autumn).',
       'External Evergreen Reward Programme QR Code – One QR code for the main store; additional codes can be purchased for other branches or partner locations.',

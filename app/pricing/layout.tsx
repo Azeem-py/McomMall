@@ -10,7 +10,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <section className="w-screen h-[calc(100vh-64px)] bg-gray-100 overflow-hidden">
+    <section className="w-screen h-[calc(100vh-64px)] bg-white overflow-hidden">
       {children}
     </section>
   );
