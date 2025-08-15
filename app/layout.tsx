@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
-import { Raleway } from 'next/font/google';
+import { Open_Sans } from 'next/font/google';
 import 'leaflet/dist/leaflet.css';
 import './globals.css';
 import ClientProviders from '@/components/client-provider';
 import { Toaster } from 'sonner';
 import Header from '@/components/Header';
 
-const raleway = Raleway({
+const opensans = Open_Sans({
   variable: '--font-geist-mono',
   subsets: ['latin'],
 });
@@ -23,7 +23,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${raleway.variable} antialiased `}>
+      <body className={`${opensans.variable} antialiased `}>
         <ClientProviders>
           <Header />
           {children}
