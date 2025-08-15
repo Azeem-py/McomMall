@@ -6,14 +6,16 @@ import { PricingTier, TableFeature, FeatureGroup } from '../types/index';
 
 const paygTiers: PricingTier[] = [
   {
-    name: '30 Days',
-    price: '£30',
-    features: [
+    name: '90 Days',
+    price: '£90',
+    primaryFeatures: [
       'Basic Access to MCOM Ecosystem – Limited to services in the purchased seasonal package (Winter, Spring, Summer, or Autumn).',
       'External Evergreen Reward Programme QR Code – One QR code for the main store; additional codes can be purchased for other branches or partner locations.',
       'Directory Listing – Business listed on 247GBS Business Directories & MCOM Lead Traffic Hub (after claim & verification).',
       'MCOM Wallet Access – Limited features for payment acceptance & reward credits.',
       'Seasonal Campaign Participation – Eligible to join network-wide promotions during your active 30-day season.',
+    ],
+    secondaryFeatures: [
       'Spare Capacity & Stock Audit Tool – Can be used to identify excess stock and create simple offers.',
       'Basic Consumer Rewards – Offer rewards via the Evergreen Programme (managed by 247GBS, not customisable).',
       '7-day, 15-day, or 21-day Challenges – Option to earn credits to reduce future subscription costs.',
@@ -26,18 +28,8 @@ const paygTiers: PricingTier[] = [
   {
     name: '180 Days',
     price: '£150',
-    features: [
-      'Basic Access to MCOM Ecosystem – Limited to services in the purchased seasonal package (Winter, Spring, Summer, or Autumn).',
-      'External Evergreen Reward Programme QR Code – One QR code for the main store; additional codes can be purchased for other branches or partner locations.',
-      'Directory Listing – Business listed on 247GBS Business Directories & MCOM Lead Traffic Hub (after claim & verification).',
-      'MCOM Wallet Access – Limited features for payment acceptance & reward credits.',
-      'Seasonal Campaign Participation – Eligible to join network-wide promotions during your active 30-day season.',
-      'Spare Capacity & Stock Audit Tool – Can be used to identify excess stock and create simple offers.',
-      'Basic Consumer Rewards – Offer rewards via the Evergreen Programme (managed by 247GBS, not customisable).',
-      '7-day, 15-day, or 21-day Challenges – Option to earn credits to reduce future subscription costs.',
-      'Referral Credits – Limited ability to refer other businesses and earn credits.',
-      'Access to Smart Money Solutions – Basic package (VoIP, POS devices, Elavon payment solutions).',
-      'Marketing Exposure – Inclusion in seasonal directory promotions for the active quarter.',
+    inherits: '30 Days',
+    primaryFeatures: [
       'Coverage for two seasonal packages (e.g., Winter + Spring).',
       'Extended marketing exposure in seasonal directory promotions across two seasons.',
     ],
@@ -46,20 +38,8 @@ const paygTiers: PricingTier[] = [
   {
     name: '270 Days',
     price: '£240',
-    features: [
-      'Basic Access to MCOM Ecosystem – Limited to services in the purchased seasonal package (Winter, Spring, Summer, or Autumn).',
-      'External Evergreen Reward Programme QR Code – One QR code for the main store; additional codes can be purchased for other branches or partner locations.',
-      'Directory Listing – Business listed on 247GBS Business Directories & MCOM Lead Traffic Hub (after claim & verification).',
-      'MCOM Wallet Access – Limited features for payment acceptance & reward credits.',
-      'Seasonal Campaign Participation – Eligible to join network-wide promotions during your active 30-day season.',
-      'Spare Capacity & Stock Audit Tool – Can be used to identify excess stock and create simple offers.',
-      'Basic Consumer Rewards – Offer rewards via the Evergreen Programme (managed by 247GBS, not customisable).',
-      '7-day, 15-day, or 21-day Challenges – Option to earn credits to reduce future subscription costs.',
-      'Referral Credits – Limited ability to refer other businesses and earn credits.',
-      'Access to Smart Money Solutions – Basic package (VoIP, POS devices, Elavon payment solutions).',
-      'Marketing Exposure – Inclusion in seasonal directory promotions for the active quarter.',
-      'Coverage for two seasonal packages (e.g., Winter + Spring).',
-      'Extended marketing exposure in seasonal directory promotions across two seasons.',
+    inherits: '180 Days',
+    primaryFeatures: [
       'Coverage for three seasonal packages (e.g., Winter + Spring + Summer).',
       'Extended marketing exposure in seasonal directory promotions across three seasons.',
     ],
@@ -246,8 +226,10 @@ export default function PayAsYouGoContent() {
       <h1 className="text-3xl md:text-4xl font-bold mb-8 text-blue-900">
         Pay As You Go Pricing
       </h1>
-      <TrialInfo />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+      <section className="flex flex-col items-center">
+        <TrialInfo />
+      </section>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 h-fit">
         {paygTiers.map((tier, index) => (
           <motion.div
             key={tier.name}
@@ -256,6 +238,7 @@ export default function PayAsYouGoContent() {
               animate: { opacity: 1, y: 0 },
             }}
             transition={{ delay: index * 0.1 }}
+            className="h-full"
           >
             <PricingCard
               tier={

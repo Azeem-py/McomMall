@@ -48,13 +48,13 @@ export default function ComparisonTable({
       <Table>
         <TableHeader className="sticky top-0 bg-blue-50 z-10">
           <TableRow>
-            <TableHead className="min-w-[300px] font-bold text-blue-900">
-              Feature
+            <TableHead className="text-7xl min-w-[300px] font-bold text-blue-900">
+              Features
             </TableHead>
             {plans.map((plan, index) => (
               <TableHead
                 key={plan}
-                className={`text-center min-w-[150px] font-bold text-${
+                className={`text-center md:text-lg min-w-[150px] font-bold text-${
                   accentHeaders[index].split('-')[0]
                 }-700 bg-${accentHeaders[index].split('-')[0]}-50`}
               >
