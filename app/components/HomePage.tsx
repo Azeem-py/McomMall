@@ -47,9 +47,9 @@ const ScrollAnimatedSection = ({ children }: { children: React.ReactNode }) => {
 // --- Mock Data ---
 const backgroundImages = [
   'https://images.unsplash.com/photo-1558002038-1055907df827?q=80&w=1920&auto-format&fit=crop',
-  'https://images.unsplash.com/photo-1600585154340-be6161a_56a0c?q=80&w=1920&auto-format&fit=crop',
+  'https://images.unsplash.com/photo-1626081062126-d3b192c1fcb0?q=80&w=1176&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?q=80&w=1920&auto-format&fit=crop',
-  'https://images.unsplash.com/photo-1585128993457-b0f079439787?q=80&w=1920&auto-format&fit=crop',
+  'https://images.unsplash.com/photo-1676630444903-163fe485c5d1?q=80&w=1126&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
 ];
 
 const categories = [
@@ -365,7 +365,7 @@ export default function HomePage() {
       setCurrentImageIndex(
         prevIndex => (prevIndex + 1) % backgroundImages.length
       );
-    }, 5000); // Change image every 5 seconds
+    }, 2000); // Change image every 5 seconds
     return () => clearInterval(timer);
   }, []);
 
