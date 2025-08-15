@@ -77,17 +77,28 @@ const coBrandedFeatures: TableFeature[] = [
   {
     name: 'Basic Directory Listing (247 GBS / MCOM Hub)',
     availability: [true, true, true],
+    tooltip: 'Lists your business on key directories for visibility.',
   },
-  { name: 'Claim & Verify Business Listing', availability: [true, true, true] },
+  {
+    name: 'Claim & Verify Business Listing',
+    availability: [true, true, true],
+    tooltip: 'Verify your business to enhance credibility.',
+  },
   {
     name: 'External Evergreen Reward QR Code',
     availability: [true, true, true],
+    tooltip: 'Generates a QR code for customer rewards.',
   },
   {
     name: 'Wallet Overview (Business Dashboard)',
     availability: [true, true, true],
+    tooltip: 'Dashboard for managing payments and credits.',
   },
-  { name: 'Basic eGift / eCard Setup', availability: [true, true, true] },
+  {
+    name: 'Basic eGift / eCard Setup',
+    availability: [true, true, true],
+    tooltip: 'Basic setup for digital gift cards.',
+  },
   {
     name: 'Customer Analytics (Basic)',
     availability: [true, true, true],
@@ -96,39 +107,67 @@ const coBrandedFeatures: TableFeature[] = [
   {
     name: 'Loyalty CardX (Basic Template Access)',
     availability: [true, true, true],
+    tooltip: 'Access to basic loyalty card templates.',
   },
-  { name: 'Cashback Rate Configuration', availability: [true, true, true] },
-  { name: 'Bonus Offers for Spare Stock', availability: [true, true, true] },
-  { name: 'Stock Audit Tool (Basic)', availability: [true, true, true] },
-  { name: 'MCOM Deals (Basic Publishing)', availability: [true, true, true] },
-  { name: 'MCOM SocialBio Profile', availability: [true, true, true] },
+  {
+    name: 'Cashback Rate Configuration',
+    availability: [true, true, true],
+    tooltip: 'Customize cashback rates for customers.',
+  },
+  {
+    name: 'Bonus Offers for Spare Stock',
+    availability: [true, true, true],
+    tooltip: 'Create offers from excess stock.',
+  },
+  {
+    name: 'Stock Audit Tool (Basic)',
+    availability: [true, true, true],
+    tooltip: 'Tool to audit and manage stock levels.',
+  },
+  {
+    name: 'MCOM Deals (Basic Publishing)',
+    availability: [true, true, true],
+    tooltip: 'Publish basic deals on the MCOM platform.',
+  },
+  {
+    name: 'MCOM SocialBio Profile',
+    availability: [true, true, true],
+    tooltip: 'Create a social bio profile for marketing.',
+  },
   {
     name: 'Videogram (QR-linked Video Cards)',
     availability: [true, true, true],
+    tooltip: 'Link videos to QR codes on cards.',
   },
   {
     name: 'Reward Program Integration (Internal)',
     availability: [true, true, true],
+    tooltip: 'Integrate internal reward systems.',
   },
   {
     name: 'Cross-Sell with Other Business Owners',
     availability: [true, true, true],
+    tooltip: 'Enable cross-selling with other businesses.',
   },
   {
     name: 'Marketing Campaign Builder (Basic)',
     availability: [true, true, true],
+    tooltip: 'Basic tool for creating marketing campaigns.',
   },
   {
     name: '247 GBS Co-Branded Partner Branding',
     availability: [true, true, true],
+    tooltip: 'Branding as a 247 GBS partner.',
   },
   {
     name: 'Marketing Campaign Builder (Advanced)',
     availability: [false, true, true],
+    tooltip: 'Advanced campaign creation tools.',
   },
   {
     name: 'Full Loyalty CardX Customisation',
     availability: [false, true, true],
+    tooltip: 'Full customization of loyalty cards.',
   },
   {
     name: 'Advanced Analytics & Insights',
@@ -138,23 +177,32 @@ const coBrandedFeatures: TableFeature[] = [
   {
     name: 'Internal Reward + Loyalty Management',
     availability: [false, true, true],
+    tooltip: 'Manage internal rewards and loyalty.',
   },
   {
     name: 'MCOM Co-Branded Marketing Traffic Package',
     availability: [false, true, true],
+    tooltip: 'Access to co-branded marketing traffic.',
   },
-  { name: 'Dedicated Account Support', availability: [false, true, true] },
+  {
+    name: 'Dedicated Account Support',
+    availability: [false, true, true],
+    tooltip: 'Dedicated support for your account.',
+  },
   {
     name: 'Hyper Local Hub Partnership Eligibility',
     availability: [false, false, true],
+    tooltip: 'Eligibility for local hub partnerships.',
   },
   {
     name: 'Advanced Stock Audit & Spare Capacity Monetisation',
     availability: [false, false, true],
+    tooltip: 'Advanced tools for stock and monetization.',
   },
   {
     name: 'Full MCOM Product Suite Access (All Features)',
     availability: [false, false, true],
+    tooltip: 'Access to all MCOM features.',
   },
   {
     name: 'DealMachine AI for Performance Tracking',
@@ -164,14 +212,17 @@ const coBrandedFeatures: TableFeature[] = [
   {
     name: 'Seasonal Campaigns (Spring/Summer/Autumn/Winter)',
     availability: [false, false, true],
+    tooltip: 'Run campaigns for each season.',
   },
   {
     name: 'White Label Branding (eGift, Loyalty, Dashboard)',
     availability: [false, false, true],
+    tooltip: 'White-label branding for various tools.',
   },
   {
     name: 'VistaPrint Integration for Physical Cards',
     availability: [false, false, true],
+    tooltip: 'Integrate with VistaPrint for physical cards.',
   },
 ];
 

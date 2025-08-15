@@ -73,17 +73,28 @@ const paygFeatures: TableFeature[] = [
   {
     name: 'Basic Directory Listing (247 GBS / MCOM Hub)',
     availability: [true, true, true],
+    tooltip: 'Lists your business on key directories for visibility.',
   },
-  { name: 'Claim & Verify Business Listing', availability: [true, true, true] },
+  {
+    name: 'Claim & Verify Business Listing',
+    availability: [true, true, true],
+    tooltip: 'Verify your business to enhance credibility.',
+  },
   {
     name: 'External Evergreen Reward QR Code',
     availability: [true, true, true],
+    tooltip: 'Generates a QR code for customer rewards.',
   },
   {
     name: 'Wallet Overview (Business Dashboard)',
     availability: [true, true, true],
+    tooltip: 'Dashboard for managing payments and credits.',
   },
-  { name: 'Basic eGift / eCard Setup', availability: [true, true, true] },
+  {
+    name: 'Basic eGift / eCard Setup',
+    availability: [true, true, true],
+    tooltip: 'Basic setup for digital gift cards.',
+  },
   {
     name: 'Customer Analytics (Basic)',
     availability: [true, true, true],
@@ -92,39 +103,67 @@ const paygFeatures: TableFeature[] = [
   {
     name: 'Loyalty CardX (Basic Template Access)',
     availability: [false, true, true],
+    tooltip: 'Access to basic loyalty card templates.',
   },
-  { name: 'Cashback Rate Configuration', availability: [false, true, true] },
-  { name: 'Bonus Offers for Spare Stock', availability: [false, true, true] },
-  { name: 'Stock Audit Tool (Basic)', availability: [false, true, true] },
-  { name: 'MCOM Deals (Basic Publishing)', availability: [false, false, true] },
-  { name: 'MCOM SocialBio Profile', availability: [false, false, true] },
+  {
+    name: 'Cashback Rate Configuration',
+    availability: [false, true, true],
+    tooltip: 'Customize cashback rates for customers.',
+  },
+  {
+    name: 'Bonus Offers for Spare Stock',
+    availability: [false, true, true],
+    tooltip: 'Create offers from excess stock.',
+  },
+  {
+    name: 'Stock Audit Tool (Basic)',
+    availability: [false, true, true],
+    tooltip: 'Tool to audit and manage stock levels.',
+  },
+  {
+    name: 'MCOM Deals (Basic Publishing)',
+    availability: [false, false, true],
+    tooltip: 'Publish basic deals on the MCOM platform.',
+  },
+  {
+    name: 'MCOM SocialBio Profile',
+    availability: [false, false, true],
+    tooltip: 'Create a social bio profile for marketing.',
+  },
   {
     name: 'Videogram (QR-linked Video Cards)',
     availability: [false, false, true],
+    tooltip: 'Link videos to QR codes on cards.',
   },
   {
     name: 'Reward Program Integration (Internal)',
     availability: [false, false, false],
+    tooltip: 'Integrate internal reward systems.',
   },
   {
     name: 'Cross-Sell with Other Business Owners',
     availability: [false, false, false],
+    tooltip: 'Enable cross-selling with other businesses.',
   },
   {
     name: 'Marketing Campaign Builder (Basic)',
     availability: [false, false, false],
+    tooltip: 'Basic tool for creating marketing campaigns.',
   },
   {
     name: '247 GBS Co-Branded Partner Branding',
     availability: [false, false, false],
+    tooltip: 'Branding as a 247 GBS partner.',
   },
   {
     name: 'Marketing Campaign Builder (Advanced)',
     availability: [false, false, false],
+    tooltip: 'Advanced campaign creation tools.',
   },
   {
     name: 'Full Loyalty CardX Customisation',
     availability: [false, false, false],
+    tooltip: 'Full customization of loyalty cards.',
   },
   {
     name: 'Advanced Analytics & Insights',
@@ -134,23 +173,32 @@ const paygFeatures: TableFeature[] = [
   {
     name: 'Internal Reward + Loyalty Management',
     availability: [false, false, false],
+    tooltip: 'Manage internal rewards and loyalty.',
   },
   {
     name: 'MCOM Co-Branded Marketing Traffic Package',
     availability: [false, false, false],
+    tooltip: 'Access to co-branded marketing traffic.',
   },
-  { name: 'Dedicated Account Support', availability: [false, false, false] },
+  {
+    name: 'Dedicated Account Support',
+    availability: [false, false, false],
+    tooltip: 'Dedicated support for your account.',
+  },
   {
     name: 'Hyper Local Hub Partnership Eligibility',
     availability: [false, false, false],
+    tooltip: 'Eligibility for local hub partnerships.',
   },
   {
     name: 'Advanced Stock Audit & Spare Capacity Monetisation',
     availability: [false, false, false],
+    tooltip: 'Advanced tools for stock and monetization.',
   },
   {
     name: 'Full MCOM Product Suite Access (All Features)',
     availability: [false, false, false],
+    tooltip: 'Access to all MCOM features.',
   },
   {
     name: 'DealMachine AI for Performance Tracking',
@@ -160,14 +208,17 @@ const paygFeatures: TableFeature[] = [
   {
     name: 'Seasonal Campaigns (Spring/Summer/Autumn/Winter)',
     availability: [false, false, false],
+    tooltip: 'Run campaigns for each season.',
   },
   {
     name: 'White Label Branding (eGift, Loyalty, Dashboard)',
     availability: [false, false, false],
+    tooltip: 'White-label branding for various tools.',
   },
   {
     name: 'VistaPrint Integration for Physical Cards',
     availability: [false, false, false],
+    tooltip: 'Integrate with VistaPrint for physical cards.',
   },
 ];
 
@@ -206,7 +257,11 @@ export default function PayAsYouGoContent() {
             }}
             transition={{ delay: index * 0.1 }}
           >
-            <PricingCard tier={{ ...tier, accent: tier.accent! }} />
+            <PricingCard
+              tier={
+                tier as PricingTier & { accent: 'teal' | 'purple' | 'yellow' }
+              }
+            />
           </motion.div>
         ))}
       </div>
