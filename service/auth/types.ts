@@ -27,3 +27,8 @@ export interface LoginResponse {
   name: string;
   role: UserRole;
 }
+
+export interface ClaimInterface {
+  plaid_id: string;
+  returnUrl: string;
+}

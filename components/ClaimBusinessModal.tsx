@@ -35,7 +35,9 @@ const Card = ({
 );
 
 // --- Main Modal Component ---
-export function ClaimBusinessModal() {
+export const ClaimBusinessModal: React.FC<{ place_id: string }> = ({
+  place_id,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({
     firstName: '',
@@ -264,4 +266,4 @@ export function ClaimBusinessModal() {
       </DialogContent>
     </Dialog>
   );
-}
+};

@@ -1,7 +1,12 @@
 import { useMutation } from '@tanstack/react-query';
 import Cookies from 'js-cookie';
 import api from '../api';
-import { UserInterface, AuthInterface, LoginResponse } from './types';
+import {
+  UserInterface,
+  AuthInterface,
+  LoginResponse,
+  ClaimInterface,
+} from './types';
 
 export interface ErrorResponse {
   response?: {
@@ -61,6 +66,36 @@ export const useLogin = () => {
 
       // Set refresh token for 7 days
       Cookies.set('refresh', data.auth.refreshToken, { expires: 7 });
+    },
+  });
+  return mutation;
+};
+
+export const useClaimBusiness = () => {
+  const claim = async (payload: ClaimInterface) => {
+    try {
+      const response = await api.post('claim/start', {
+        ...payload,
+      });
+      return response.data;
+    } catch (error: unknown) {
+      const err = error as ErrorResponse;
+      throw new Error(
+        err.response?.data?.message ||
+          err.message ||
+          'Failed to create business'
+      );
+    }
+  };
+
+  const mutation = useMutation({
+    mutationFn: claim,
+    onSuccess: data => {
+      if (data.authUrl) {
+        window.location.href = data.authUrl;
+      } else {
+        alert('Unable to start Google verification.');
+      }
     },
   });
   return mutation;
