@@ -1,7 +1,9 @@
 export interface PricingTier {
   name: string;
   price: string;
-  features: string[];
+  inherits?: string;
+  primaryFeatures: string[];
+  secondaryFeatures?: string[];
   accent?: 'teal' | 'purple' | 'yellow';
 }
 

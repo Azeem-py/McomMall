@@ -9,12 +9,14 @@ const coBrandedTiers: PricingTier[] = [
   {
     name: 'Standard',
     price: '£300 / year',
-    features: [
+    primaryFeatures: [
       'All PAYG Benefits – Full access without seasonal limitation.',
       'Customisable Rewards & Loyalty Program – Internal loyalty program setup (Visit-based, Spend-based, Referral-based, Seasonal campaigns).',
       'White-Label Branding – Loyalty cards, eGift cards, and marketing materials in own brand (logo, colours, fonts).',
       'Multiple QR Codes – For multiple branches, departments, or partner locations.',
       'Cross-Selling Network Access – Ability to sell and promote other business owners’ products via your own loyalty system.',
+    ],
+    secondaryFeatures: [
       'Full Dashboard Access – Advanced analytics, customer insights, loyalty performance, eGift & eCard management.',
       'eGift Card Creation & Sale – Pre-purchased cards (physical or digital) with QR codes, audio/video attachments, and SaaS resale options.',
       'Integration with MCOMECARD – Load rewards, cashback, and promotions directly onto the consumer’s card.',
@@ -26,17 +28,8 @@ const coBrandedTiers: PricingTier[] = [
   {
     name: 'Pro',
     price: '£600 / year',
-    features: [
-      'All PAYG Benefits – Full access without seasonal limitation.',
-      'Customisable Rewards & Loyalty Program – Internal loyalty program setup (Visit-based, Spend-based, Referral-based, Seasonal campaigns).',
-      'White-Label Branding – Loyalty cards, eGift cards, and marketing materials in own brand (logo, colours, fonts).',
-      'Multiple QR Codes – For multiple branches, departments, or partner locations.',
-      'Cross-Selling Network Access – Ability to sell and promote other business owners’ products via your own loyalty system.',
-      'Full Dashboard Access – Advanced analytics, customer insights, loyalty performance, eGift & eCard management.',
-      'eGift Card Creation & Sale – Pre-purchased cards (physical or digital) with QR codes, audio/video attachments, and SaaS resale options.',
-      'Integration with MCOMECARD – Load rewards, cashback, and promotions directly onto the consumer’s card.',
-      'Run Independent Campaigns – Marketing and advertising with or without 247GBS support.',
-      'Product & Service Sales Rights – Sell 247GBS products/services independently or as a licensed sales agent.',
+    inherits: 'Standard',
+    primaryFeatures: [
       'Priority Marketing Campaigns – Access to 247GBS traffic leads and campaign packages.',
       'Advanced Stock Audit Integration – AI-powered DealMachine integration for excess stock promotions.',
       'Hyper-Local Partnerships – Ability to partner with local stalls, events, and services for joint loyalty programs.',
@@ -46,23 +39,13 @@ const coBrandedTiers: PricingTier[] = [
   {
     name: 'Plus',
     price: '£900 / year',
-    features: [
-      'All PAYG Benefits – Full access without seasonal limitation.',
-      'Customisable Rewards & Loyalty Program – Internal loyalty program setup (Visit-based, Spend-based, Referral-based, Seasonal campaigns).',
-      'White-Label Branding – Loyalty cards, eGift cards, and marketing materials in own brand (logo, colours, fonts).',
-      'Multiple QR Codes – For multiple branches, departments, or partner locations.',
-      'Cross-Selling Network Access – Ability to sell and promote other business owners’ products via your own loyalty system.',
-      'Full Dashboard Access – Advanced analytics, customer insights, loyalty performance, eGift & eCard management.',
-      'eGift Card Creation & Sale – Pre-purchased cards (physical or digital) with QR codes, audio/video attachments, and SaaS resale options.',
-      'Integration with MCOMECARD – Load rewards, cashback, and promotions directly onto the consumer’s card.',
-      'Run Independent Campaigns – Marketing and advertising with or without 247GBS support.',
-      'Product & Service Sales Rights – Sell 247GBS products/services independently or as a licensed sales agent.',
-      'Priority Marketing Campaigns – Access to 247GBS traffic leads and campaign packages.',
-      'Advanced Stock Audit Integration – AI-powered DealMachine integration for excess stock promotions.',
-      'Hyper-Local Partnerships – Ability to partner with local stalls, events, and services for joint loyalty programs.',
+    inherits: 'Pro',
+    primaryFeatures: [
       'All Features Activated – No restrictions.',
       'Hyper Local Hub Partnership Eligibility – Bid to run physical MCOM Hyper Local Support Hubs.',
       'Complete Automation – Seasonal preset campaigns (Winter, Spring, Summer, Autumn) auto-activated.',
+    ],
+    secondaryFeatures: [
       'National & Regional Campaign Control – Lead and manage campaigns in assigned territories.',
       'Unlimited Consumer Rewards – No cap on loyalty members or rewards given.',
       'AI & BOT Marketing Automation – Seasonal templates, predictive consumer offers, automated upsell campaigns.',
