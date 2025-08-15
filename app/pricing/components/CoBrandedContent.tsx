@@ -248,34 +248,38 @@ export default function CoBrandedContent() {
         initial: { opacity: 0 },
         animate: { opacity: 1, transition: { staggerChildren: 0.1 } },
       }}
-      className="max-w-7xl mx-auto"
+      className="max-w-7xl mx-auto flex flex-col items-center"
     >
       <h1 className="text-3xl md:text-4xl font-bold mb-8 text-blue-900">
         Co-Branded Pricing
       </h1>
-      <motion.div
-        variants={{
-          initial: { opacity: 0, y: 20 },
-          animate: { opacity: 1, y: 0 },
-        }}
-      >
-        <Card className="mb-8 bg-gradient-to-r from-purple-50 to-teal-50 border-none shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-2xl font-semibold text-blue-900">
-              Co-Branded Model Overview
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-700">
-              The Co-Branded model requires an upfront annual platform fee of
-              £365 (£1 per day). This fee is a prerequisite to unlock the tiered
-              packages below.
-            </p>
-          </CardContent>
-        </Card>
-      </motion.div>
-      <TrialInfo />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+      <section className=" flex flex-col items-center justify-center">
+        <motion.div
+          variants={{
+            initial: { opacity: 0, y: 20 },
+            animate: { opacity: 1, y: 0 },
+          }}
+          className=" md:w-4/5"
+        >
+          <Card className="mb-8 bg-white border-none shadow-lg">
+            <CardHeader>
+              <CardTitle className="text-2xl font-semibold text-blue-900">
+                Co-Branded Model Overview
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-700">
+                The Co-Branded model requires an upfront annual platform fee of
+                £365 (£1 per day). This fee is a prerequisite to unlock the
+                tiered packages below.
+              </p>
+            </CardContent>
+          </Card>
+        </motion.div>
+        <TrialInfo />
+      </section>
+
+      <div className="flex flex-col md:flex-row gap-6 mb-12">
         {coBrandedTiers.map((tier, index) => (
           <motion.div
             key={tier.name}
