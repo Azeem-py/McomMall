@@ -52,6 +52,9 @@ const menuItems = [
         <ListItem href="/seasons/summer" title="Summer">
           Explore our summer sales and new items.
         </ListItem>
+        <ListItem href="/seasons/autumn" title="Autumn">
+          Explore our autumn sales and new items.
+        </ListItem>
       </div>
     ),
   },
