@@ -226,8 +226,10 @@ export default function PayAsYouGoContent() {
       <h1 className="text-3xl md:text-4xl font-bold mb-8 text-blue-900">
         Pay As You Go Pricing
       </h1>
-      <TrialInfo />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+      <section className="flex flex-col items-center">
+        <TrialInfo />
+      </section>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 h-fit">
         {paygTiers.map((tier, index) => (
           <motion.div
             key={tier.name}
@@ -236,6 +238,7 @@ export default function PayAsYouGoContent() {
               animate: { opacity: 1, y: 0 },
             }}
             transition={{ delay: index * 0.1 }}
+            className="h-full"
           >
             <PricingCard
               tier={

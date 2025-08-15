@@ -19,11 +19,11 @@ export default function PricingCard({ tier }: PricingCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const accentClasses = {
-    teal: 'from-teal-50 to-teal-100 border-teal-200 shadow-teal-200/50',
+    teal: 'from-teal-50 to-teal-100 border-teal-500 shadow-teal-200/50',
     purple:
-      'from-purple-50 to-purple-100 border-purple-200 shadow-purple-200/50',
+      'from-purple-50 to-purple-100 border-purple-500 shadow-purple-200/50',
     yellow:
-      'from-yellow-50 to-yellow-100 border-yellow-200 shadow-yellow-200/50',
+      'from-yellow-50 to-yellow-100 border-yellow-500 shadow-yellow-200/50',
   };
 
   const priceColor = {
@@ -44,15 +44,24 @@ export default function PricingCard({ tier }: PricingCardProps) {
     yellow: 'bg-yellow-500 hover:bg-yellow-600',
   };
 
+  const outlineButtonColor = {
+    teal: 'border-teal-500 hover:border-teal-600 text-teal-500 hover:bg-white',
+    purple:
+      'border-purple-500 hover:border-purple-600 text-purple-500 hover:bg-white',
+    yellow:
+      'border-yellow-500 hover:border-yellow-600 text-yellow-500 hover:bg-white',
+  };
+
   return (
     <motion.div
       whileHover={{ scale: 1.02, boxShadow: '0px 10px 20px rgba(0,0,0,0.1)' }}
       transition={{ duration: 0.3 }}
+      className="h-full"
     >
       <Card
-        className={`flex flex-col h-full bg-gradient-to-br ${
+        className={`flex flex-col h-full bg-white ${
           accentClasses[tier.accent]
-        } border shadow-md`}
+        } border-2 shadow-md`}
       >
         <CardHeader>
           <CardTitle className="text-xl font-bold text-blue-900">
@@ -126,8 +135,19 @@ export default function PricingCard({ tier }: PricingCardProps) {
             </button>
           )}
         </CardContent>
-        <CardFooter>
-          <Button className={`w-full text-white ${buttonColor[tier.accent]}`}>
+        <CardFooter className="flex gap-2 ">
+          <Button
+            className={`w-full md:w-1/2 text-white cursor-pointer ${
+              buttonColor[tier.accent]
+            } `}
+          >
+            Pay Now
+          </Button>
+          <Button
+            className={`w-full md:w-1/2 border bg-white cursor-pointer ${
+              outlineButtonColor[tier.accent]
+            }`}
+          >
             Start Free Trial
           </Button>
         </CardFooter>

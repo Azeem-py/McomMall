@@ -8,8 +8,9 @@ export default function TrialInfo() {
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.4 }}
+      className="md:w-4/5"
     >
-      <Card className="mb-8 bg-gradient-to-r from-teal-50 via-purple-50 to-yellow-50 border-blue-200 shadow-lg">
+      <Card className="mb-8 bg-white border-blue-200 shadow-lg ">
         <CardHeader className="flex flex-row items-center gap-2">
           <Gift className="h-5 w-5 text-yellow-500" />
           <CardTitle className="text-xl font-semibold text-blue-900">
