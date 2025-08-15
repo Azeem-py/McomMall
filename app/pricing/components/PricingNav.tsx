@@ -22,7 +22,7 @@ export default function PricingNav({
       >
         <Button
           variant={activeView === 'payg' ? 'default' : 'ghost'}
-          className={`w-full justify-start text-left border border-red-800 ${
+          className={`w-full justify-start text-left  ${
             activeView === 'payg'
               ? 'bg-teal-500 text-white hover:bg-teal-600'
               : 'hover:bg-teal-100 text-teal-700'
