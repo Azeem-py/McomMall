@@ -14,14 +14,16 @@ export interface ErrorResponse {
 export const useGetGoogleListings = ({
   lat,
   lng,
+  queryText,
 }: {
   lat: number;
   lng: number;
+  queryText: string | null;
 }) => {
   const fetch = async () => {
     try {
       const response = await api.get('listings/google-business', {
-        params: { lat, lng },
+        params: { lat, lng, queryText },
       });
       return response.data.results as GooglePlaceResults;
     } catch (error: unknown) {
@@ -36,7 +38,7 @@ export const useGetGoogleListings = ({
 
   const query = useQuery({
     queryFn: fetch,
-    queryKey: ['FETCH_GOOGLE_BUSINESSES', lat, lng],
+    queryKey: ['FETCH_GOOGLE_BUSINESSES', lat, lng, queryText],
     enabled: lat && lng ? true : false,
     refetchOnMount: false,
   });
