@@ -3,11 +3,8 @@
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import dynamic from 'next/dynamic';
-import 'react-quill/dist/quill.snow.css';
+import { Editor } from '@tinymce/tinymce-react';
 import { ListingFormData } from '../types';
-
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
 interface FinalDetailsStepProps {
   formData: ListingFormData;
@@ -34,14 +31,24 @@ const FinalDetailsStep: React.FC<FinalDetailsStepProps> = ({ formData, setFormDa
       {/* Description */}
       <div className="p-6 border rounded-lg">
         <h3 className="text-lg font-semibold mb-4">Description</h3>
-        <div style={{ height: '300px' }}>
-            <ReactQuill
-            theme="snow"
-            value={formData.description}
-            onChange={handleDescriptionChange}
-            style={{ height: '250px' }}
-            />
-        </div>
+        <Editor
+          apiKey={process.env.NEXT_PUBLIC_EDITOR_KEY}
+          value={formData.description}
+          onEditorChange={handleDescriptionChange}
+          init={{
+            height: 300,
+            menubar: false,
+            plugins: [
+              'advlist autolink lists link image charmap print preview anchor',
+              'searchreplace visualblocks code fullscreen',
+              'insertdatetime media table paste code help wordcount',
+            ],
+            toolbar:
+              'undo redo | formatselect | bold italic backcolor | \
+               alignleft aligncenter alignright alignjustify | \
+               bullist numlist outdent indent | removeformat | help',
+          }}
+        />
       </div>
 
       {/* Social Media */}
