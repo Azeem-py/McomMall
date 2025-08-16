@@ -14,9 +14,11 @@ export interface ErrorResponse {
 export const useGetGoogleListings = ({
   lat,
   lng,
+  queryText,
 }: {
-  lat: number;
-  lng: number;
+  lat?: number;
+  lng?: number;
+  queryText?: string;
 }) => {
   const fetch = async () => {
     try {

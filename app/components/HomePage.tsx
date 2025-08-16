@@ -26,6 +26,7 @@ import {
   ArrowUp,
 } from 'lucide-react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
+import { useGetGoogleListings } from '@/service/listings/hook';
 
 // --- Helper Components ---
 const ScrollAnimatedSection = ({ children }: { children: React.ReactNode }) => {
@@ -359,6 +360,11 @@ export default function HomePage() {
   const [activeAdFilter, setActiveAdFilter] = useState('All');
   const [showBackToTop, setShowBackToTop] = useState(false);
 
+  const [coords, setCoords] = useState<{ lat: number; lng: number }>({
+    lat: 6.454075,
+    lng: 3.394673,
+  });
+
   const backgroundImages = [
     'https://images.unsplash.com/photo-1558002038-1055907df827?q=80&w=1920&auto-format&fit=crop',
     'https://images.unsplash.com/photo-1626081062126-d3b192c1fcb0?q=80&w=1176&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
@@ -375,6 +381,22 @@ export default function HomePage() {
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          setCoords({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        },
+        () => {
+          // Keep default Lagos coordinates if permission denied
+        }
+      );
+    }
+  }, []);
+
   // Effect for back to top button visibility
   useEffect(() => {
     const checkScrollTop = () => {
@@ -388,6 +410,11 @@ export default function HomePage() {
     window.addEventListener('scroll', checkScrollTop);
     return () => window.removeEventListener('scroll', checkScrollTop);
   }, [showBackToTop]);
+
+  const { isLoading, data, isSuccess } = useGetGoogleListings({
+    lat: coords.lat,
+    lng: coords.lng,
+  });
 
   // Filtered ads based on the active tab
   const filteredAds =

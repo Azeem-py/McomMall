@@ -53,6 +53,7 @@ export default function DirectoryPage() {
   const { isLoading, isSuccess, data } = useGetGoogleListings({
     lat: coords.lat,
     lng: coords.lng,
+    queryText: 'Bussinesses near me',
   });
 
   const [filtersVisible, setFiltersVisible] = useState(false);
