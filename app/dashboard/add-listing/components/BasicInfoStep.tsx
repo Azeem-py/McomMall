@@ -20,12 +20,19 @@ interface BasicInfoStepProps {
   errors: Record<string, string>;
 }
 
-const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ formData, setFormData, errors }) => {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
+  formData,
+  setFormData,
+  errors,
+}) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleLogoChange = (image: string | null) => {
+  // ✅ Now expects File | null
+  const handleLogoChange = (image: File | null) => {
     setFormData({ ...formData, logo: image });
   };
 
@@ -40,7 +47,9 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ formData, setFormData, er
         <h3 className="text-lg font-semibold mb-4">Core Details</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <Label htmlFor="title">Listing Title <span className="text-red-500">*</span></Label>
+            <Label htmlFor="title">
+              Listing Title <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="title"
               name="title"
@@ -49,15 +58,23 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ formData, setFormData, er
               placeholder="e.g., John's Plumbing Services"
               required
             />
-            {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title}</p>}
+            {errors.title && (
+              <p className="text-red-500 text-xs mt-1">{errors.title}</p>
+            )}
           </div>
-           <div className="space-y-2">
-            <Label>Listing Logo <span className="text-red-500">*</span></Label>
+
+          <div className="space-y-2">
+            <Label>
+              Listing Logo <span className="text-red-500">*</span>
+            </Label>
             <div className="w-32 h-32">
-                <SingleImageInput onImageChange={handleLogoChange} />
+              <SingleImageInput onImageChange={handleLogoChange} />
             </div>
-            {errors.logo && <p className="text-red-500 text-xs mt-1">{errors.logo}</p>}
+            {errors.logo && (
+              <p className="text-red-500 text-xs mt-1">{errors.logo}</p>
+            )}
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="category">Category</Label>
             <Select value={formData.category} disabled>
@@ -72,6 +89,7 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ formData, setFormData, er
               </SelectContent>
             </Select>
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="keywords">Keywords</Label>
             <Input
@@ -81,7 +99,9 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ formData, setFormData, er
               onChange={handleChange}
               placeholder="e.g., plumber, renovation, pipes"
             />
-             <p className="text-xs text-gray-500">Separate keywords with commas.</p>
+            <p className="text-xs text-gray-500">
+              Separate keywords with commas.
+            </p>
           </div>
         </div>
       </div>
@@ -116,7 +136,11 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ formData, setFormData, er
       {/* Gallery */}
       <div className="p-6 border rounded-lg">
         <h3 className="text-lg font-semibold mb-4">Gallery (Optional)</h3>
-        <UploadBox onImagesChange={handleGalleryChange} maxFiles={3} maxSize={5} />
+        <UploadBox
+          onImagesChange={handleGalleryChange}
+          maxFiles={3}
+          maxSize={5}
+        />
       </div>
     </div>
   );
