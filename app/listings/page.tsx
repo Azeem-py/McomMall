@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, Suspense } from 'react';
 import dynamic from 'next/dynamic';
+import { useSearchParams } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import {
@@ -26,7 +27,9 @@ const initialFilters: FilterState = {
   priceRange: [0, 1000],
 };
 
-export default function DirectoryPage() {
+function ListingsPageContent() {
+  const searchParams = useSearchParams();
+  const queryText = searchParams.get('queryText');
   // Default to Lagos, Nigeria
   const [coords, setCoords] = useState<{ lat: number; lng: number }>({
     lat: 6.454075,
@@ -51,6 +54,7 @@ export default function DirectoryPage() {
   }, []);
 
   const { isLoading, isSuccess, data } = useGetGoogleListings({
+    queryText: queryText,
     lat: coords.lat,
     lng: coords.lng,
   });
@@ -203,4 +207,12 @@ export default function DirectoryPage() {
         </main>
       </div>
     );
+}
+
+export default function DirectoryPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ListingsPageContent />
+    </Suspense>
+  );
 }

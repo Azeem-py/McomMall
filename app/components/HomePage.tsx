@@ -26,6 +26,7 @@ import {
   ArrowUp,
 } from 'lucide-react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
 // --- Helper Components ---
 const ScrollAnimatedSection = ({ children }: { children: React.ReactNode }) => {
@@ -358,6 +359,9 @@ export default function HomePage() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [activeAdFilter, setActiveAdFilter] = useState('All');
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [location, setLocation] = useState('');
+  const router = useRouter();
 
   const backgroundImages = [
     'https://images.unsplash.com/photo-1558002038-1055907df827?q=80&w=1920&auto-format&fit=crop',
@@ -403,6 +407,14 @@ export default function HomePage() {
         behavior: 'smooth',
       });
     }
+  };
+
+  const handleSearch = () => {
+    let query = searchQuery;
+    if (location) {
+      query = `${searchQuery} in ${location}`;
+    }
+    router.push(`/listings?queryText=${encodeURIComponent(query)}`);
   };
 
   const scrollToTop = () => {
@@ -455,6 +467,8 @@ export default function HomePage() {
                   type="text"
                   placeholder="Type what are you looking for..."
                   className="w-full bg-transparent focus:outline-none text-black"
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
                 />
               </div>
               <div className="w-full md:w-auto flex-1 flex items-center p-2">
@@ -463,12 +477,15 @@ export default function HomePage() {
                   type="text"
                   placeholder="Enter Location (e.g. Canasa)"
                   className="w-full bg-transparent focus:outline-none text-black"
+                  value={location}
+                  onChange={e => setLocation(e.target.value)}
                 />
               </div>
               <motion.button
                 className="bg-[#f58220] text-white font-bold py-3 px-6 rounded-lg w-full md:w-auto flex items-center justify-center gap-2"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={handleSearch}
               >
                 Search Now <ArrowRight size={20} />
               </motion.button>
