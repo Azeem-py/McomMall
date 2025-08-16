@@ -46,7 +46,8 @@ export default function ClientListingDetail({
     if (listing.photos) {
       const { photo_reference } = listing?.photos[0];
       const API_URL =
-        process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3009/api/v1';
+        process.env.NEXT_PUBLIC_API_URL ||
+        'https://mcom-mall-api.vercel.app/api/v1';
       imgUrl = `${API_URL}/listings/photo/${photo_reference}`;
     } else {
       imgUrl =
