@@ -43,7 +43,7 @@ export default function PricingNav({
           className={`w-full justify-start text-left ${
             activeView === 'cobranded'
               ? 'bg-purple-500 text-white hover:bg-purple-600'
-              : 'hover:bg-purple-100 text-purple-700'
+              : 'bg-orange-500'
           }`}
           onClick={() => setActiveView('cobranded')}
         >
