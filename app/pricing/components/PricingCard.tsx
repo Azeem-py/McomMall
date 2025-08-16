@@ -19,37 +19,21 @@ export default function PricingCard({ tier }: PricingCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const accentClasses = {
-    teal: 'from-teal-50 to-teal-100 border-teal-500 shadow-teal-200/50',
-    purple:
-      'from-purple-50 to-purple-100 border-purple-500 shadow-purple-200/50',
-    yellow:
-      'from-yellow-50 to-yellow-100 border-yellow-500 shadow-yellow-200/50',
+    teal: '',
+    purple: 'border-orange-500',
+    yellow: '',
   };
 
   const priceColor = {
     teal: 'text-teal-700',
-    purple: 'text-purple-700',
+    purple: 'text-orange-700',
     yellow: 'text-yellow-700',
   };
 
   const checkColor = {
-    teal: 'text-teal-500',
+    teal: 'text-black',
     purple: 'text-purple-500',
-    yellow: 'text-yellow-500',
-  };
-
-  const buttonColor = {
-    teal: 'bg-teal-500 hover:bg-teal-600',
-    purple: 'bg-purple-500 hover:bg-purple-600',
-    yellow: 'bg-yellow-500 hover:bg-yellow-600',
-  };
-
-  const outlineButtonColor = {
-    teal: 'border-teal-500 hover:border-teal-600 text-teal-500 hover:bg-white',
-    purple:
-      'border-purple-500 hover:border-purple-600 text-purple-500 hover:bg-white',
-    yellow:
-      'border-yellow-500 hover:border-yellow-600 text-yellow-500 hover:bg-white',
+    yellow: 'text-black',
   };
 
   return (
@@ -135,7 +119,7 @@ export default function PricingCard({ tier }: PricingCardProps) {
             </button>
           )}
         </CardContent>
-        <CardFooter className="flex gap-2 ">
+        {/* <CardFooter className="flex gap-2 ">
           <Button
             className={`w-full md:w-1/2 text-white cursor-pointer ${
               buttonColor[tier.accent]
@@ -150,7 +134,7 @@ export default function PricingCard({ tier }: PricingCardProps) {
           >
             Start Free Trial
           </Button>
-        </CardFooter>
+        </CardFooter> */}
       </Card>
     </motion.div>
   );

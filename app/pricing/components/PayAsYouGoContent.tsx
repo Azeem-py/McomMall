@@ -28,7 +28,7 @@ const paygTiers: PricingTier[] = [
   {
     name: '180 Days',
     price: '£150',
-    inherits: '30 Days',
+    inherits: '90 Days',
     primaryFeatures: [
       'Coverage for two seasonal packages (e.g., Winter + Spring).',
       'Extended marketing exposure in seasonal directory promotions across two seasons.',
@@ -47,7 +47,7 @@ const paygTiers: PricingTier[] = [
   },
 ];
 
-const paygPlans = ['30 Days', '180 Days', '270 Days'];
+const paygPlans = ['90 Days', '180 Days', '270 Days'];
 
 const paygFeatures: TableFeature[] = [
   {
