@@ -15,8 +15,8 @@ const SingleImageInput: React.FC<SingleImageInputProps> = ({
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        alert('Image size must not exceed 2MB');
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image size must not exceed 5MB');
         return;
       }
       const reader = new FileReader();
