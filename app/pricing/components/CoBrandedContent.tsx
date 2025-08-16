@@ -231,7 +231,7 @@ export default function CoBrandedContent() {
         initial: { opacity: 0 },
         animate: { opacity: 1, transition: { staggerChildren: 0.1 } },
       }}
-      className="max-w-7xl mx-auto"
+      className="max-w-7xl mx-auto flex flex-col items-center"
     >
       <h1 className="text-3xl md:text-4xl font-bold mb-8 text-blue-900">
         Co-Branded Pricing

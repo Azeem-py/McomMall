@@ -359,7 +359,13 @@ export default function HomePage() {
   const [activeAdFilter, setActiveAdFilter] = useState('All');
   const [showBackToTop, setShowBackToTop] = useState(false);
 
-  // Effect to cycle through background images
+  const backgroundImages = [
+    'https://images.unsplash.com/photo-1558002038-1055907df827?q=80&w=1920&auto-format&fit=crop',
+    'https://images.unsplash.com/photo-1626081062126-d3b192c1fcb0?q=80&w=1176&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?q=80&w=1920&auto-format&fit=crop',
+    'https://images.unsplash.com/photo-1676630444903-163fe485c5d1?q=80&w=1126&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+  ];
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentImageIndex(
