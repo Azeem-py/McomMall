@@ -2,12 +2,18 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { House, Map, PartyPopper, Speaker } from 'lucide-react';
 
-// Reusable CategoryCard component
-const CategoryCard: React.FC<{
+interface CategoryCardProps {
   title: string;
-  icon: React.ReactNode;
+  // 👇 accept an Icon component instead of a ReactNode
+  icon: React.ElementType;
   onClick: () => void;
-}> = ({ title, icon, onClick }) => {
+}
+
+const CategoryCard: React.FC<CategoryCardProps> = ({
+  title,
+  icon: Icon,
+  onClick,
+}) => {
   return (
     <motion.div
       className="flex flex-col items-center justify-center w-64 h-44 rounded-lg cursor-pointer bg-gray-100 text-gray-800"
@@ -20,25 +26,22 @@ const CategoryCard: React.FC<{
       }}
     >
       <div className="w-16 h-16 rounded-full flex items-center justify-center mb-2 bg-white bg-opacity-50">
-        {React.cloneElement(icon as React.ReactElement, {
-          size: 32,
-          className: 'text-red-500',
-        })}
+        {/* render as a real icon with size + className */}
+        <Icon size={32} className="text-red-500" />
       </div>
       <span className="text-center font-medium text-lg">{title}</span>
     </motion.div>
   );
 };
 
-// Main ListingTypeSelector component
 const ListingTypeSelector: React.FC<{
   onCategorySelect: (category: string) => void;
 }> = ({ onCategorySelect }) => {
   const categories = [
-    { title: 'Service', icon: <Map /> },
-    { title: 'Rent', icon: <House /> },
-    { title: 'Event', icon: <PartyPopper /> },
-    { title: 'Classified', icon: <Speaker /> },
+    { title: 'Service', icon: Map },
+    { title: 'Rent', icon: House },
+    { title: 'Event', icon: PartyPopper },
+    { title: 'Classified', icon: Speaker },
   ];
 
   return (

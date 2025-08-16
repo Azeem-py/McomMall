@@ -4,9 +4,18 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Trash, PlusCircle, Copy } from 'lucide-react';
 import { TimePicker } from 'antd';
+import dayjs, { Dayjs } from 'dayjs';
 import 'antd/dist/reset.css';
 
-const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const daysOfWeek = [
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday',
+];
 
 interface TimeRange {
   start: string;
@@ -22,10 +31,25 @@ interface WeeklyScheduleProps {
   setSchedule: (schedule: Schedule) => void;
 }
 
-const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ schedule, setSchedule }) => {
-  const handleTimeChange = (day: string, index: number, time: [string, string]) => {
+const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({
+  schedule,
+  setSchedule,
+}) => {
+  const handleTimeChange = (
+    day: string,
+    index: number,
+    time: [Dayjs | null, Dayjs | null]
+  ) => {
+    if (!time) return;
+
+    const [start, end] = time;
     const newSchedule = { ...schedule };
-    newSchedule[day][index] = { start: time[0], end: time[1] };
+
+    newSchedule[day][index] = {
+      start: start ? start.format('HH:mm') : '',
+      end: end ? end.format('HH:mm') : '',
+    };
+
     setSchedule(newSchedule);
   };
 
@@ -57,39 +81,59 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ schedule, setSchedule }
 
   return (
     <div className="p-6 border rounded-lg">
-        <h3 className="text-lg font-semibold mb-4">Weekly Schedule</h3>
-        <div className="space-y-4">
-            {daysOfWeek.map(day => (
-                <div key={day} className="grid grid-cols-[120px_1fr_auto] items-start gap-4">
-                    <div className="font-semibold pt-2">{day}</div>
-                    <div className="space-y-2">
-                        {(schedule[day] || []).map((range, index) => (
-                            <div key={index} className="flex items-center gap-2">
-                                <TimePicker.RangePicker
-                                    use12Hours
-                                    format="h:mm a"
-                                    value={[range.start, range.end]}
-                                    onChange={(time, timeString) => handleTimeChange(day, index, timeString)}
-                                />
-                                <Button variant="ghost" size="icon" onClick={() => removeTimeRange(day, index)}>
-                                    <Trash className="h-4 w-4" />
-                                </Button>
-                            </div>
-                        ))}
-                         <Button variant="link" size="sm" onClick={() => addTimeRange(day)}>
-                            <PlusCircle className="h-4 w-4 mr-2" />
-                            Add hours
-                        </Button>
-                    </div>
-                    <div className="pt-2">
-                         <Button variant="ghost" size="sm" onClick={() => copyToAll(day)}>
-                            <Copy className="h-4 w-4 mr-2" />
-                            Copy to all
-                        </Button>
-                    </div>
+      <h3 className="text-lg font-semibold mb-4">Weekly Schedule</h3>
+      <div className="space-y-4">
+        {daysOfWeek.map(day => (
+          <div
+            key={day}
+            className="grid grid-cols-[120px_1fr_auto] items-start gap-4"
+          >
+            <div className="font-semibold pt-2">{day}</div>
+            <div className="space-y-2">
+              {(schedule[day] || []).map((range, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <TimePicker.RangePicker
+                    use12Hours
+                    format="h:mm a"
+                    value={[
+                      range.start ? dayjs(range.start, 'HH:mm') : null,
+                      range.end ? dayjs(range.end, 'HH:mm') : null,
+                    ]}
+                    onChange={time =>
+                      handleTimeChange(
+                        day,
+                        index,
+                        time as [Dayjs | null, Dayjs | null]
+                      )
+                    }
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeTimeRange(day, index)}
+                  >
+                    <Trash className="h-4 w-4" />
+                  </Button>
                 </div>
-            ))}
-        </div>
+              ))}
+              <Button
+                variant="link"
+                size="sm"
+                onClick={() => addTimeRange(day)}
+              >
+                <PlusCircle className="h-4 w-4 mr-2" />
+                Add hours
+              </Button>
+            </div>
+            <div className="pt-2">
+              <Button variant="ghost" size="sm" onClick={() => copyToAll(day)}>
+                <Copy className="h-4 w-4 mr-2" />
+                Copy to all
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

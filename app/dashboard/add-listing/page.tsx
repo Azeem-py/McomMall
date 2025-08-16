@@ -26,10 +26,7 @@ const AddListingPage = () => {
           <ListingTypeSelector onCategorySelect={handleCategorySelect} />
         </div>
       ) : (
-        <MultiStepListingForm
-          category={selectedCategory}
-          onBack={handleBack}
-        />
+        <MultiStepListingForm category={selectedCategory} onBack={handleBack} />
       )}
     </section>
   );

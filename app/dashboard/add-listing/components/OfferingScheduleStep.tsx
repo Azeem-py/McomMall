@@ -32,7 +32,10 @@ interface OfferingScheduleStepProps {
   setFormData: (data: ListingFormData) => void;
 }
 
-const OfferingScheduleStep: React.FC<OfferingScheduleStepProps> = ({ formData, setFormData }) => {
+const OfferingScheduleStep: React.FC<OfferingScheduleStepProps> = ({
+  formData,
+  setFormData,
+}) => {
   const [service, setService] = useState<Omit<Service, 'id'>>({
     image: null,
     title: '',
@@ -45,7 +48,9 @@ const OfferingScheduleStep: React.FC<OfferingScheduleStepProps> = ({ formData, s
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [serviceToDelete, setServiceToDelete] = useState<number | null>(null);
 
-  const handleServiceChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleServiceChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setService({ ...service, [e.target.name]: e.target.value });
   };
 
@@ -53,7 +58,10 @@ const OfferingScheduleStep: React.FC<OfferingScheduleStepProps> = ({ formData, s
     setService({ ...service, image });
   };
 
-  const handleSelectChange = (name: 'currency' | 'pricingModel', value: string) => {
+  const handleSelectChange = (
+    name: 'currency' | 'pricingModel',
+    value: string
+  ) => {
     setService({ ...service, [name]: value });
   };
 
@@ -68,7 +76,10 @@ const OfferingScheduleStep: React.FC<OfferingScheduleStepProps> = ({ formData, s
     } else {
       // Add new service
       const newService = { ...service, id: Date.now() };
-      setFormData({ ...formData, services: [...formData.services, newService] });
+      setFormData({
+        ...formData,
+        services: [...formData.services, newService],
+      });
     }
     // Reset form
     setService({
@@ -79,6 +90,10 @@ const OfferingScheduleStep: React.FC<OfferingScheduleStepProps> = ({ formData, s
       currency: 'USD',
       pricingModel: 'one-time',
     });
+  };
+
+  const handleLogoChange = (image: File | null) => {
+    setFormData({ ...formData, logo: image });
   };
 
   const handleEditService = (s: Service) => {
@@ -107,7 +122,9 @@ const OfferingScheduleStep: React.FC<OfferingScheduleStepProps> = ({ formData, s
         <div className="space-y-6">
           {/* Pricing & Bookable Services */}
           <div className="p-6 border rounded-lg">
-            <h3 className="text-lg font-semibold mb-4">Pricing & Bookable Services</h3>
+            <h3 className="text-lg font-semibold mb-4">
+              Pricing & Bookable Services
+            </h3>
 
             {/* Service Input Form */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
@@ -116,28 +133,49 @@ const OfferingScheduleStep: React.FC<OfferingScheduleStepProps> = ({ formData, s
                 <div className="space-y-2">
                   <Label>Service Image</Label>
                   <div className="w-32 h-32">
-                    <SingleImageInput onImageChange={handleImageChange} />
+                    <SingleImageInput onImageChange={handleLogoChange} />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="title">Title</Label>
-                  <Input id="title" name="title" value={service.title} onChange={handleServiceChange} />
+                  <Input
+                    id="title"
+                    name="title"
+                    value={service.title}
+                    onChange={handleServiceChange}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="description">Description</Label>
-                  <Textarea id="description" name="description" value={service.description} onChange={handleServiceChange} />
+                  <Textarea
+                    id="description"
+                    name="description"
+                    value={service.description}
+                    onChange={handleServiceChange}
+                  />
                 </div>
               </div>
               {/* Price, Currency, Model */}
               <div className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="price">Price</Label>
-                  <Input id="price" name="price" type="number" value={service.price} onChange={handleServiceChange} />
+                  <Input
+                    id="price"
+                    name="price"
+                    type="number"
+                    value={service.price}
+                    onChange={handleServiceChange}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>Currency</Label>
-                  <Select value={service.currency} onValueChange={(v) => handleSelectChange('currency', v)}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                  <Select
+                    value={service.currency}
+                    onValueChange={v => handleSelectChange('currency', v)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="USD">USD</SelectItem>
                       <SelectItem value="EUR">EUR</SelectItem>
@@ -147,11 +185,18 @@ const OfferingScheduleStep: React.FC<OfferingScheduleStepProps> = ({ formData, s
                 </div>
                 <div className="space-y-2">
                   <Label>Pricing Model</Label>
-                  <Select value={service.pricingModel} onValueChange={(v) => handleSelectChange('pricingModel', v)}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                  <Select
+                    value={service.pricingModel}
+                    onValueChange={v => handleSelectChange('pricingModel', v)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="one-time">One-time fee</SelectItem>
-                      <SelectItem value="per-guest">Multiply by guest</SelectItem>
+                      <SelectItem value="per-guest">
+                        Multiply by guest
+                      </SelectItem>
                       <SelectItem value="per-day">Multiply by days</SelectItem>
                     </SelectContent>
                   </Select>
@@ -171,20 +216,49 @@ const OfferingScheduleStep: React.FC<OfferingScheduleStepProps> = ({ formData, s
                     <table className="min-w-full divide-y divide-gray-300">
                       <thead>
                         <tr>
-                          <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">Title</th>
-                          <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Price</th>
-                          <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-0"><span className="sr-only">Edit</span></th>
+                          <th
+                            scope="col"
+                            className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
+                          >
+                            Title
+                          </th>
+                          <th
+                            scope="col"
+                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                          >
+                            Price
+                          </th>
+                          <th
+                            scope="col"
+                            className="relative py-3.5 pl-3 pr-4 sm:pr-0"
+                          >
+                            <span className="sr-only">Edit</span>
+                          </th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-200">
                         {formData.services.map((s: Service) => (
                           <tr key={s.id}>
-                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">{s.title}</td>
-                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{s.price} {s.currency}</td>
+                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
+                              {s.title}
+                            </td>
+                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                              {s.price} {s.currency}
+                            </td>
                             <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-                              <button onClick={() => handleEditService(s)} className="text-red-600 hover:text-red-900 mr-4"><Edit size={16} /></button>
+                              <button
+                                onClick={() => handleEditService(s)}
+                                className="text-red-600 hover:text-red-900 mr-4"
+                              >
+                                <Edit size={16} />
+                              </button>
                               <DialogTrigger asChild>
-                                <button onClick={() => openDeleteDialog(s.id)} className="text-gray-400 hover:text-gray-600"><Trash size={16} /></button>
+                                <button
+                                  onClick={() => openDeleteDialog(s.id)}
+                                  className="text-gray-400 hover:text-gray-600"
+                                >
+                                  <Trash size={16} />
+                                </button>
                               </DialogTrigger>
                             </td>
                           </tr>
@@ -200,12 +274,14 @@ const OfferingScheduleStep: React.FC<OfferingScheduleStepProps> = ({ formData, s
           {/* Availability */}
           <WeeklySchedule
             schedule={formData.schedule}
-            setSchedule={(schedule) => setFormData({ ...formData, schedule })}
+            setSchedule={schedule => setFormData({ ...formData, schedule })}
           />
 
           <AvailabilityCalendar
             availability={formData.availability}
-            setAvailability={(availability) => setFormData({ ...formData, availability })}
+            setAvailability={availability =>
+              setFormData({ ...formData, availability })
+            }
           />
         </div>
 
@@ -213,12 +289,17 @@ const OfferingScheduleStep: React.FC<OfferingScheduleStepProps> = ({ formData, s
           <DialogHeader>
             <DialogTitle>Are you sure?</DialogTitle>
           </DialogHeader>
-          <p>This action cannot be undone. This will permanently delete the service.</p>
+          <p>
+            This action cannot be undone. This will permanently delete the
+            service.
+          </p>
           <DialogFooter>
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button variant="destructive" onClick={handleDeleteService}>Delete</Button>
+            <Button variant="destructive" onClick={handleDeleteService}>
+              Delete
+            </Button>
           </DialogFooter>
         </DialogContent>
       </>
