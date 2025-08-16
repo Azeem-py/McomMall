@@ -5,14 +5,20 @@ import Image from 'next/image'; // Import next/image
 // Reusable UploadBox component
 interface UploadBoxProps {
   onImagesChange: (images: File[]) => void; // Callback for updated images
+  maxFiles?: number;
+  maxSize?: number; // in MB
 }
 
-const UploadBox: React.FC<UploadBoxProps> = ({ onImagesChange }) => {
+const UploadBox: React.FC<UploadBoxProps> = ({
+  onImagesChange,
+  maxFiles = 3,
+  maxSize = 5,
+}) => {
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  const MAX_SIZE = 2 * 1024 * 1024; // 2MB in bytes
+  const MAX_SIZE_BYTES = maxSize * 1024 * 1024;
 
   // Cleanup object URLs on unmount
   useEffect(() => {
@@ -50,9 +56,14 @@ const UploadBox: React.FC<UploadBoxProps> = ({ onImagesChange }) => {
   };
 
   const handleFiles = (files: File[]) => {
-    const oversizedFiles = files.filter(file => file.size > MAX_SIZE);
+    if (selectedImages.length + files.length > maxFiles) {
+      setError(`You can only upload a maximum of ${maxFiles} images.`);
+      return;
+    }
+
+    const oversizedFiles = files.filter(file => file.size > MAX_SIZE_BYTES);
     if (oversizedFiles.length > 0) {
-      setError('File too large. Maximum size is 2MB.');
+      setError(`File too large. Maximum size is ${maxSize}MB.`);
       return;
     }
     setError(null);

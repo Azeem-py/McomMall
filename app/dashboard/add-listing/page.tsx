@@ -1,43 +1,38 @@
 'use client';
 
-import { ArrowRight } from 'lucide-react';
-import ListingCategory from './components/PricingPlans';
 import { useState } from 'react';
 import ListingTypeSelector from './components/ListCategory';
-import AddListingForm from '@/components/AddListingForm';
+import MultiStepListingForm from './components/MultiStepListingForm';
 
-const Page = () => {
-  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+const AddListingPage = () => {
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  const handlePlanSelection = (plan: string) => {
-    setSelectedPlan(plan);
-    console.log(`Selected plan: ${plan}`);
+  const handleCategorySelect = (category: string) => {
+    setSelectedCategory(category);
+  };
+
+  const handleBack = () => {
+    setSelectedCategory(null);
   };
 
   return (
-    <section>
-      <h2 className="font-medium text-3xl">Add Listing</h2>
-      <h3>Buy New Package</h3>
-      {!selectedPlan ? (
-        <section>
-          <ListingCategory />
-          <div className="w-full flex items-center justify-center">
-            <button
-              className="flex items-center gap-2 bg-red-500 text-xl py-4 px-5 rounded-4xl text-white"
-              onClick={() => handlePlanSelection('housing')}
-            >
-              Submit Listing
-              <ArrowRight />
-            </button>
-          </div>
-        </section>
+    <section className="w-full">
+      {!selectedCategory ? (
+        <div className="flex flex-col items-center justify-center h-full py-12">
+          <h2 className="text-3xl font-bold mb-4">Create a New Listing</h2>
+          <p className="text-gray-600 mb-8">
+            To get started, please select a category for your listing.
+          </p>
+          <ListingTypeSelector onCategorySelect={handleCategorySelect} />
+        </div>
       ) : (
-        <ListingTypeSelector />
+        <MultiStepListingForm
+          category={selectedCategory}
+          onBack={handleBack}
+        />
       )}
-
-      {selectedPlan && <AddListingForm />}
     </section>
   );
 };
 
-export default Page;
+export default AddListingPage;
