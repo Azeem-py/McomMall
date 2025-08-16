@@ -2,12 +2,7 @@ import { motion } from 'framer-motion';
 import PricingCard from './PricingCard';
 import ComparisonTable from './ComparisonTable';
 import { PricingTier, TableFeature, FeatureGroup } from '../types/index';
-import {
-  ShieldCheck,
-  LayoutDashboard,
-  Rocket,
-  Headset,
-} from 'lucide-react';
+import { ShieldCheck, LayoutDashboard, Rocket, Headset } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const coBrandedTiers: PricingTier[] = [
@@ -246,16 +241,16 @@ export default function CoBrandedContent() {
           <h2 className="text-3xl font-bold text-center mb-2">
             Your Co-Branded Launchpad
           </h2>
-          <p className="text-center text-gray-600 mb-8">
-            (One-time $XXX onboarding fee to unlock your choice of Standard,
-            Pro, or Pro Plus plans)
+          <p className="text-center text-gray-600 mb-8 text-lg font-medium">
+            ($365 onboarding fee to unlock your choice of Standard, Pro, or Pro
+            Plus plans)
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Category 1: Verification & Activation */}
             <div className="flex items-start space-x-4">
               <div className="flex-shrink-0">
-                <ShieldCheck className="h-8 w-8 text-[#4A90E2]" />
+                <ShieldCheck className="h-8 w-8 text-orange-500" />
               </div>
               <div>
                 <h3 className="text-xl font-semibold">
@@ -277,7 +272,7 @@ export default function CoBrandedContent() {
             {/* Category 2: Platform & Dashboard Access */}
             <div className="flex items-start space-x-4">
               <div className="flex-shrink-0">
-                <LayoutDashboard className="h-8 w-8 text-[#4A90E2]" />
+                <LayoutDashboard className="h-8 w-8 text-orange-500" />
               </div>
               <div>
                 <h3 className="text-xl font-semibold">
@@ -303,7 +298,7 @@ export default function CoBrandedContent() {
             {/* Category 3: Marketing & Growth */}
             <div className="flex items-start space-x-4">
               <div className="flex-shrink-0">
-                <Rocket className="h-8 w-8 text-[#4A90E2]" />
+                <Rocket className="h-8 w-8 text-orange-500" />
               </div>
               <div>
                 <h3 className="text-xl font-semibold">Marketing & Growth</h3>
@@ -331,7 +326,7 @@ export default function CoBrandedContent() {
             {/* Category 4: Support & Flexibility */}
             <div className="flex items-start space-x-4">
               <div className="flex-shrink-0">
-                <Headset className="h-8 w-8 text-[#4A90E2]" />
+                <Headset className="h-8 w-8 text-orange-500" />
               </div>
               <div>
                 <h3 className="text-xl font-semibold">Support & Flexibility</h3>
@@ -352,14 +347,14 @@ export default function CoBrandedContent() {
           <div className="mt-10 flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-4">
             <Button
               size="lg"
-              className="bg-[#4A90E2] text-white hover:bg-[#4A90E2]/90 transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 hover:shadow-lg"
+              className="bg-orange-500 text-white hover:bg-orange-500/90 transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 hover:shadow-lg"
             >
               Pay Now
             </Button>
             <Button
               size="lg"
               variant="outline"
-              className="border-[#4A90E2] text-[#4A90E2] hover:bg-[#4A90E2] hover:text-white transition-colors duration-300"
+              className="border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white transition-colors duration-300"
             >
               Start Trial
             </Button>
