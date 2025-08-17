@@ -6,6 +6,7 @@ import type { DetailedListing } from '@/lib/listing-data';
 import ReviewsSection from './ReviewSection';
 import LocationSection from './locationSection';
 import { GooglePlaceResult } from '@/service/listings/types';
+import { ReviewsTabContent } from '@/app/listings/[id]/components/ReviewsTabContent';
 
 // You would create more detailed components for each tab
 function OverviewSection({ listing }: { listing: DetailedListing }) {
@@ -35,8 +36,10 @@ function OverviewSection({ listing }: { listing: DetailedListing }) {
 
 export default function ContentTabs({
   listing,
+  isLoading,
 }: {
   listing: GooglePlaceResult;
+  isLoading: boolean;
 }) {
   return (
     <Tabs defaultValue="overview" className="w-full">
@@ -57,11 +60,7 @@ export default function ContentTabs({
         />
       </TabsContent>
       <TabsContent value="reviews">
-        {/* <ReviewsSection
-          reviews={listing.reviews}
-          overallRating={listing.rating}
-          breakdown={listing.ratingBreakdown}
-        /> */}
+        <ReviewsTabContent reviews={listing.reviews} isLoading={isLoading} />
       </TabsContent>
     </Tabs>
   );
