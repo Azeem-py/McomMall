@@ -22,7 +22,9 @@ export default function PricingPage() {
       <section className="w-5/6 mt-10 flex flex-col  items-center bg-gradient-to-br from-blue-50 via-purple-50 to-teal-50 ">
         {/* Desktop Sidebar */}
         <aside className="mt-20 space-y-4">
-          <h3 className="text-xl font-medium text-center">Select your plan</h3>
+          <h3 className="text-xl md:text-2xl font-medium text-center">
+            Select your plan
+          </h3>
           <div className="hidden rounded-full border h-fit md:block min-w-fit border-r px-10 bg-white/80 backdrop-blur-sm py-5 ">
             <PricingNav
               orientation="vertical"
