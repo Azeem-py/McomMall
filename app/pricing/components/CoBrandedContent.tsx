@@ -242,7 +242,7 @@ export default function CoBrandedContent() {
             Your Co-Branded Launchpad
           </h2>
           <p className="text-center text-gray-600 mb-8 text-lg font-medium">
-            ($365 onboarding fee to unlock your choice of Standard, Pro, or Pro
+            (£365 onboarding fee to unlock your choice of Standard, Pro, or Pro
             Plus plans)
           </p>
 

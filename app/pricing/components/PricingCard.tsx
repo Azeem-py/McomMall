@@ -71,6 +71,24 @@ export default function PricingCard({ tier, isPayg }: PricingCardProps) {
           </h3>
         </CardHeader>
         <CardContent className="flex-1 space-y-4">
+          {isPayg && (
+            <CardFooter className="flex gap-2 ">
+              <Button
+                className={`w-full md:w-1/2 text-white cursor-pointer ${
+                  buttonColor[tier.accent]
+                } `}
+              >
+                Pay Now
+              </Button>
+              <Button
+                className={`w-full md:w-1/2 border bg-white cursor-pointer ${
+                  outlineButtonColor[tier.accent]
+                }`}
+              >
+                Start Free Trial
+              </Button>
+            </CardFooter>
+          )}
           {tier.inherits && (
             <p className="text-sm font-semibold text-gray-600">
               Everything in {tier.inherits}, plus:
@@ -121,7 +139,7 @@ export default function PricingCard({ tier, isPayg }: PricingCardProps) {
           {tier.secondaryFeatures && tier.secondaryFeatures.length > 0 && (
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className={`flex items-center text-sm font-semibold text-orange-800`}
+              className={`flex items-center font-semibold text-orange-800 text-lg`}
             >
               {isExpanded ? 'See less features' : 'See more features'}
               {isExpanded ? (
@@ -132,24 +150,6 @@ export default function PricingCard({ tier, isPayg }: PricingCardProps) {
             </button>
           )}
         </CardContent>
-        {isPayg && (
-          <CardFooter className="flex gap-2 ">
-            <Button
-              className={`w-full md:w-1/2 text-white cursor-pointer ${
-                buttonColor[tier.accent]
-              } `}
-            >
-              Pay Now
-            </Button>
-            <Button
-              className={`w-full md:w-1/2 border bg-white cursor-pointer ${
-                outlineButtonColor[tier.accent]
-              }`}
-            >
-              Start Free Trial
-            </Button>
-          </CardFooter>
-        )}
       </Card>
     </motion.div>
   );
