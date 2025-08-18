@@ -85,7 +85,7 @@ export default function PricingCard({ tier, isPayg }: PricingCardProps) {
                   outlineButtonColor[tier.accent]
                 }`}
               >
-                Start Free Trial
+                Start Trial
               </Button>
             </CardFooter>
           )}

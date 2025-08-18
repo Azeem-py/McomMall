@@ -353,7 +353,7 @@ export default function CoBrandedContent() {
             <Button
               className={`w-full md:w-1/5 border bg-white cursor-pointer text-orange-600 border-orange-600  hover:border-orange-700 hover:bg-white`}
             >
-              Start Free Trial
+              Start Trial
             </Button>
           </CardFooter>
         </div>
