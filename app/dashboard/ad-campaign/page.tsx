@@ -5,12 +5,12 @@ import { CampaignFilters } from './components/CampaignFilters';
 import { CampaignsTable } from './components/CampaignsTable';
 import { PageHeader } from './components/PageHeader';
 import { mockCampaigns } from './data';
+import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
 
 const CampaignsPage = () => {
-  // Original data source
   const [allCampaigns] = useState(mockCampaigns);
 
-  // State for filters
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
@@ -23,22 +23,22 @@ const CampaignsPage = () => {
     setDateRange(undefined);
   };
 
-  // Memoized filtering logic for performance
+  const router = useRouter();
+  const goToAddPage = () => {
+    router.push('/dashboard/add-campaign');
+  };
+
   const filteredCampaigns = useMemo(() => {
     return allCampaigns.filter(campaign => {
-      // Search term filter (case-insensitive)
       const matchesSearch = campaign.listingName
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
 
-      // Status filter
       const matchesStatus =
         statusFilter === 'all' || campaign.status === statusFilter;
 
-      // Type filter
       const matchesType = typeFilter === 'all' || campaign.type === typeFilter;
 
-      // Date range filter
       const matchesDate =
         !dateRange?.from ||
         (campaign.startDate >= dateRange.from &&
@@ -69,6 +69,12 @@ const CampaignsPage = () => {
         />
 
         <CampaignsTable campaigns={filteredCampaigns} />
+        <Button
+          className="mt-3 py-6 px-5 bg-orange-600 hover:bg-orange-700 rounded-2xl"
+          onClick={goToAddPage}
+        >
+          Add New Campaign
+        </Button>
       </div>
     </div>
   );
