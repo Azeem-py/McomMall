@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants, Transition } from 'framer-motion';
 import ListingTypeSelector from './components/ListCategory';
 import MultiStepListingForm from './components/MultiStepListingForm';
 import {
@@ -23,13 +23,14 @@ const AddListingPage = () => {
     setSelectedCategory(null);
   };
 
-  const pageVariants = {
+  const pageVariants: Variants = {
     initial: { opacity: 0, x: -50 },
     in: { opacity: 1, x: 0 },
     out: { opacity: 0, x: 50 },
   };
 
-  const pageTransition = {
+  // ✅ explicitly typed as Transition
+  const pageTransition: Transition = {
     type: 'tween',
     ease: 'anticipate',
     duration: 0.5,

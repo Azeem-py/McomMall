@@ -70,7 +70,7 @@ const OfferingScheduleStep: React.FC<OfferingScheduleStepProps> = ({
   };
 
   const handleImageChange = (image: File | null) => {
-    setService({ ...service, image });
+    setService({ ...service, image: image ? image.name : null });
   };
 
   const handleSelectChange = (

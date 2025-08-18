@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import { House, Map, PartyPopper, Speaker } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -35,7 +35,7 @@ const ListingTypeSelector: React.FC<{
     },
   ];
 
-  const cardVariants = {
+  const cardVariants: Variants = {
     hidden: { y: 20, opacity: 0 },
     visible: {
       y: 0,
@@ -50,7 +50,11 @@ const ListingTypeSelector: React.FC<{
       y: -5,
       scale: 1.05,
       boxShadow: '0px 10px 20px rgba(0,0,0,0.1)',
-      transition: { type: 'spring', stiffness: 300, damping: 20 },
+      transition: {
+        type: 'spring',
+        stiffness: 300,
+        damping: 20,
+      },
     },
   };
 
