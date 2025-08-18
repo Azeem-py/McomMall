@@ -53,6 +53,9 @@ function ListingsPageContent() {
     }
   }, []);
 
+  const [activeFilters, setActiveFilters] =
+    useState<FilterState>(initialFilters);
+
   const { isLoading, isSuccess, data } = useGetGoogleListings({
     queryText: activeFilters.searchTerm || queryText,
     lat: coords.lat,
@@ -61,8 +64,7 @@ function ListingsPageContent() {
 
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [activeFilters, setActiveFilters] =
-    useState<FilterState>(initialFilters);
+
   const [selectedCategory, setSelectedCategory] = useState('All');
   const listingsPerPage = 4;
 
@@ -179,7 +181,7 @@ function ListingsPageContent() {
               </div>
             </div>
             <div className="w-1/3 h-full flex-shrink-0 hidden lg:block">
-              <MapComponent listings={data} />
+              {/* <MapComponent listings={data ?? []} /> */}
             </div>
           </div>
         </main>
