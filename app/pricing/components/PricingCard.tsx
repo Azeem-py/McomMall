@@ -36,6 +36,20 @@ export default function PricingCard({ tier }: PricingCardProps) {
     yellow: 'text-black',
   };
 
+  const buttonColor = {
+    teal: 'bg-teal-500 hover:bg-teal-600',
+    purple: 'bg-purple-500 hover:bg-purple-600',
+    yellow: 'bg-yellow-500 hover:bg-yellow-600',
+  };
+
+  const outlineButtonColor = {
+    teal: 'border-teal-500 hover:border-teal-600 text-teal-500 hover:bg-white',
+    purple:
+      'border-purple-500 hover:border-purple-600 text-purple-500 hover:bg-white',
+    yellow:
+      'border-yellow-500 hover:border-yellow-600 text-yellow-500 hover:bg-white',
+  };
+
   return (
     <motion.div
       whileHover={{ scale: 1.02, boxShadow: '0px 10px 20px rgba(0,0,0,0.1)' }}
@@ -119,7 +133,7 @@ export default function PricingCard({ tier }: PricingCardProps) {
             </button>
           )}
         </CardContent>
-        {/* <CardFooter className="flex gap-2 ">
+        <CardFooter className="flex gap-2 ">
           <Button
             className={`w-full md:w-1/2 text-white cursor-pointer ${
               buttonColor[tier.accent]
@@ -134,7 +148,7 @@ export default function PricingCard({ tier }: PricingCardProps) {
           >
             Start Free Trial
           </Button>
-        </CardFooter> */}
+        </CardFooter>
       </Card>
     </motion.div>
   );
