@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 
 const coBrandedTiers: PricingTier[] = [
   {
-    name: 'Standard',
+    name: 'Mcom Standard',
     price: '£300 / year',
     primaryFeatures: [
       'All PAYG Benefits – Full access without seasonal limitation.',
@@ -26,7 +26,7 @@ const coBrandedTiers: PricingTier[] = [
     accent: 'teal',
   },
   {
-    name: 'Pro',
+    name: 'Mcom Pro',
     price: '£600 / year',
     inherits: 'Standard',
     primaryFeatures: [
@@ -37,7 +37,7 @@ const coBrandedTiers: PricingTier[] = [
     accent: 'purple',
   },
   {
-    name: 'Plus',
+    name: 'Mcom Plus',
     price: '£900 / year',
     inherits: 'Pro',
     primaryFeatures: [
@@ -344,21 +344,6 @@ export default function CoBrandedContent() {
             </div>
           </div>
 
-          <div className="mt-10 flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-4">
-            <Button
-              size="lg"
-              className="bg-orange-500 text-white hover:bg-orange-500/90 transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 hover:shadow-lg"
-            >
-              Pay Now
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white transition-colors duration-300"
-            >
-              Start Trial
-            </Button>
-          </div>
         </div>
       </section>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
@@ -375,6 +360,7 @@ export default function CoBrandedContent() {
               tier={
                 tier as PricingTier & { accent: 'teal' | 'purple' | 'yellow' }
               }
+              isPayg={false}
             />
           </motion.div>
         ))}

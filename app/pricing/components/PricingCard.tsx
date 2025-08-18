@@ -13,9 +13,10 @@ import { PricingTier } from '../types/index';
 
 interface PricingCardProps {
   tier: PricingTier & { accent: 'teal' | 'purple' | 'yellow' };
+  isPayg?: boolean;
 }
 
-export default function PricingCard({ tier }: PricingCardProps) {
+export default function PricingCard({ tier, isPayg }: PricingCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const accentClasses = {
@@ -37,17 +38,17 @@ export default function PricingCard({ tier }: PricingCardProps) {
   };
 
   const buttonColor = {
-    teal: 'bg-teal-500 hover:bg-teal-600',
-    purple: 'bg-purple-500 hover:bg-purple-600',
-    yellow: 'bg-yellow-500 hover:bg-yellow-600',
+    teal: 'bg-orange-600 hover:bg-orange-700',
+    purple: 'bg-orange-600 hover:bg-orange-700',
+    yellow: 'bg-orange-600 hover:bg-orange-700',
   };
 
   const outlineButtonColor = {
-    teal: 'border-teal-500 hover:border-teal-600 text-teal-500 hover:bg-white',
+    teal: 'border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white',
     purple:
-      'border-purple-500 hover:border-purple-600 text-purple-500 hover:bg-white',
+      'border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white',
     yellow:
-      'border-yellow-500 hover:border-yellow-600 text-yellow-500 hover:bg-white',
+      'border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white',
   };
 
   return (
@@ -120,9 +121,7 @@ export default function PricingCard({ tier }: PricingCardProps) {
           {tier.secondaryFeatures && tier.secondaryFeatures.length > 0 && (
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className={`flex items-center text-sm font-semibold ${
-                priceColor[tier.accent]
-              }`}
+              className={`flex items-center text-sm font-semibold text-orange-800`}
             >
               {isExpanded ? 'See less features' : 'See more features'}
               {isExpanded ? (
@@ -133,22 +132,24 @@ export default function PricingCard({ tier }: PricingCardProps) {
             </button>
           )}
         </CardContent>
-        <CardFooter className="flex gap-2 ">
-          <Button
-            className={`w-full md:w-1/2 text-white cursor-pointer ${
-              buttonColor[tier.accent]
-            } `}
-          >
-            Pay Now
-          </Button>
-          <Button
-            className={`w-full md:w-1/2 border bg-white cursor-pointer ${
-              outlineButtonColor[tier.accent]
-            }`}
-          >
-            Start Free Trial
-          </Button>
-        </CardFooter>
+        {isPayg && (
+          <CardFooter className="flex gap-2 ">
+            <Button
+              className={`w-full md:w-1/2 text-white cursor-pointer ${
+                buttonColor[tier.accent]
+              } `}
+            >
+              Pay Now
+            </Button>
+            <Button
+              className={`w-full md:w-1/2 border bg-white cursor-pointer ${
+                outlineButtonColor[tier.accent]
+              }`}
+            >
+              Start Free Trial
+            </Button>
+          </CardFooter>
+        )}
       </Card>
     </motion.div>
   );

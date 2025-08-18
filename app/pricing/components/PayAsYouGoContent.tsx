@@ -244,6 +244,7 @@ export default function PayAsYouGoContent() {
               tier={
                 tier as PricingTier & { accent: 'teal' | 'purple' | 'yellow' }
               }
+              isPayg={true}
             />
           </motion.div>
         ))}
