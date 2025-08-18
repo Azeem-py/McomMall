@@ -1,8 +1,16 @@
 'use client';
 
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import ListingTypeSelector from './components/ListCategory';
 import MultiStepListingForm from './components/MultiStepListingForm';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 const AddListingPage = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -15,19 +23,60 @@ const AddListingPage = () => {
     setSelectedCategory(null);
   };
 
+  const pageVariants = {
+    initial: { opacity: 0, x: -50 },
+    in: { opacity: 1, x: 0 },
+    out: { opacity: 0, x: 50 },
+  };
+
+  const pageTransition = {
+    type: 'tween',
+    ease: 'anticipate',
+    duration: 0.5,
+  };
+
   return (
-    <section className="w-full">
-      {!selectedCategory ? (
-        <div className="flex flex-col items-center justify-center h-full py-12">
-          <h2 className="text-3xl font-bold mb-4">Create a New Listing</h2>
-          <p className="text-gray-600 mb-8">
-            To get started, please select a category for your listing.
-          </p>
-          <ListingTypeSelector onCategorySelect={handleCategorySelect} />
-        </div>
-      ) : (
-        <MultiStepListingForm category={selectedCategory} onBack={handleBack} />
-      )}
+    <section className="w-full max-w-4xl mx-auto py-12">
+      <AnimatePresence mode="wait">
+        {!selectedCategory ? (
+          <motion.div
+            key="category-selector"
+            initial="initial"
+            animate="in"
+            exit="out"
+            variants={pageVariants}
+            transition={pageTransition}
+          >
+            <Card>
+              <CardHeader className="text-center">
+                <CardTitle className="text-3xl font-bold">
+                  Create a New Listing
+                </CardTitle>
+                <CardDescription className="text-lg">
+                  To get started, please select a category for your listing.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ListingTypeSelector onCategorySelect={handleCategorySelect} />
+              </CardContent>
+            </Card>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="form"
+            initial="initial"
+            animate="in"
+            exit="out"
+            variants={pageVariants}
+            transition={pageTransition}
+          >
+            <MultiStepListingForm
+              category={selectedCategory}
+              onBack={handleBack}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 };

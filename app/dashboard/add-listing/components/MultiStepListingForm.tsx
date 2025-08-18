@@ -1,44 +1,88 @@
 'use client';
 
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Check } from 'lucide-react';
+
 import BasicInfoStep from './BasicInfoStep';
 import OfferingScheduleStep from './OfferingScheduleStep';
 import FinalDetailsStep from './FinalDetailsStep';
 import { ListingFormData } from '../types';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 
 interface MultiStepListingFormProps {
   category: string;
   onBack: () => void;
 }
 
-const StepIndicator = ({ currentStep }: { currentStep: number }) => {
-  const steps = ['Basic Information', 'Offering & Schedule', 'Final Details'];
+const steps = [
+  {
+    number: 1,
+    title: 'Basic Information',
+    component: BasicInfoStep,
+  },
+  {
+    number: 2,
+    title: 'Offering & Schedule',
+    component: OfferingScheduleStep,
+  },
+  {
+    number: 3,
+    title: 'Final Details',
+    component: FinalDetailsStep,
+  },
+];
 
-  return (
-    <div className="flex justify-center items-center mb-8">
-      {steps.map((step, index) => (
-        <div key={index} className="flex items-center">
+const StepIndicator = ({ currentStep }: { currentStep: number }) => (
+  <div className="flex justify-center items-center mb-8">
+    {steps.map((step, index) => (
+      <div key={step.number} className="flex items-center">
+        <div className="flex flex-col items-center">
           <div
-            className={`w-8 h-8 rounded-full flex items-center justify-center text-white ${
-              currentStep > index + 1 ? 'bg-green-500' : currentStep === index + 1 ? 'bg-red-500' : 'bg-gray-300'
+            className={`w-10 h-10 rounded-full flex items-center justify-center text-lg font-semibold transition-colors duration-300 ${
+              currentStep > step.number
+                ? 'bg-primary text-primary-foreground'
+                : currentStep === step.number
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted text-muted-foreground'
             }`}
           >
-            {currentStep > index + 1 ? '✔' : index + 1}
+            {currentStep > step.number ? <Check /> : step.number}
           </div>
-          <p className={`ml-2 ${currentStep >= index + 1 ? 'text-red-500' : 'text-gray-500'}`}>
-            {step}
+          <p
+            className={`mt-2 text-sm font-medium transition-colors duration-300 ${
+              currentStep >= step.number
+                ? 'text-primary'
+                : 'text-muted-foreground'
+            }`}
+          >
+            {step.title}
           </p>
-          {index < steps.length - 1 && (
-            <div className="w-16 h-1 bg-gray-300 mx-4"></div>
-          )}
         </div>
-      ))}
-    </div>
-  );
-};
+        {index < steps.length - 1 && (
+          <div
+            className={`w-16 h-1 mx-4 transition-colors duration-300 ${
+              currentStep > step.number ? 'bg-primary' : 'bg-muted'
+            }`}
+          />
+        )}
+      </div>
+    ))}
+  </div>
+);
 
-
-const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({ category, onBack }) => {
+const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
+  category,
+  onBack,
+}) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<ListingFormData>({
     category,
@@ -79,53 +123,69 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({ category, o
 
   const handleSubmit = () => {
     console.log('Submitting data:', JSON.stringify(formData, null, 2));
-    // Here you would typically send the data to a server
     alert('Listing submitted! Check the console for the data.');
   };
 
+  const CurrentStepComponent = steps.find(
+    s => s.number === currentStep
+  )!.component;
+
+  const formVariants = {
+    hidden: { opacity: 0, x: 50 },
+    visible: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: -50 },
+  };
+
   return (
-    <div className="p-8 bg-white rounded-lg shadow-md w-full">
-        <div className='flex justify-between'>
-            <h2 className="text-2xl font-bold mb-2">Create a new <span className='text-red-500'>{category}</span> Listing</h2>
-            <button onClick={onBack} className="text-gray-600 hover:text-gray-900">← Back to categories</button>
-      </div>
-      <StepIndicator currentStep={currentStep} />
-
-      <form onSubmit={e => e.preventDefault()}>
-        {currentStep === 1 && (
-          <BasicInfoStep
-            formData={formData}
-            setFormData={setFormData}
-            errors={errors}
-          />
-        )}
-        {currentStep === 2 && (
-          <OfferingScheduleStep
-            formData={formData}
-            setFormData={setFormData}
-          />
-        )}
-        {currentStep === 3 && (
-          <FinalDetailsStep
-            formData={formData}
-            setFormData={setFormData}
-          />
-        )}
-      </form>
-
-      {/* Navigation */}
-      <div className="flex justify-between mt-8">
+    <Card>
+      <CardHeader>
+        <div className="flex justify-between items-center">
+          <CardTitle className="text-2xl font-bold">
+            Create a new <span className="text-primary">{category}</span>{' '}
+            Listing
+          </CardTitle>
+          <Button variant="ghost" onClick={onBack}>
+            &larr; Back to categories
+          </Button>
+        </div>
+      </CardHeader>
+      <Separator />
+      <CardContent className="pt-6">
+        <StepIndicator currentStep={currentStep} />
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentStep}
+            variants={formVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            transition={{ type: 'tween', ease: 'easeInOut', duration: 0.4 }}
+          >
+            <CurrentStepComponent
+              formData={formData}
+              setFormData={setFormData}
+              errors={errors}
+            />
+          </motion.div>
+        </AnimatePresence>
+      </CardContent>
+      <Separator />
+      <CardFooter className="flex justify-between mt-6">
         {currentStep > 1 ? (
-          <button onClick={prevStep} className="px-6 py-2 bg-gray-300 rounded-md">Back</button>
-        ) : <div />}
+          <Button variant="outline" onClick={prevStep}>
+            Back
+          </Button>
+        ) : (
+          <div />
+        )}
 
         {currentStep < 3 ? (
-          <button onClick={nextStep} className="px-6 py-2 bg-red-500 text-white rounded-md">Next</button>
+          <Button onClick={nextStep}>Next</Button>
         ) : (
-          <button onClick={handleSubmit} className="px-6 py-2 bg-green-500 text-white rounded-md">Submit</button>
+          <Button onClick={handleSubmit}>Submit</Button>
         )}
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   );
 };
 

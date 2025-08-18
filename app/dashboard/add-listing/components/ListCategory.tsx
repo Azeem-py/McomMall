@@ -1,59 +1,86 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { House, Map, PartyPopper, Speaker } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-interface CategoryCardProps {
+interface Category {
   title: string;
-  // 👇 accept an Icon component instead of a ReactNode
+  description: string;
   icon: React.ElementType;
-  onClick: () => void;
 }
-
-const CategoryCard: React.FC<CategoryCardProps> = ({
-  title,
-  icon: Icon,
-  onClick,
-}) => {
-  return (
-    <motion.div
-      className="flex flex-col items-center justify-center w-64 h-44 rounded-lg cursor-pointer bg-gray-100 text-gray-800"
-      onClick={onClick}
-      whileHover={{
-        y: -10,
-        scale: 1.05,
-        boxShadow: '0px 10px 20px rgba(0,0,0,0.1)',
-        transition: { type: 'spring', stiffness: 300, damping: 20 },
-      }}
-    >
-      <div className="w-16 h-16 rounded-full flex items-center justify-center mb-2 bg-white bg-opacity-50">
-        {/* render as a real icon with size + className */}
-        <Icon size={32} className="text-red-500" />
-      </div>
-      <span className="text-center font-medium text-lg">{title}</span>
-    </motion.div>
-  );
-};
 
 const ListingTypeSelector: React.FC<{
   onCategorySelect: (category: string) => void;
 }> = ({ onCategorySelect }) => {
-  const categories = [
-    { title: 'Service', icon: Map },
-    { title: 'Rent', icon: House },
-    { title: 'Event', icon: PartyPopper },
-    { title: 'Classified', icon: Speaker },
+  const categories: Category[] = [
+    {
+      title: 'Service',
+      description: 'For professionals offering services',
+      icon: Map,
+    },
+    {
+      title: 'Rent',
+      description: 'For properties available for rent',
+      icon: House,
+    },
+    {
+      title: 'Event',
+      description: 'For upcoming events and gatherings',
+      icon: PartyPopper,
+    },
+    {
+      title: 'Classified',
+      description: 'For general classified advertisements',
+      icon: Speaker,
+    },
   ];
 
+  const cardVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: 'spring',
+        stiffness: 100,
+        damping: 10,
+      },
+    },
+    hover: {
+      y: -5,
+      scale: 1.05,
+      boxShadow: '0px 10px 20px rgba(0,0,0,0.1)',
+      transition: { type: 'spring', stiffness: 300, damping: 20 },
+    },
+  };
+
   return (
-    <div className="w-full max-w-6xl">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
-        {categories.map(category => (
-          <CategoryCard
+    <div className="w-full max-w-4xl mx-auto">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+        {categories.map((category, index) => (
+          <motion.div
             key={category.title}
-            title={category.title}
-            icon={category.icon}
+            custom={index}
+            initial="hidden"
+            animate="visible"
+            whileHover="hover"
+            variants={cardVariants}
             onClick={() => onCategorySelect(category.title)}
-          />
+          >
+            <Card className="cursor-pointer h-full">
+              <CardHeader className="flex-row items-center gap-4">
+                <div className="w-12 h-12 rounded-full flex items-center justify-center bg-primary/10">
+                  <category.icon className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <CardTitle>{category.title}</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">{category.description}</p>
+              </CardContent>
+            </Card>
+          </motion.div>
         ))}
       </div>
     </div>
