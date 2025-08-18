@@ -343,7 +343,6 @@ export default function CoBrandedContent() {
               </div>
             </div>
           </div>
-
         </div>
       </section>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
@@ -368,7 +367,7 @@ export default function CoBrandedContent() {
       <ComparisonTable
         plans={coBrandedPlans}
         featureGroups={coBrandedFeatureGroups}
-        accentHeaders={['teal-500', 'purple-500', 'yellow-500']}
+        accentHeaders={['blue-900', 'orange-800', 'black-500']}
       />
     </motion.div>
   );

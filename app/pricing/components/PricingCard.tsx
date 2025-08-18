@@ -26,15 +26,15 @@ export default function PricingCard({ tier, isPayg }: PricingCardProps) {
   };
 
   const priceColor = {
-    teal: 'text-teal-700',
+    teal: 'text-blue-900',
     purple: 'text-orange-700',
-    yellow: 'text-yellow-700',
+    yellow: 'text-blue-900',
   };
 
   const checkColor = {
-    teal: 'text-black',
-    purple: 'text-purple-500',
-    yellow: 'text-black',
+    teal: 'text-blue-900',
+    purple: 'text-orange-700',
+    yellow: 'text-blue-900',
   };
 
   const buttonColor = {
