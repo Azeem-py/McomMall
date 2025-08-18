@@ -417,6 +417,12 @@ export default function HomePage() {
     router.push(`/listings?queryText=${encodeURIComponent(query)}`);
   };
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -469,6 +475,7 @@ export default function HomePage() {
                   className="w-full bg-transparent focus:outline-none text-black"
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
+                  onKeyDown={handleKeyDown}
                 />
               </div>
               <div className="w-full md:w-auto flex-1 flex items-center p-2">
@@ -479,6 +486,7 @@ export default function HomePage() {
                   className="w-full bg-transparent focus:outline-none text-black"
                   value={location}
                   onChange={e => setLocation(e.target.value)}
+                  onKeyDown={handleKeyDown}
                 />
               </div>
               <motion.button

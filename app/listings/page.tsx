@@ -54,7 +54,7 @@ function ListingsPageContent() {
   }, []);
 
   const { isLoading, isSuccess, data } = useGetGoogleListings({
-    queryText: queryText,
+    queryText: activeFilters.searchTerm || queryText,
     lat: coords.lat,
     lng: coords.lng,
   });
@@ -80,36 +80,14 @@ function ListingsPageContent() {
   const handleFilterChange = (newFilters: FilterState) => {
     setActiveFilters(newFilters);
     setCurrentPage(1);
+    const params = new URLSearchParams();
+    if (newFilters.searchTerm) {
+      params.set('queryText', newFilters.searchTerm);
+    }
+    window.history.pushState(null, '', `?${params.toString()}`);
   };
 
-  const filteredListings = useMemo(() => {
-    return listings.filter(listing => {
-      if (selectedCategory !== 'All' && listing.category !== selectedCategory)
-        return false;
-      if (
-        activeFilters.searchTerm &&
-        !listing.title
-          .toLowerCase()
-          .includes(activeFilters.searchTerm.toLowerCase())
-      )
-        return false;
-      if (
-        activeFilters.category !== 'all' &&
-        listing.category.toLowerCase() !== activeFilters.category.toLowerCase()
-      )
-        return false;
-      if (
-        activeFilters.location &&
-        !listing.location
-          .toLowerCase()
-          .includes(activeFilters.location.toLowerCase())
-      )
-        return false;
-      return true;
-    });
-  }, [selectedCategory, activeFilters]);
-
-  const totalPages = Math.ceil(filteredListings.length / listingsPerPage);
+  const totalPages = Math.ceil((data?.length || 0) / listingsPerPage);
 
   if (isLoading) return <p>Loading...</p>;
 
@@ -201,7 +179,7 @@ function ListingsPageContent() {
               </div>
             </div>
             <div className="w-1/3 h-full flex-shrink-0 hidden lg:block">
-              <MapComponent listings={filteredListings} />
+              <MapComponent listings={data} />
             </div>
           </div>
         </main>

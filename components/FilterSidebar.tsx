@@ -39,8 +39,12 @@ export default function FilterSidebar({
   const [priceRange, setPriceRange] = useState([20, 500]);
 
   const handleApplyFilters = () => {
+    let query = searchTerm;
+    if (location) {
+      query = `${searchTerm} in ${location}`;
+    }
     onFilterChange({
-      searchTerm,
+      searchTerm: query,
       category,
       location,
       radius: radius[0],
