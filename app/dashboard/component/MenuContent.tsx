@@ -9,6 +9,7 @@ import {
   listingMenuItems,
   storeMenuItems,
   accountMenuItems,
+  pluginMenuItems,
 } from '@/lib/menu-items';
 
 // An optional prop to close the menu on link click (for mobile)
@@ -35,7 +36,7 @@ export const MenuContent = ({ onLinkClick }: MenuContentProps) => {
             className="rounded-2xl"
           >
             <div
-              className="flex items-center justify-between p-2 text-gray-700 hover:text-red-500 transition-colors cursor-pointer rounded-2xl hover:shadow hover:bg-white"
+              className="flex items-center justify-between p-2 text-gray-700 hover:text-orange-500 transition-colors cursor-pointer rounded-2xl hover:shadow hover:bg-white"
               onClick={() => item.subMenu && toggleSubMenu(item.title)}
             >
               <Link
@@ -43,7 +44,7 @@ export const MenuContent = ({ onLinkClick }: MenuContentProps) => {
                 className="flex items-center space-x-2"
                 onClick={onLinkClick} // Close mobile menu on click
               >
-                <item.icon className="w-5 h-5 text-red-500" />
+                <item.icon className="w-5 h-5 text-orange-500" />
                 <span>{item.title}</span>
               </Link>
               {item.subMenu && (
@@ -68,7 +69,7 @@ export const MenuContent = ({ onLinkClick }: MenuContentProps) => {
                   <li key={j}>
                     <Link
                       href={subItem.href}
-                      className="block py-1 text-gray-600 hover:text-red-500 text-sm transition-colors pl-8"
+                      className="block py-1 text-gray-600 hover:text-orange-500 text-sm transition-colors pl-8"
                       onClick={onLinkClick} // Close mobile menu on click
                     >
                       {subItem.title}
@@ -108,6 +109,12 @@ export const MenuContent = ({ onLinkClick }: MenuContentProps) => {
           Account
         </h3>
         {renderMenuItems(accountMenuItems)}
+      </nav>
+      <nav className="mt-6">
+        <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2 px-2">
+          Plugin
+        </h3>
+        {renderMenuItems(pluginMenuItems)}
       </nav>
     </>
   );

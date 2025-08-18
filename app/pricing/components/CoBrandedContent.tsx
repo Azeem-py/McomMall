@@ -1,13 +1,13 @@
 import { motion } from 'framer-motion';
 import PricingCard from './PricingCard';
 import ComparisonTable from './ComparisonTable';
-import TrialInfo from './TrialInfo';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PricingTier, TableFeature, FeatureGroup } from '../types/index';
+import { ShieldCheck, LayoutDashboard, Rocket, Headset } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const coBrandedTiers: PricingTier[] = [
   {
-    name: 'Standard',
+    name: 'Mcom Standard',
     price: '£300 / year',
     primaryFeatures: [
       'All PAYG Benefits – Full access without seasonal limitation.',
@@ -26,7 +26,7 @@ const coBrandedTiers: PricingTier[] = [
     accent: 'teal',
   },
   {
-    name: 'Pro',
+    name: 'Mcom Pro',
     price: '£600 / year',
     inherits: 'Standard',
     primaryFeatures: [
@@ -37,7 +37,7 @@ const coBrandedTiers: PricingTier[] = [
     accent: 'purple',
   },
   {
-    name: 'Plus',
+    name: 'Mcom Plus',
     price: '£900 / year',
     inherits: 'Pro',
     primaryFeatures: [
@@ -236,30 +236,114 @@ export default function CoBrandedContent() {
       <h1 className="text-3xl md:text-4xl font-bold mb-8 text-blue-900">
         Co-Branded Pricing
       </h1>
-      <section className=" flex flex-col items-center justify-center">
-        <motion.div
-          variants={{
-            initial: { opacity: 0, y: 20 },
-            animate: { opacity: 1, y: 0 },
-          }}
-          className=" md:w-4/5"
-        >
-          <Card className="mb-8 bg-white border-none shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-2xl font-semibold text-blue-900">
-                Co-Branded Model Overview
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-700">
-                The Co-Branded model requires an upfront annual platform fee of
-                £365 (£1 per day). This fee is a prerequisite to unlock the
-                tiered packages below.
-              </p>
-            </CardContent>
-          </Card>
-        </motion.div>
-        <TrialInfo />
+      <section className="w-full flex flex-col items-center justify-center mb-12">
+        <div className="w-full p-8 bg-white rounded-lg shadow-lg">
+          <h2 className="text-3xl font-bold text-center mb-2">
+            Your Co-Branded Launchpad
+          </h2>
+          <p className="text-center text-gray-600 mb-8 text-lg font-medium">
+            ($365 onboarding fee to unlock your choice of Standard, Pro, or Pro
+            Plus plans)
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Category 1: Verification & Activation */}
+            <div className="flex items-start space-x-4">
+              <div className="flex-shrink-0">
+                <ShieldCheck className="h-8 w-8 text-orange-500" />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold">
+                  Verification & Activation
+                </h3>
+                <ul className="list-disc list-inside text-gray-700 mt-2">
+                  <li>
+                    Business Verification: Secure your business ownership and
+                    activate your primary account.
+                  </li>
+                  <li>
+                    Full Directory Claim: Get verified and listed across all
+                    247GBS directories and the MCOM Lead Traffic Hub.
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Category 2: Platform & Dashboard Access */}
+            <div className="flex items-start space-x-4">
+              <div className="flex-shrink-0">
+                <LayoutDashboard className="h-8 w-8 text-orange-500" />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold">
+                  Platform & Dashboard Access
+                </h3>
+                <ul className="list-disc list-inside text-gray-700 mt-2">
+                  <li>
+                    Initial Dashboard Access: Get temporary pre-subscription
+                    access to the MCOM Dashboard to explore key features.
+                  </li>
+                  <li>
+                    Feature Previews: View your Wallet Overview, Loyalty Program
+                    Controls (view-only), and eGift/eCard Previews.
+                  </li>
+                  <li>
+                    Business Tools: Access a basic version of our Spare Capacity
+                    & Stock Audit Tool.
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Category 3: Marketing & Growth */}
+            <div className="flex items-start space-x-4">
+              <div className="flex-shrink-0">
+                <Rocket className="h-8 w-8 text-orange-500" />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold">Marketing & Growth</h3>
+                <ul className="list-disc list-inside text-gray-700 mt-2">
+                  <li>
+                    Evergreen Rewards: Receive your first co-branded QR code for
+                    our external reward program.
+                  </li>
+                  <li>
+                    Promotional Inclusion: Be featured in our initial co-branded
+                    marketing promotions for immediate exposure.
+                  </li>
+                  <li>
+                    Network Access: Join the 247GBS Co-Branded Network for
+                    collaboration opportunities.
+                  </li>
+                  <li>
+                    Campaign Trial: Gain the option to participate in one
+                    seasonal marketing campaign.
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Category 4: Support & Flexibility */}
+            <div className="flex items-start space-x-4">
+              <div className="flex-shrink-0">
+                <Headset className="h-8 w-8 text-orange-500" />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold">Support & Flexibility</h3>
+                <ul className="list-disc list-inside text-gray-700 mt-2">
+                  <li>
+                    Guided Onboarding: Receive step-by-step support and a guided
+                    walkthrough of all co-branded options.
+                  </li>
+                  <li>
+                    Extended Payment Window: Choose a 14 or 30-day window to pay
+                    the remaining balance for your chosen plan.
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
         {coBrandedTiers.map((tier, index) => (
@@ -275,6 +359,7 @@ export default function CoBrandedContent() {
               tier={
                 tier as PricingTier & { accent: 'teal' | 'purple' | 'yellow' }
               }
+              isPayg={false}
             />
           </motion.div>
         ))}
@@ -282,7 +367,7 @@ export default function CoBrandedContent() {
       <ComparisonTable
         plans={coBrandedPlans}
         featureGroups={coBrandedFeatureGroups}
-        accentHeaders={['teal-500', 'purple-500', 'yellow-500']}
+        accentHeaders={['blue-900', 'orange-800', 'black-500']}
       />
     </motion.div>
   );

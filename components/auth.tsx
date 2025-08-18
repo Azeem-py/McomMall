@@ -233,7 +233,7 @@ const Auth = ({ children }: { children?: React.ReactNode }) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" className="text-rose-700">
+        <Button variant="outline" className="text-orange-500">
           {children || 'Sign In'}
         </Button>
       </DialogTrigger>
@@ -244,7 +244,7 @@ const Auth = ({ children }: { children?: React.ReactNode }) => {
               <Button
                 variant="link"
                 className={`mr-4 text-lg ${
-                  !newAccount ? 'text-red-500' : 'text-gray-400'
+                  !newAccount ? 'text-orange-500' : 'text-gray-400'
                 }`}
                 onClick={() => handleToggleMode(false)}
               >
@@ -253,7 +253,7 @@ const Auth = ({ children }: { children?: React.ReactNode }) => {
               <Button
                 variant="link"
                 className={`text-lg ${
-                  newAccount ? 'text-red-500' : 'text-gray-400'
+                  newAccount ? 'text-orange-500' : 'text-gray-400'
                 }`}
                 onClick={() => handleToggleMode(true)}
               >
@@ -262,7 +262,7 @@ const Auth = ({ children }: { children?: React.ReactNode }) => {
             </div>
             <hr className="w-full bg-gray-400 " />
           </div>
-          <DialogTitle className="text-2xl text-red-500 hover:text-red-600">
+          <DialogTitle className="text-2xl text-orange-500 hover:text-orange-600">
             {newAccount
               ? `Create ${
                   selectedRole === UserRole.CUSTOMER
@@ -293,7 +293,7 @@ const Auth = ({ children }: { children?: React.ReactNode }) => {
                   variant="outline"
                   className={`flex-1 px-4 py-2 text-gray-700 ${
                     selectedRole === UserRole.CUSTOMER
-                      ? 'bg-red-500 hover:bg-red-600 text-white'
+                      ? 'bg-orange-500 hover:bg-orange-600 text-white'
                       : 'bg-gray-200 hover:bg-gray-300'
                   } rounded`}
                   onClick={() => handleRoleSelect(UserRole.CUSTOMER)}
@@ -304,7 +304,7 @@ const Auth = ({ children }: { children?: React.ReactNode }) => {
                   variant="outline"
                   className={`flex-1 px-4 py-2 text-gray-700 ${
                     selectedRole === UserRole.OWNER
-                      ? 'bg-red-500 hover:bg-red-600 text-white'
+                      ? 'bg-orange-500 hover:bg-orange-600 text-white'
                       : 'bg-gray-200 hover:bg-gray-300'
                   } rounded`}
                   onClick={() => handleRoleSelect(UserRole.OWNER)}
@@ -314,7 +314,7 @@ const Auth = ({ children }: { children?: React.ReactNode }) => {
               </div>
             )}
             {errors.role && (
-              <p className="text-red-500 text-sm mt-1">{errors.role}</p>
+              <p className="text-orange-500 text-sm mt-1">{errors.role}</p>
             )}
           </div>
           {newAccount && (
@@ -329,11 +329,11 @@ const Auth = ({ children }: { children?: React.ReactNode }) => {
                 onChange={handleInputChange}
                 placeholder="John Doe"
                 className={`sm:h-[3rem] ${
-                  errors.fullName ? 'border-red-500' : ''
+                  errors.fullName ? 'border-orange-500' : ''
                 }`}
               />
               {errors.fullName && (
-                <p className="text-red-500 text-sm">{errors.fullName}</p>
+                <p className="text-orange-500 text-sm">{errors.fullName}</p>
               )}
             </div>
           )}
@@ -347,10 +347,12 @@ const Auth = ({ children }: { children?: React.ReactNode }) => {
               value={formData.email}
               onChange={handleInputChange}
               placeholder="john@doe.com"
-              className={`sm:h-[3rem] ${errors.email ? 'border-red-500' : ''}`}
+              className={`sm:h-[3rem] ${
+                errors.email ? 'border-orange-500' : ''
+              }`}
             />
             {errors.email && (
-              <p className="text-red-500 text-sm">{errors.email}</p>
+              <p className="text-orange-500 text-sm">{errors.email}</p>
             )}
           </div>
           {newAccount && (
@@ -385,11 +387,11 @@ const Auth = ({ children }: { children?: React.ReactNode }) => {
               onChange={handleInputChange}
               placeholder="your password"
               className={`sm:h-[3rem] ${
-                errors.password ? 'border-red-500' : ''
+                errors.password ? 'border-orange-500' : ''
               }`}
             />
             {errors.password && (
-              <p className="text-red-500 text-sm">{errors.password}</p>
+              <p className="text-orange-500 text-sm">{errors.password}</p>
             )}
           </div>
           {newAccount && (
@@ -405,11 +407,13 @@ const Auth = ({ children }: { children?: React.ReactNode }) => {
                 onChange={handleInputChange}
                 placeholder="confirm password"
                 className={`sm:h-[3rem] ${
-                  errors.confirmPassword ? 'border-red-500' : ''
+                  errors.confirmPassword ? 'border-orange-500' : ''
                 }`}
               />
               {errors.confirmPassword && (
-                <p className="text-red-500 text-sm">{errors.confirmPassword}</p>
+                <p className="text-red-orange text-sm">
+                  {errors.confirmPassword}
+                </p>
               )}
             </div>
           )}
@@ -426,7 +430,7 @@ const Auth = ({ children }: { children?: React.ReactNode }) => {
           />
         )}
         {newAccount && errors.terms && (
-          <p className="text-red-500 text-sm mt-1">{errors.terms}</p>
+          <p className="text-orange-500 text-sm mt-1">{errors.terms}</p>
         )}
         {!newAccount && <RememberMe />}
         <DialogFooter className="flex flex-col justify-between mt-4">
@@ -435,7 +439,7 @@ const Auth = ({ children }: { children?: React.ReactNode }) => {
           </DialogClose>
           <Button
             type="button"
-            className="justify-start w-fit bg-red-500 hover:bg-red-600"
+            className="justify-start w-fit bg-orange-500 hover:bg-orange-600"
             onClick={handleSubmit}
             disabled={isPending || loginPending}
           >

@@ -21,6 +21,21 @@ import {
   DialogFooter,
   DialogClose,
 } from '@/components/ui/dialog';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Trash, Edit } from 'lucide-react';
 import WeeklySchedule from './WeeklySchedule';
 import AvailabilityCalendar from './AvailabilityCalendar';
@@ -54,7 +69,7 @@ const OfferingScheduleStep: React.FC<OfferingScheduleStepProps> = ({
     setService({ ...service, [e.target.name]: e.target.value });
   };
 
-  const handleImageChange = (image: string | null) => {
+  const handleImageChange = (image: File | null) => {
     setService({ ...service, image });
   };
 
@@ -67,21 +82,18 @@ const OfferingScheduleStep: React.FC<OfferingScheduleStepProps> = ({
 
   const handleAddOrUpdateService = () => {
     if (editingId !== null) {
-      // Update existing service
-      const updatedServices = formData.services.map((s: Service) =>
+      const updatedServices = formData.services.map(s =>
         s.id === editingId ? { ...s, ...service } : s
       );
       setFormData({ ...formData, services: updatedServices });
       setEditingId(null);
     } else {
-      // Add new service
       const newService = { ...service, id: Date.now() };
       setFormData({
         ...formData,
         services: [...formData.services, newService],
       });
     }
-    // Reset form
     setService({
       image: null,
       title: '',
@@ -90,10 +102,6 @@ const OfferingScheduleStep: React.FC<OfferingScheduleStepProps> = ({
       currency: 'USD',
       pricingModel: 'one-time',
     });
-  };
-
-  const handleLogoChange = (image: File | null) => {
-    setFormData({ ...formData, logo: image });
   };
 
   const handleEditService = (s: Service) => {
@@ -109,7 +117,7 @@ const OfferingScheduleStep: React.FC<OfferingScheduleStepProps> = ({
   const handleDeleteService = () => {
     if (serviceToDelete === null) return;
     const updatedServices = formData.services.filter(
-      (s: Service) => s.id !== serviceToDelete
+      s => s.id !== serviceToDelete
     );
     setFormData({ ...formData, services: updatedServices });
     setServiceToDelete(null);
@@ -118,22 +126,21 @@ const OfferingScheduleStep: React.FC<OfferingScheduleStepProps> = ({
 
   return (
     <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-      <>
-        <div className="space-y-6">
-          {/* Pricing & Bookable Services */}
-          <div className="p-6 border rounded-lg">
-            <h3 className="text-lg font-semibold mb-4">
-              Pricing & Bookable Services
-            </h3>
-
-            {/* Service Input Form */}
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Pricing & Bookable Services</CardTitle>
+            <CardDescription>
+              Add the services you offer and their prices.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-              {/* Image, Title, Desc */}
               <div className="md:col-span-2 grid grid-cols-1 gap-6">
                 <div className="space-y-2">
                   <Label>Service Image</Label>
                   <div className="w-32 h-32">
-                    <SingleImageInput onImageChange={handleLogoChange} />
+                    <SingleImageInput onImageChange={handleImageChange} />
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -155,7 +162,6 @@ const OfferingScheduleStep: React.FC<OfferingScheduleStepProps> = ({
                   />
                 </div>
               </div>
-              {/* Price, Currency, Model */}
               <div className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="price">Price</Label>
@@ -206,103 +212,82 @@ const OfferingScheduleStep: React.FC<OfferingScheduleStepProps> = ({
             <Button onClick={handleAddOrUpdateService} className="mt-4">
               {editingId ? 'Update Service' : 'Add Service'}
             </Button>
-
-            {/* Services Table */}
             <div className="mt-8">
               <h4 className="font-semibold">Added Services</h4>
-              <div className="mt-4 flow-root">
-                <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                  <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                    <table className="min-w-full divide-y divide-gray-300">
-                      <thead>
-                        <tr>
-                          <th
-                            scope="col"
-                            className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
+              <Card className="mt-4">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Title</TableHead>
+                      <TableHead>Price</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {formData.services.map((s: Service) => (
+                      <TableRow key={s.id}>
+                        <TableCell className="font-medium">{s.title}</TableCell>
+                        <TableCell>
+                          {s.price} {s.currency}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleEditService(s)}
+                            className="mr-2"
                           >
-                            Title
-                          </th>
-                          <th
-                            scope="col"
-                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                          >
-                            Price
-                          </th>
-                          <th
-                            scope="col"
-                            className="relative py-3.5 pl-3 pr-4 sm:pr-0"
-                          >
-                            <span className="sr-only">Edit</span>
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-200">
-                        {formData.services.map((s: Service) => (
-                          <tr key={s.id}>
-                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
-                              {s.title}
-                            </td>
-                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                              {s.price} {s.currency}
-                            </td>
-                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-                              <button
-                                onClick={() => handleEditService(s)}
-                                className="text-red-600 hover:text-red-900 mr-4"
-                              >
-                                <Edit size={16} />
-                              </button>
-                              <DialogTrigger asChild>
-                                <button
-                                  onClick={() => openDeleteDialog(s.id)}
-                                  className="text-gray-400 hover:text-gray-600"
-                                >
-                                  <Trash size={16} />
-                                </button>
-                              </DialogTrigger>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <DialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => openDeleteDialog(s.id)}
+                            >
+                              <Trash className="h-4 w-4" />
+                            </Button>
+                          </DialogTrigger>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Card>
             </div>
-          </div>
+          </CardContent>
+        </Card>
 
-          {/* Availability */}
-          <WeeklySchedule
-            schedule={formData.schedule}
-            setSchedule={schedule => setFormData({ ...formData, schedule })}
-          />
+        <WeeklySchedule
+          schedule={formData.schedule}
+          setSchedule={schedule => setFormData({ ...formData, schedule })}
+        />
 
-          <AvailabilityCalendar
-            availability={formData.availability}
-            setAvailability={availability =>
-              setFormData({ ...formData, availability })
-            }
-          />
-        </div>
+        <AvailabilityCalendar
+          availability={formData.availability}
+          setAvailability={availability =>
+            setFormData({ ...formData, availability })
+          }
+        />
+      </div>
 
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Are you sure?</DialogTitle>
-          </DialogHeader>
-          <p>
-            This action cannot be undone. This will permanently delete the
-            service.
-          </p>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
-            <Button variant="destructive" onClick={handleDeleteService}>
-              Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Are you sure?</DialogTitle>
+        </DialogHeader>
+        <p>
+          This action cannot be undone. This will permanently delete the
+          service.
+        </p>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="outline">Cancel</Button>
+          </DialogClose>
+          <Button variant="destructive" onClick={handleDeleteService}>
+            Delete
+          </Button>
+        </DialogFooter>
+      </DialogContent>
     </Dialog>
   );
 };
