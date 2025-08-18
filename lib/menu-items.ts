@@ -116,3 +116,18 @@ export const accountMenuItems: MenuItem[] = [
   { title: 'My Profile', href: '/dashboard/my-profile', icon: UserPen },
   { title: 'Logout', href: '/', icon: LogOut },
 ];
+
+export const pluginMenuItems: MenuItem[] = [
+  {
+    title: 'Loyalty & Reward',
+    href: '/dashboard/loyalty',
+    icon: Settings,
+    subMenu: [
+      { title: 'Dashboard', href: '/dashboard/loyalty' },
+      { title: 'Members', href: '/dashboard/loyalty/members' },
+      { title: 'Promotion', href: '/dashboard/loyalty/promotion' },
+      { title: 'Offers', href: '/dashboard/loyalty/offers' },
+      { title: 'Settings', href: '/dashboard/loyalty/settings' },
+    ],
+  },
+];
