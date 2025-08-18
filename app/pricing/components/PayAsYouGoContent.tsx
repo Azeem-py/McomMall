@@ -244,6 +244,7 @@ export default function PayAsYouGoContent() {
               tier={
                 tier as PricingTier & { accent: 'teal' | 'purple' | 'yellow' }
               }
+              isPayg={true}
             />
           </motion.div>
         ))}
@@ -251,7 +252,7 @@ export default function PayAsYouGoContent() {
       <ComparisonTable
         plans={paygPlans}
         featureGroups={paygFeatureGroups}
-        accentHeaders={['teal-500', 'purple-500', 'yellow-500']}
+        accentHeaders={['blue-900', 'orange-800', 'black-500']}
       />
     </motion.div>
   );

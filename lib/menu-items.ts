@@ -1,5 +1,3 @@
-// lib/menu-items.ts
-
 import {
   LayoutDashboard,
   Calendar,
@@ -17,10 +15,10 @@ import {
   Settings,
   LucideIcon,
   UserPen,
-  LogOut, // Import the type for the icon
+  LogOut,
+  Megaphone,
 } from 'lucide-react';
 
-// Define a reusable type for menu items
 export interface SubMenuItem {
   title: string;
   href: string;
@@ -56,7 +54,7 @@ export const mainMenuItems: MenuItem[] = [
 export const listingMenuItems: MenuItem[] = [
   { title: 'Add listing', href: '/dashboard/add-listing', icon: Plus },
   { title: 'My Bookings', href: '/dashboard/my-bookings', icon: Calendar },
-  { title: 'Messages', href: '/dashboard/messages', icon: MessageSquare },
+  { title: 'Ad Campaign', href: '/dashboard/ad-campaign', icon: Megaphone },
   {
     title: 'My listings',
     href: '/dashboard/my-listings',
