@@ -181,7 +181,17 @@ function ListingsPageContent() {
               </div>
             </div>
             <div className="w-1/3 h-full flex-shrink-0 hidden lg:block">
-              {/* <MapComponent listings={data ?? []} /> */}
+              <MapComponent
+                listings={data ?? []}
+                center={
+                  data && data.length > 0
+                    ? [
+                        data[0].geometry.location.lat,
+                        data[0].geometry.location.lng,
+                      ]
+                    : [coords.lat, coords.lng]
+                }
+              />
             </div>
           </div>
         </main>

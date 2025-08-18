@@ -1,10 +1,13 @@
 // app/components/MapComponent.tsx
 'use client';
 
+// app/components/MapComponent.tsx
+'use client';
+
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { Listing } from '@/lib/listing-data';
+import { GooglePlaceResult } from '@/service/listings/types';
 
 // Function to create custom numbered icons using a string with Tailwind classes
 const createNumberedIcon = (number: number) => {
@@ -17,8 +20,21 @@ const createNumberedIcon = (number: number) => {
   });
 };
 
-export default function MapComponent({ listings }: { listings: Listing[] }) {
-  const position: [number, number] = [40.7128, -74.006]; // Default to NYC
+export default function MapComponent({
+  listings,
+  center,
+}: {
+  listings: GooglePlaceResult[];
+  center?: [number, number];
+}) {
+  const position =
+    center ??
+    (listings.length > 0
+      ? [
+          listings[0].geometry.location.lat,
+          listings[0].geometry.location.lng,
+        ]
+      : [40.7128, -74.006]); // Default to NYC
 
   return (
     <MapContainer
@@ -33,13 +49,16 @@ export default function MapComponent({ listings }: { listings: Listing[] }) {
       />
       {listings.map((listing, index) => (
         <Marker
-          key={listing.id}
-          position={[listing.lat, listing.lng]}
+          key={listing.place_id}
+          position={[
+            listing.geometry.location.lat,
+            listing.geometry.location.lng,
+          ]}
           icon={createNumberedIcon(index + 1)}
         >
           <Popup>
-            <div className="font-bold">{listing.title}</div>
-            <div className="text-sm">{listing.location}</div>
+            <div className="font-bold">{listing.name}</div>
+            <div className="text-sm">{listing.vicinity}</div>
           </Popup>
         </Marker>
       ))}
