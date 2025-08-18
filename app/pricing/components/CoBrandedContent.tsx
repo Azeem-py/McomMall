@@ -4,6 +4,7 @@ import ComparisonTable from './ComparisonTable';
 import { PricingTier, TableFeature, FeatureGroup } from '../types/index';
 import { ShieldCheck, LayoutDashboard, Rocket, Headset } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { CardFooter } from '@/components/ui/card';
 
 const coBrandedTiers: PricingTier[] = [
   {
@@ -245,7 +246,6 @@ export default function CoBrandedContent() {
             (£365 onboarding fee to unlock your choice of Standard, Pro, or Pro
             Plus plans)
           </p>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Category 1: Verification & Activation */}
             <div className="flex items-start space-x-4">
@@ -343,6 +343,19 @@ export default function CoBrandedContent() {
               </div>
             </div>
           </div>
+
+          <CardFooter className="flex gap-2 full items-center justify-center py-3">
+            <Button
+              className={`w-full md:w-1/5 text-white cursor-pointer bg-orange-600  hover:bg-orange-700`}
+            >
+              Pay Now
+            </Button>
+            <Button
+              className={`w-full md:w-1/5 border bg-white cursor-pointer text-orange-600 border-orange-600  hover:border-orange-700 hover:bg-white`}
+            >
+              Start Free Trial
+            </Button>
+          </CardFooter>
         </div>
       </section>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
