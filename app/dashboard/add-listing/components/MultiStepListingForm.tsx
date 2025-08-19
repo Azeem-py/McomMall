@@ -3,12 +3,14 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check } from 'lucide-react';
+import { toast } from 'sonner';
 
 import BasicInfoStep from './BasicInfoStep';
 import OfferingScheduleStep from './OfferingScheduleStep';
 import FinalDetailsStep from './FinalDetailsStep';
-import { ListingFormData } from '../types';
+import { ListingFormData } from '@/service/listings/types';
 import { Button } from '@/components/ui/button';
+import { useCreateListing } from '@/service/listings/hook';
 import {
   Card,
   CardContent,
@@ -121,9 +123,17 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
 
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));
 
+  const { mutate, isPending } = useCreateListing();
+
   const handleSubmit = () => {
-    console.log('Submitting data:', JSON.stringify(formData, null, 2));
-    alert('Listing submitted! Check the console for the data.');
+    mutate(formData, {
+      onSuccess: () => {
+        toast.success('Listing created successfully');
+      },
+      onError: error => {
+        toast.error(error.message);
+      },
+    });
   };
 
   const CurrentStepComponent = steps.find(
@@ -182,7 +192,9 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
         {currentStep < 3 ? (
           <Button onClick={nextStep}>Next</Button>
         ) : (
-          <Button onClick={handleSubmit}>Submit</Button>
+          <Button onClick={handleSubmit} disabled={isPending}>
+            {isPending ? 'Submitting...' : 'Submit'}
+          </Button>
         )}
       </CardFooter>
     </Card>

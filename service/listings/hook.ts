@@ -1,6 +1,11 @@
-import { useQuery } from '@tanstack/react-query';
-import api from '../api';
-import { GooglePlaceResult, GooglePlaceResults } from './types';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import Cookies from 'js-cookie';
+import api, { setBearerToken } from '../api';
+import {
+  GooglePlaceResult,
+  GooglePlaceResults,
+  ListingFormData,
+} from './types';
 
 export interface ErrorResponse {
   response?: {
@@ -89,4 +94,29 @@ export const useGetPlacePhoto = (photoReference: string) => {
   });
 
   return query;
+};
+
+export const useCreateListing = () => {
+  const create = async (payload: ListingFormData) => {
+    try {
+      const token = Cookies.get('access');
+      if (token) {
+        setBearerToken(token);
+      }
+      const response = await api.post('listings', { ...payload });
+      return response.data;
+    } catch (error: unknown) {
+      const err = error as ErrorResponse;
+      throw new Error(
+        err.response?.data?.message ||
+          err.message ||
+          'Failed to create listing'
+      );
+    }
+  };
+
+  const mutation = useMutation({
+    mutationFn: create,
+  });
+  return mutation;
 };
