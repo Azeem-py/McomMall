@@ -2,7 +2,9 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import React from 'react';
+import React, { useEffect } from 'react';
+import Cookies from 'js-cookie';
+import { setBearerToken } from '@/service/api';
 
 export default function ClientProviders({
   children,
@@ -10,6 +12,14 @@ export default function ClientProviders({
   children: React.ReactNode;
 }) {
   const [queryClient] = React.useState(() => new QueryClient());
+
+  useEffect(() => {
+    const token = Cookies.get('access');
+    if (token) {
+      setBearerToken(token);
+    }
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       {children}
