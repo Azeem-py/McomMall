@@ -57,7 +57,7 @@ export default function ListingCard({
     const API_URL =
       process.env.NEXT_PUBLIC_API_URL ||
       'https://mcom-mall-api.vercel.app/api/v1';
-    imgUrl = `${API_URL}/listings/photo/${photo_reference}`;
+    imgUrl = `${API_URL}/google/google-business/photo/${photo_reference}`;
   } else {
     imgUrl =
       'https://images.unsplash.com/photo-1543269865-cbf427effbad?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80';

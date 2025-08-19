@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check } from 'lucide-react';
 
@@ -9,6 +10,7 @@ import OfferingScheduleStep from './OfferingScheduleStep';
 import FinalDetailsStep from './FinalDetailsStep';
 import { ListingFormData } from '../types';
 import { Button } from '@/components/ui/button';
+import { useAddListing } from '@/service/listings/hook';
 import {
   Card,
   CardContent,
@@ -99,6 +101,8 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
     socials: {},
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const router = useRouter();
+  const { mutate: addListing, isPending } = useAddListing();
 
   const validateStep1 = () => {
     const newErrors: Record<string, string> = {};
@@ -122,8 +126,43 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));
 
   const handleSubmit = () => {
-    console.log('Submitting data:', JSON.stringify(formData, null, 2));
-    alert('Listing submitted! Check the console for the data.');
+    const urlPattern = new RegExp(
+      '^(https?:\\/\\/)?' + // protocol
+        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+        '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+        '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+        '(\\#[-a-z\\d_]*)?$',
+      'i'
+    ); // fragment locator
+
+    const newErrors: Record<string, string> = {};
+    Object.entries(formData.socials).forEach(([key, value]) => {
+      if (value && !urlPattern.test(value)) {
+        newErrors[
+          `socials.${key}`
+        ] = `Invalid URL format for ${key}. Please enter a valid URL.`;
+      }
+    });
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    const transformedData = {
+      ...formData,
+      keywords: formData.keywords.split(',').map(k => k.trim()),
+      services: formData.services.map(s => ({
+        ...s,
+        price: parseFloat(s.price),
+      })),
+    };
+    addListing(transformedData, {
+      onSuccess: () => {
+        router.push('/dashboard/my-listings');
+      },
+    });
   };
 
   const CurrentStepComponent = steps.find(
@@ -182,7 +221,9 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
         {currentStep < 3 ? (
           <Button onClick={nextStep}>Next</Button>
         ) : (
-          <Button onClick={handleSubmit}>Submit</Button>
+          <Button onClick={handleSubmit} disabled={isPending}>
+            {isPending ? 'Submitting...' : 'Submit'}
+          </Button>
         )}
       </CardFooter>
     </Card>

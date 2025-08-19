@@ -115,3 +115,29 @@ export interface UserListing {
   availabilityOverrides: any[];
   user: User;
 }
+
+export interface Listing {
+  category: string;
+  title: string;
+  logo: File | null;
+  keywords: string[];
+  address: string;
+  googleMapsPlaceId: string;
+  gallery: File[];
+  services: {
+    title: string;
+    description: string;
+    price: number;
+    currency: string;
+    pricingModel: string;
+  }[];
+  schedule: any;
+  availability: any;
+  description: string;
+  socials: {
+    youtube?: string;
+    facebook?: string;
+    instagram?: string;
+    twitter?: string;
+  };
+}
