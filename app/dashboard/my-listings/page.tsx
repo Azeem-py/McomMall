@@ -2,18 +2,21 @@
 
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Search, MapPin, Edit, Trash2, Calendar } from 'lucide-react';
+import {
+  Search,
+  MapPin,
+  Edit,
+  Trash2,
+  Calendar,
+  Building2,
+} from 'lucide-react';
 import Image from 'next/image';
 import { useGetUserListings } from '@/service/listings/hook';
+import { UserListing } from '@/service/listings/types';
 
 // --- Type Definitions ---
 
-type Listing = {
-  id: number;
-  title: string;
-  location: string;
-  imageUrl: string;
-};
+type Listing = UserListing;
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: 'default' | 'primary' | 'ghost';
@@ -100,7 +103,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ searchTerm, setSearchTerm }) => (
 );
 
 const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
-  const [imgSrc, setImgSrc] = useState(listing.imageUrl);
+  const [imgSrc, setImgSrc] = useState(listing.logoUrl);
 
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -111,35 +114,32 @@ const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
     <motion.div variants={cardVariants}>
       <Card className="w-full overflow-hidden">
         <div className="flex flex-col md:flex-row items-start gap-6 p-4">
-          <Image
-            src={imgSrc}
-            alt={listing.title}
-            width={128}
-            height={128}
-            className="h-32 w-full md:h-32 md:w-32 rounded-lg object-cover bg-slate-200"
-            onError={() => {
-              setImgSrc(
-                'https://placehold.co/128x128/e2e8f0/64748b?text=Error'
-              );
-            }}
-          />
+          {imgSrc ? (
+            <Image
+              src={imgSrc}
+              alt={listing.title}
+              width={128}
+              height={128}
+              className="h-32 w-full md:h-32 md:w-32 rounded-lg object-cover bg-slate-200"
+              onError={() => {
+                setImgSrc(null);
+              }}
+            />
+          ) : (
+            <div className="h-32 w-full md:h-32 md:w-32 rounded-lg bg-slate-200 flex items-center justify-center">
+              <Building2 className="h-16 w-16 text-slate-400" />
+            </div>
+          )}
           <div className="flex-grow">
             <h3 className="text-lg font-bold text-slate-800">
               {listing.title}
             </h3>
             <div className="mt-1 flex items-center gap-2 text-sm text-slate-500">
               <MapPin className="h-4 w-4 flex-shrink-0" />
-              <span>{listing.location}</span>
-            </div>
-            <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600">
-              <Calendar className="h-3 w-3" />
-              <span>Expiring: Never/not set</span>
+              <span>{listing.address}</span>
             </div>
           </div>
           <div className="flex w-full shrink-0 flex-row items-center justify-end gap-2 md:w-auto">
-            <Button variant="default" className="text-xs px-3 py-1.5">
-              iCal
-            </Button>
             <Button variant="default" className="text-xs px-3 py-1.5">
               <Edit className="mr-1 h-3 w-3" /> Edit
             </Button>
@@ -238,7 +238,7 @@ export default function MyListingsPage() {
     return listingsData.filter(
       (listing: Listing) =>
         listing.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        listing.location.toLowerCase().includes(searchTerm.toLowerCase())
+        listing.address.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [searchTerm, listingsData]);
 
