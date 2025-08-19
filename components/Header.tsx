@@ -8,9 +8,12 @@ import { ShoppingCart, User } from 'lucide-react';
 import Auth from './auth';
 import { NavMenu } from './NavMenu';
 import { usePathname } from 'next/navigation';
+import { useAuth } from '@/hooks/useAuth';
+import { UserMenu } from './UserMenu';
 
 export default function Header() {
   const pathname = usePathname();
+  const { isAuthenticated } = useAuth();
 
   if (pathname.startsWith('/dashboard')) {
     return null;
@@ -48,10 +51,14 @@ export default function Header() {
                 0
               </Badge>
             </Button>
-            <Auth>
-              <User className="w-4 h-4 mr-2" />
-              Sign In
-            </Auth>
+            {isAuthenticated ? (
+              <UserMenu />
+            ) : (
+              <Auth>
+                <User className="w-4 h-4 mr-2" />
+                Sign In
+              </Auth>
+            )}
 
             {/* Mobile Nav Trigger is now inside NavMenu */}
             <div className="md:hidden">
