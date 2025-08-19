@@ -94,7 +94,7 @@ export const useGetPlacePhoto = (photoReference: string) => {
 export const useGetUserListings = () => {
   const fetch = async () => {
     try {
-      const response = await api.get('listings/user');
+      const response = await api.get('listings/mine');
       return response.data;
     } catch (error: unknown) {
       const err = error as ErrorResponse;
