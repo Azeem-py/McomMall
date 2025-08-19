@@ -38,6 +38,9 @@ export const useCreateUser = () => {
   return mutation;
 };
 
+import { store } from '@/lib/redux/store';
+import { setAuth } from '@/lib/redux/authSlice';
+
 export const useLogin = () => {
   const login = async (payload: AuthInterface): Promise<LoginResponse> => {
     try {
@@ -66,6 +69,14 @@ export const useLogin = () => {
 
       // Set refresh token for 7 days
       Cookies.set('refresh', data.auth.refreshToken, { expires: 7 });
+
+      store.dispatch(
+        setAuth({
+          access_token: data.auth.accessToken,
+          user_name: data.name,
+          user_role: data.role,
+        })
+      );
     },
   });
   return mutation;

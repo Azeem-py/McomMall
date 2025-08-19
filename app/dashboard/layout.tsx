@@ -18,7 +18,9 @@ import { NavMenuContent } from './component/NavMenuContent';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
-export default function DashboardLayout({
+import withAuth from '@/components/withAuth';
+
+function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -75,7 +77,7 @@ export default function DashboardLayout({
                     onLinkClick={() => setIsSideMenuOpen(false)}
                   />
                 </div>
-              </SheetContent>
+              </SheetContent>.
             </Sheet>
           </div>
 
@@ -108,3 +110,5 @@ export default function DashboardLayout({
     </section>
   );
 }
+
+export default withAuth(DashboardLayout);

@@ -3,6 +3,7 @@ import { Open_Sans } from 'next/font/google';
 import 'leaflet/dist/leaflet.css';
 import './globals.css';
 import ClientProviders from '@/components/client-provider';
+import ReduxProvider from '@/components/redux-provider';
 import { Toaster } from 'sonner';
 import Header from '@/components/Header';
 
@@ -24,10 +25,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${opensans.variable} antialiased `}>
-        <ClientProviders>
-          <Header />
-          {children}
-        </ClientProviders>
+        <ReduxProvider>
+          <ClientProviders>
+            <Header />
+            {children}
+          </ClientProviders>
+        </ReduxProvider>
         <Toaster />
       </body>
     </html>
