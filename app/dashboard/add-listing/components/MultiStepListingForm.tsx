@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check } from 'lucide-react';
 
@@ -100,6 +101,7 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
     socials: {},
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const router = useRouter();
   const { mutate: addListing, isPending } = useAddListing();
 
   const validateStep1 = () => {
@@ -156,7 +158,11 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
         price: parseFloat(s.price),
       })),
     };
-    addListing(transformedData);
+    addListing(transformedData, {
+      onSuccess: () => {
+        router.push('/dashboard/my-listings');
+      },
+    });
   };
 
   const CurrentStepComponent = steps.find(
