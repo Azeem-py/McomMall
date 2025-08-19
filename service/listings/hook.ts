@@ -22,7 +22,7 @@ export const useGetGoogleListings = ({
 }) => {
   const fetch = async () => {
     try {
-      const response = await api.get('listings/google-business', {
+      const response = await api.get('google/google-business', {
         params: { lat, lng, queryText },
       });
       return response.data.results as GooglePlaceResults;
@@ -48,7 +48,7 @@ export const useGetGoogleListings = ({
 export const useGetGoogleListing = ({ place_id }: { place_id: string }) => {
   const fetch = async () => {
     try {
-      const response = await api.get(`listings/google-business/${place_id}`);
+      const response = await api.get(`google/google-business/${place_id}`);
       return response.data.result as GooglePlaceResult;
     } catch (error: unknown) {
       const err = error as ErrorResponse;
