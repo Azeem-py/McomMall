@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import Cookies from 'js-cookie';
-import api from '../api';
+import api, { setBearerToken } from '../api';
 import {
   UserInterface,
   AuthInterface,
@@ -60,7 +60,7 @@ export const useLogin = () => {
     onSuccess: data => {
       localStorage.setItem('user-type', String(data.role));
       localStorage.setItem('user-name', data.name);
-
+      setBearerToken(data.auth.accessToken);
       // Set access token for 30 minutes
       Cookies.set('access', data.auth.accessToken, { expires: 1 / 48 }); // 30 minutes
 

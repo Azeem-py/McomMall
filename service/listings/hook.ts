@@ -90,3 +90,25 @@ export const useGetPlacePhoto = (photoReference: string) => {
 
   return query;
 };
+
+export const useGetUserListings = () => {
+  const fetch = async () => {
+    try {
+      const response = await api.get('listings/user');
+      return response.data;
+    } catch (error: unknown) {
+      const err = error as ErrorResponse;
+      throw new Error(
+        err.response?.data?.message ||
+          err.message ||
+          'Failed to fetch user listings'
+      );
+    }
+  };
+
+  const query = useQuery({
+    queryFn: fetch,
+    queryKey: ['FETCH_USER_LISTINGS'],
+  });
+  return query;
+};

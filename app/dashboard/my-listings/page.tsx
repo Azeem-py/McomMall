@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Search, MapPin, Edit, Trash2, Calendar } from 'lucide-react';
 import Image from 'next/image';
+import { useGetUserListings } from '@/service/listings/hook';
 
 // --- Type Definitions ---
 
@@ -82,82 +83,6 @@ const Card: React.FC<CardProps> = ({ children, className, ...props }) => {
   );
 };
 
-// --- Data (Mock Listings) ---
-
-const listingsData: Listing[] = [
-  {
-    id: 1,
-    title: 'io',
-    location: 'Northampton County, Pennsylvania, Verenigde Staten',
-    imageUrl: 'https://placehold.co/200x200/e2e8f0/e2e8f0',
-  },
-  {
-    id: 2,
-    title: 'Maxime voluptate rer',
-    location: 'Enim vero sunt qui',
-    imageUrl: 'https://placehold.co/200x200/e2e8f0/e2e8f0',
-  },
-  {
-    id: 3,
-    title: 'TESTE',
-    location: 'Anterior Lemos 585',
-    imageUrl: "https://placehold.co/200x200/000000/ffffff?text=SELK'NAM",
-  },
-  {
-    id: 4,
-    title: 'test',
-    location: 'Lahore',
-    imageUrl: 'https://placehold.co/200x200/9333ea/ffffff?text=35+Ways',
-  },
-  {
-    id: 5,
-    title: 'MR',
-    location: '46 AKASIA',
-    imageUrl: 'https://placehold.co/200x200/e2e8f0/e2e8f0',
-  },
-  {
-    id: 6,
-    title: 'gghh',
-    location: 'Never/not set',
-    imageUrl: 'https://placehold.co/200x200/e2e8f0/e2e8f0',
-  },
-  {
-    id: 7,
-    title: 'bnrtbtrb',
-    location: 'Pilane Masia, Gaza, Zona Sul, Mocambique',
-    imageUrl: 'https://placehold.co/200x200/3b82f6/ffffff?text=Interior',
-  },
-  {
-    id: 8,
-    title: 'The GuestHouse',
-    location: 'Never/not set',
-    imageUrl: 'https://placehold.co/200x200/e2e8f0/e2e8f0',
-  },
-  {
-    id: 9,
-    title: 'Blino Tech Soluxions',
-    location: '1st avenue, waterdal, De Aar, 7000',
-    imageUrl: 'https://placehold.co/200x200/e2e8f0/e2e8f0',
-  },
-  {
-    id: 10,
-    title: 'Modern Apartment',
-    location: 'Downtown, Metropolis',
-    imageUrl: 'https://placehold.co/200x200/10b981/ffffff?text=Modern',
-  },
-  {
-    id: 11,
-    title: 'Cozy Cottage',
-    location: 'Green Valley, Suburbia',
-    imageUrl: 'https://placehold.co/200x200/f97316/ffffff?text=Cozy',
-  },
-  {
-    id: 12,
-    title: 'Beachfront Villa',
-    location: 'Sunset Beach, Coastline',
-    imageUrl: 'https://placehold.co/200x200/0ea5e9/ffffff?text=Beach',
-  },
-];
 
 // --- Reusable Components ---
 
@@ -300,14 +225,22 @@ export default function MyListingsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
+  const {
+    data: listingsData,
+    isLoading,
+    isError,
+    error,
+  } = useGetUserListings();
+
   const filteredListings = useMemo(() => {
+    if (!listingsData) return [];
     if (!searchTerm) return listingsData;
     return listingsData.filter(
-      listing =>
+      (listing: Listing) =>
         listing.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         listing.location.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [searchTerm]);
+  }, [searchTerm, listingsData]);
 
   const paginatedListings = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -356,13 +289,25 @@ export default function MyListingsPage() {
             initial="hidden"
             animate="visible"
           >
-            {paginatedListings.length > 0 ? (
-              paginatedListings.map(listing => (
+            {isLoading ? (
+              <div className="py-12 text-center text-slate-500">
+                <p>Loading...</p>
+              </div>
+            ) : isError ? (
+              <div className="py-12 text-center text-red-500">
+                <p>Error fetching listings: {error?.message}</p>
+              </div>
+            ) : paginatedListings.length > 0 ? (
+              paginatedListings.map((listing: Listing) => (
                 <ListingCard key={listing.id} listing={listing} />
               ))
             ) : (
               <div className="py-12 text-center text-slate-500">
-                <p>No listings found for &quot;{searchTerm}&quot;.</p>
+                <p>
+                  {searchTerm
+                    ? `No listings found for "${searchTerm}".`
+                    : 'You have no listings yet.'}
+                </p>
               </div>
             )}
           </motion.div>
