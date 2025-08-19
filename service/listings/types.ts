@@ -73,7 +73,7 @@ export interface Service {
   image: string | null;
   title: string;
   description: string;
-  price: string;
+  price: number;
   currency: string;
   pricingModel: string;
 }
@@ -105,7 +105,7 @@ export interface ListingFormData {
   category: string;
   title: string;
   logo: File | null;
-  keywords: string;
+  keywords: string[];
   address: string;
   googleMapsPlaceId: string;
   gallery: File[];

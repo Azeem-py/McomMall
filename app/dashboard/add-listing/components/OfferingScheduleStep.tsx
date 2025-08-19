@@ -39,7 +39,7 @@ import {
 import { Trash, Edit } from 'lucide-react';
 import WeeklySchedule from './WeeklySchedule';
 import AvailabilityCalendar from './AvailabilityCalendar';
-import { ListingFormData, Service } from '../types';
+import { ListingFormData, Service } from '@/service/listings/types';
 import SingleImageInput from '@/components/SingleImageInput';
 
 interface OfferingScheduleStepProps {
@@ -55,7 +55,7 @@ const OfferingScheduleStep: React.FC<OfferingScheduleStepProps> = ({
     image: null,
     title: '',
     description: '',
-    price: '',
+    price: 0,
     currency: 'USD',
     pricingModel: 'one-time',
   });
@@ -66,7 +66,11 @@ const OfferingScheduleStep: React.FC<OfferingScheduleStepProps> = ({
   const handleServiceChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setService({ ...service, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setService({
+      ...service,
+      [name]: name === 'price' ? parseFloat(value) || 0 : value,
+    });
   };
 
   const handleImageChange = (image: File | null) => {
@@ -98,7 +102,7 @@ const OfferingScheduleStep: React.FC<OfferingScheduleStepProps> = ({
       image: null,
       title: '',
       description: '',
-      price: '',
+      price: 0,
       currency: 'USD',
       pricingModel: 'one-time',
     });

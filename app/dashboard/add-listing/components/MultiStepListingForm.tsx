@@ -90,7 +90,7 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
     category,
     title: '',
     logo: null,
-    keywords: '',
+    keywords: [],
     address: '',
     googleMapsPlaceId: '',
     gallery: [],
@@ -126,7 +126,17 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
   const { mutate, isPending } = useCreateListing();
 
   const handleSubmit = () => {
-    mutate(formData, {
+    const payload = { ...formData };
+    if (typeof payload.keywords === 'string') {
+      payload.keywords = payload.keywords.split(',').map(k => k.trim());
+    }
+
+    payload.services = payload.services.map(service => ({
+      ...service,
+      price: Number(service.price) || 0,
+    }));
+
+    mutate(payload, {
       onSuccess: () => {
         toast.success('Listing created successfully');
       },

@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/card';
 import SingleImageInput from '@/components/SingleImageInput';
 import UploadBox from '@/components/UploadBox';
-import { ListingFormData } from '../types';
+import { ListingFormData } from '@/service/listings/types';
 
 interface BasicInfoStepProps {
   formData: ListingFormData;
@@ -103,7 +103,11 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               <Input
                 id="keywords"
                 name="keywords"
-                value={formData.keywords}
+                value={
+                  Array.isArray(formData.keywords)
+                    ? formData.keywords.join(', ')
+                    : formData.keywords
+                }
                 onChange={handleChange}
                 placeholder="e.g., plumber, renovation, pipes"
               />
