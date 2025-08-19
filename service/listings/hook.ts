@@ -1,6 +1,7 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import api from '../api';
-import { GooglePlaceResult, GooglePlaceResults } from './types';
+import { GooglePlaceResult, GooglePlaceResults, Listing } from './types';
 
 export interface ErrorResponse {
   response?: {
@@ -43,6 +44,34 @@ export const useGetGoogleListings = ({
     refetchOnMount: false,
   });
   return query;
+};
+
+export const useAddListing = () => {
+  const create = async (payload: Listing) => {
+    try {
+      const response = await api.post('listings', { ...payload });
+      return response.data;
+    } catch (error: unknown) {
+      const err = error as ErrorResponse;
+      throw new Error(
+        err.response?.data?.message ||
+          err.message ||
+          'Failed to create listing'
+      );
+    }
+  };
+
+  const mutation = useMutation({
+    mutationFn: create,
+    onSuccess: data => {
+      toast.success(data.message);
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
+
+  return mutation;
 };
 
 export const useGetGoogleListing = ({ place_id }: { place_id: string }) => {
