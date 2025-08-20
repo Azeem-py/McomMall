@@ -134,10 +134,10 @@ export const pluginMenuItems: MenuItem[] = [
     icon: Settings,
     subMenu: [
       { title: 'Dashboard', href: '/dashboard/gift-card' },
+      { title: 'Admin', href: '/dashboard/gift-card/admin' },
       { title: 'Check Balance', href: '/dashboard/gift-card/check-balance' },
-      { title: 'Promotion', href: '/dashboard/loyalty/promotion' },
       { title: 'Offers', href: '/dashboard/loyalty/offers' },
-      { title: 'Settings', href: '/dashboard/loyalty/settings' },
+      { title: 'Settings', href: '/dashboard/gift-card/settings' },
     ],
   },
 ];
