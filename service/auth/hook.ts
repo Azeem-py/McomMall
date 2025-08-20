@@ -7,6 +7,13 @@ import {
   LoginResponse,
   ClaimInterface,
 } from './types';
+import { useDispatch } from 'react-redux';
+import {
+  setAuthTokens,
+  setUserData,
+  logout as logoutAction,
+} from '../store/authSlice';
+import { AppDispatch } from '../store/store';
 
 export interface ErrorResponse {
   response?: {
@@ -39,6 +46,7 @@ export const useCreateUser = () => {
 };
 
 export const useLogin = () => {
+  const dispatch: AppDispatch = useDispatch();
   const login = async (payload: AuthInterface): Promise<LoginResponse> => {
     try {
       const response = await api.post('auth', {
@@ -58,17 +66,30 @@ export const useLogin = () => {
   const mutation = useMutation({
     mutationFn: login,
     onSuccess: data => {
-      localStorage.setItem('user-type', String(data.role));
-      localStorage.setItem('user-name', data.name);
+      dispatch(
+        setAuthTokens({
+          accessToken: data.auth.accessToken,
+        })
+      );
+      dispatch(
+        setUserData({
+          userName: data.name,
+          userRole: String(data.role),
+        })
+      );
       setBearerToken(data.auth.accessToken);
-      // Set access token for 30 minutes
-      Cookies.set('access', data.auth.accessToken, { expires: 1 / 48 }); // 30 minutes
-
-      // Set refresh token for 7 days
       Cookies.set('refresh', data.auth.refreshToken, { expires: 7 });
     },
   });
   return mutation;
+};
+
+export const useLogout = () => {
+  const dispatch: AppDispatch = useDispatch();
+  const logout = () => {
+    dispatch(logoutAction());
+  };
+  return logout;
 };
 
 export const useClaimBusiness = () => {

@@ -2,25 +2,42 @@
 'use client';
 
 import Link from 'next/link';
-import { Button } from '@/components/ui/button'; // Assuming you still want these ui components
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ShoppingCart, User } from 'lucide-react';
+import { ShoppingCart, User, ChevronDown } from 'lucide-react';
 import Auth from './auth';
 import { NavMenu } from './NavMenu';
 import { usePathname } from 'next/navigation';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/service/store/store';
+import { useLogout } from '@/service/auth/hook';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import AuthRedirect from './AuthRedirect';
 
 export default function Header() {
   const pathname = usePathname();
+  const { accessToken, userName } = useSelector(
+    (state: RootState) => state.auth
+  );
+  const logout = useLogout();
 
   if (pathname.startsWith('/dashboard')) {
     return null;
   }
 
   return (
-    <header className="bg-slate-800 text-white">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
+    <>
+      <AuthRedirect />
+      <header className="bg-slate-800 text-white">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
               <span className="text-white font-bold text-sm">M</span>
@@ -48,10 +65,33 @@ export default function Header() {
                 0
               </Badge>
             </Button>
-            <Auth>
-              <User className="w-4 h-4 mr-2" />
-              Sign In
-            </Auth>
+            {accessToken ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="flex items-center">
+                    <Avatar className="w-8 h-8 mr-2">
+                      <AvatarImage src="https://github.com/shadcn.png" />
+                      <AvatarFallback>
+                        {userName?.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span>{userName}</span>
+                    <ChevronDown className="w-4 h-4 ml-1" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard">Dashboard</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={logout}>Log out</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Auth>
+                <User className="w-4 h-4 mr-2" />
+                Sign In
+              </Auth>
+            )}
 
             {/* Mobile Nav Trigger is now inside NavMenu */}
             <div className="md:hidden">
@@ -59,7 +99,7 @@ export default function Header() {
             </div>
           </div>
         </div>
-      </div>
-    </header>
+      </header>
+    </>
   );
 }
