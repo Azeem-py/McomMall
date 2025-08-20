@@ -1,5 +1,5 @@
 import React from 'react';
-import { TimeRange, WeeklyHours } from '../../../types';
+import { TimeRange, WeeklyHours } from '../../types';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
