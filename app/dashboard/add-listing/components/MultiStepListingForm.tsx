@@ -52,31 +52,46 @@ const profanityCheck = (value: string) => !badWords.some(word => value.toLowerCa
 
 // Zod Schemas for validation
 const businessInfoSchema = z.object({
-    businessName: z.string().min(1, { message: "Business name is required." }).refine(profanityCheck, { message: "Business name contains inappropriate language." }),
-    shortDesc: z.string().min(20, { message: "Must be 20-180 characters." }).max(180, { message: "Must be 20-180 characters." }).refine(profanityCheck, { message: "Description contains inappropriate language." }),
-    phone: z.string().regex(/^\+44\d{10}$/, { message: "Invalid UK phone. Use +44 format." }),
-    email: z.string().email({ message: "Invalid email." }).optional().or(z.literal('')),
-    socials: z.object({
-        website: z.string().url({ message: "Invalid URL." }).optional().or(z.literal('')),
-    }).optional(),
-});
+  businessName: z.string().min(1, { message: "Business name is required." }).refine(profanityCheck, { message: "Business name contains inappropriate language." }),
+  legalName: z.string().optional(),
+  companyRegNo: z.string().optional(),
+  vatNo: z.string().optional(),
+  shortDesc: z.string().min(20, { message: "Must be 20-180 characters." }).max(180, { message: "Must be 20-180 characters." }).refine(profanityCheck, { message: "Description contains inappropriate language." }),
+  longDesc: z.string().optional(),
+  phone: z.string().regex(/^\+44\d{10}$/, { message: "Invalid UK phone. Use +44 format." }),
+  email: z.string().email({ message: "Invalid email." }).optional().or(z.literal('')),
+  socials: z.object({
+    website: z.string().url({ message: "Invalid URL." }).optional().or(z.literal('')),
+    facebook: z.string().url({ message: "Invalid URL." }).optional().or(z.literal('')),
+    instagram: z.string().url({ message: "Invalid URL." }).optional().or(z.literal('')),
+    twitter: z.string().url({ message: "Invalid URL." }).optional().or(z.literal('')),
+    youtube: z.string().url({ message: "Invalid URL." }).optional().or(z.literal('')),
+    linkedin: z.string().url({ message: "Invalid URL." }).optional().or(z.literal('')),
+  }).optional(),
+}).passthrough();
 
 const mediaSchema = z.object({
-    logo: z.object({
-        file: z.instanceof(File, { message: "Logo image is required." }),
-        altText: z.string().min(1, { message: "Logo alt text is required." }),
-    }),
-    banner: z.object({
-        file: z.instanceof(File, { message: "Banner image is required." }),
-        altText: z.string().min(1, { message: "Banner alt text is required." }),
-    }),
-});
+  logo: z.object({
+    file: z.instanceof(File).nullable(),
+    altText: z.string(),
+  }).refine(data => data.file ? data.altText.length > 0 : true, {
+    message: "Logo alt text is required when an image is uploaded.",
+    path: ['altText'],
+  }).nullable(),
+  banner: z.object({
+    file: z.instanceof(File).nullable(),
+    altText: z.string(),
+  }).refine(data => data.file ? data.altText.length > 0 : true, {
+    message: "Banner alt text is required when an image is uploaded.",
+    path: ['altText'],
+  }).nullable(),
+}).passthrough();
 
 const productCategorySchema = z.object({
     productData: z.object({
         primaryCategory: z.string().min(1, { message: "Primary category is required." }),
     }).optional(),
-});
+}).passthrough();
 
 const sellingModesSchema = z.object({
     productData: z.object({
@@ -89,13 +104,13 @@ const sellingModesSchema = z.object({
             path: ['sellingModes'],
         }),
     }).optional(),
-});
+}).passthrough();
 
 const serviceCategorySchema = z.object({
     serviceData: z.object({
         tradeCategory: z.string().min(1, { message: "Trade category is required." }),
     }).optional(),
-});
+}).passthrough();
 
 const bookingSchema = z.object({
     serviceData: z.object({
@@ -110,7 +125,7 @@ const bookingSchema = z.object({
         message: "A valid booking URL is required for online booking.",
         path: ['bookingURL'],
     }),
-});
+}).passthrough();
 
 
 const StepIndicator = ({
@@ -211,7 +226,7 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
 
   const validateStep = () => {
       const currentSchema = steps[currentStep - 1].schema;
-      const result = currentSchema.partial().safeParse(formData);
+      const result = currentSchema.safeParse(formData);
 
       if(!result.success) {
           const newErrors: Record<string, string> = {};
