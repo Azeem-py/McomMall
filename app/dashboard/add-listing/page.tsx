@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence, Variants, Transition } from 'framer-motion';
-import ListingTypeSelector from './components/ListCategory';
+import BusinessTypeSelector from './components/BusinessTypeSelector';
 import MultiStepListingForm from './components/MultiStepListingForm';
 import {
   Card,
@@ -13,14 +13,14 @@ import {
 } from '@/components/ui/card';
 
 const AddListingPage = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
 
-  const handleCategorySelect = (category: string) => {
-    setSelectedCategory(category);
+  const handleNext = (types: string[]) => {
+    setSelectedTypes(types);
   };
 
   const handleBack = () => {
-    setSelectedCategory(null);
+    setSelectedTypes([]);
   };
 
   const pageVariants: Variants = {
@@ -39,9 +39,9 @@ const AddListingPage = () => {
   return (
     <section className="w-full max-w-4xl mx-auto py-12">
       <AnimatePresence mode="wait">
-        {!selectedCategory ? (
+        {selectedTypes.length === 0 ? (
           <motion.div
-            key="category-selector"
+            key="type-selector"
             initial="initial"
             animate="in"
             exit="out"
@@ -54,11 +54,11 @@ const AddListingPage = () => {
                   Create a New Listing
                 </CardTitle>
                 <CardDescription className="text-lg">
-                  To get started, please select a category for your listing.
+                  First, tell us what kind of business you operate.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <ListingTypeSelector onCategorySelect={handleCategorySelect} />
+                <BusinessTypeSelector onNext={handleNext} />
               </CardContent>
             </Card>
           </motion.div>
@@ -72,7 +72,7 @@ const AddListingPage = () => {
             transition={pageTransition}
           >
             <MultiStepListingForm
-              businessTypes={selectedCategory ? [selectedCategory] : []}
+              businessTypes={selectedTypes}
               onBack={handleBack}
             />
           </motion.div>
