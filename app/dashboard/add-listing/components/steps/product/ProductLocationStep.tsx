@@ -37,7 +37,10 @@ const ProductLocationStep: React.FC<StepProps> = ({
     }));
   };
 
-  const handleProductDataChange = (key: string, value: any) => {
+  const handleProductDataChange = (
+    key: string,
+    value: boolean | { type: 'radius' | 'postcodes'; value: string }
+  ) => {
     setFormData(prev => ({
       ...prev,
       productData: {

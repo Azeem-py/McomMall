@@ -20,7 +20,7 @@ const BookingStep: React.FC<StepProps> = ({
   const bookingMethod = serviceData.bookingMethod || 'call';
   const pricingVisibility = serviceData.pricingVisibility || 'quote';
 
-  const handleServiceDataChange = (key: string, value: any) => {
+  const handleServiceDataChange = (key: string, value: string) => {
     setFormData(prev => ({
       ...prev,
       serviceData: {

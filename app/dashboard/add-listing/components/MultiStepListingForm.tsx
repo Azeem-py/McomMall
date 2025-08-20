@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   AlertDialog,
   AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -215,7 +214,7 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
       { title: 'Review & Publish', component: ReviewStep, schema: z.any() },
     ];
 
-    let flowSteps: { title: string; component: React.ElementType, schema: z.ZodSchema<any> }[] = [];
+    let flowSteps: { title: string; component: React.ElementType, schema: z.ZodSchema<unknown> }[] = [];
 
     if (businessTypes.includes('Product') && businessTypes.includes('Service')) {
       flowSteps = [...productSteps, ...serviceSteps];
