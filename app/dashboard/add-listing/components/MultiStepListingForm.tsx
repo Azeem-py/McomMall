@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -13,14 +13,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Check } from 'lucide-react';
-
-import BasicInfoStep from './BasicInfoStep';
-import OfferingScheduleStep from './OfferingScheduleStep';
-import FinalDetailsStep from './FinalDetailsStep';
-import { ListingFormData } from '../types';
 import { Button } from '@/components/ui/button';
-import { useAddListing } from '@/service/listings/hook';
 import {
   Card,
   CardContent,
@@ -29,49 +22,122 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Check } from 'lucide-react';
+import { z } from 'zod';
+
+import { ListingFormData } from '../types';
+
+// Import all step components
+import BusinessInfoStep from './steps/shared/BusinessInfoStep';
+import MediaStep from './steps/shared/MediaStep';
+import ReviewStep from './steps/shared/ReviewStep';
+import ProductCategoryStep from './steps/product/ProductCategoryStep';
+import ProductLocationStep from './steps/product/ProductLocationStep';
+import ProductHoursStep from './steps/product/ProductHoursStep';
+import SellingModesStep from './steps/product/SellingModesStep';
+import ServiceCategoryStep from './steps/service/ServiceCategoryStep';
+import ServiceAreaStep from './steps/service/ServiceAreaStep';
+import ServiceHoursStep from './steps/service/ServiceHoursStep';
+import BookingStep from './steps/service/BookingStep';
+import CredentialsStep from './steps/service/CredentialsStep';
 
 interface MultiStepListingFormProps {
-  category: string;
+  businessTypes: string[];
   onBack: () => void;
 }
 
-const steps = [
-  {
-    number: 1,
-    title: 'Basic Information',
-    component: BasicInfoStep,
-  },
-  {
-    number: 2,
-    title: 'Offering & Schedule',
-    component: OfferingScheduleStep,
-  },
-  {
-    number: 3,
-    title: 'Final Details',
-    component: FinalDetailsStep,
-  },
-];
+// Profanity filter (simple version)
+const badWords = ['profanity', 'badword'];
+const profanityCheck = (value: string) => !badWords.some(word => value.toLowerCase().includes(word));
 
-const StepIndicator = ({ currentStep }: { currentStep: number }) => (
-  <div className="flex justify-center items-center mb-8">
+// Zod Schemas for validation
+const businessInfoSchema = z.object({
+    businessName: z.string().min(1, { message: "Business name is required." }).refine(profanityCheck, { message: "Business name contains inappropriate language." }),
+    shortDesc: z.string().min(20, { message: "Must be 20-180 characters." }).max(180, { message: "Must be 20-180 characters." }).refine(profanityCheck, { message: "Description contains inappropriate language." }),
+    phone: z.string().regex(/^\+44\d{10}$/, { message: "Invalid UK phone. Use +44 format." }),
+    email: z.string().email({ message: "Invalid email." }).optional().or(z.literal('')),
+    socials: z.object({
+        website: z.string().url({ message: "Invalid URL." }).optional().or(z.literal('')),
+    }).optional(),
+});
+
+const mediaSchema = z.object({
+    logo: z.object({
+        file: z.instanceof(File, { message: "Logo image is required." }),
+        altText: z.string().min(1, { message: "Logo alt text is required." }),
+    }),
+    banner: z.object({
+        file: z.instanceof(File, { message: "Banner image is required." }),
+        altText: z.string().min(1, { message: "Banner alt text is required." }),
+    }),
+});
+
+const productCategorySchema = z.object({
+    productData: z.object({
+        primaryCategory: z.string().min(1, { message: "Primary category is required." }),
+    }).optional(),
+});
+
+const sellingModesSchema = z.object({
+    productData: z.object({
+        sellingModes: z.object({
+            inStorePickup: z.boolean(),
+            localDelivery: z.boolean(),
+            ukWideShipping: z.boolean(),
+        }).refine(data => data.inStorePickup || data.localDelivery || data.ukWideShipping, {
+            message: "At least one selling mode must be selected.",
+            path: ['sellingModes'],
+        }),
+    }).optional(),
+});
+
+const serviceCategorySchema = z.object({
+    serviceData: z.object({
+        tradeCategory: z.string().min(1, { message: "Trade category is required." }),
+    }).optional(),
+});
+
+const bookingSchema = z.object({
+    serviceData: z.object({
+        bookingMethod: z.string(),
+        bookingURL: z.string().optional(),
+    }).refine(data => {
+        if (data.bookingMethod === 'online') {
+            return data.bookingURL && z.string().url().safeParse(data.bookingURL).success;
+        }
+        return true;
+    }, {
+        message: "A valid booking URL is required for online booking.",
+        path: ['bookingURL'],
+    }),
+});
+
+
+const StepIndicator = ({
+  currentStep,
+  steps,
+}: {
+  currentStep: number;
+  steps: { title: string; component: React.ElementType }[];
+}) => (
+  <div className="flex justify-center items-center mb-8 overflow-x-auto py-2">
     {steps.map((step, index) => (
-      <div key={step.number} className="flex items-center">
-        <div className="flex flex-col items-center">
+      <div key={step.title} className="flex items-center flex-shrink-0">
+        <div className="flex flex-col items-center w-24">
           <div
             className={`w-10 h-10 rounded-full flex items-center justify-center text-lg font-semibold transition-colors duration-300 ${
-              currentStep > step.number
-                ? 'bg-primary text-primary-foreground'
-                : currentStep === step.number
-                  ? 'bg-primary text-primary-foreground'
+              currentStep > index + 1
+                ? 'bg-blue-600 text-white'
+                : currentStep === index + 1
+                  ? 'bg-orange-700 text-white'
                   : 'bg-muted text-muted-foreground'
             }`}
           >
-            {currentStep > step.number ? <Check /> : step.number}
+            {currentStep > index + 1 ? <Check /> : index + 1}
           </div>
           <p
-            className={`mt-2 text-sm font-medium transition-colors duration-300 ${
-              currentStep >= step.number
+            className={`mt-2 text-xs text-center font-medium transition-colors duration-300 ${
+              currentStep >= index + 1
                 ? 'text-primary'
                 : 'text-muted-foreground'
             }`}
@@ -82,7 +148,7 @@ const StepIndicator = ({ currentStep }: { currentStep: number }) => (
         {index < steps.length - 1 && (
           <div
             className={`w-16 h-1 mx-4 transition-colors duration-300 ${
-              currentStep > step.number ? 'bg-primary' : 'bg-muted'
+              currentStep > index + 1 ? 'bg-blue-600' : 'bg-muted'
             }`}
           />
         )}
@@ -92,93 +158,89 @@ const StepIndicator = ({ currentStep }: { currentStep: number }) => (
 );
 
 const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
-  category,
+  businessTypes,
   onBack,
 }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<ListingFormData>({
-    category,
-    title: '',
+    businessTypes: businessTypes as ('Product' | 'Service')[],
+    businessName: '',
+    phone: '',
+    email: '',
+    shortDesc: '',
+    socials: { website: '' },
     logo: null,
-    keywords: '',
-    address: '',
-    googleMapsPlaceId: '',
-    gallery: [],
-    services: [],
-    schedule: {},
-    availability: {},
-    description: '',
-    socials: {},
+    banner: null,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const router = useRouter();
-  const { mutate: addListing, isPending } = useAddListing();
 
-  const validateStep1 = () => {
-    const newErrors: Record<string, string> = {};
-    if (!formData.title.trim()) {
-      newErrors.title = 'Listing title is required.';
+  const steps = useMemo(() => {
+    const sharedInitial = [{ title: 'Business Info', component: BusinessInfoStep, schema: businessInfoSchema }];
+    const productSteps = [
+      { title: 'Product Categories', component: ProductCategoryStep, schema: productCategorySchema },
+      { title: 'Location', component: ProductLocationStep, schema: z.any() },
+      { title: 'Hours', component: ProductHoursStep, schema: z.any() },
+      { title: 'Selling Modes', component: SellingModesStep, schema: sellingModesSchema },
+    ];
+    const serviceSteps = [
+      { title: 'Service Categories', component: ServiceCategoryStep, schema: serviceCategorySchema },
+      { title: 'Service Area', component: ServiceAreaStep, schema: z.any() },
+      { title: 'Availability', component: ServiceHoursStep, schema: z.any() },
+      { title: 'Booking', component: BookingStep, schema: bookingSchema },
+      { title: 'Credentials', component: CredentialsStep, schema: z.any() },
+    ];
+    const sharedFinal = [
+      { title: 'Media', component: MediaStep, schema: mediaSchema },
+      { title: 'Review & Publish', component: ReviewStep, schema: z.any() },
+    ];
+
+    let flowSteps: { title: string; component: React.ElementType, schema: z.ZodSchema<any> }[] = [];
+
+    if (businessTypes.includes('Product') && businessTypes.includes('Service')) {
+      flowSteps = [...productSteps, ...serviceSteps];
+    } else if (businessTypes.includes('Product')) {
+      flowSteps = productSteps;
+    } else if (businessTypes.includes('Service')) {
+      flowSteps = serviceSteps;
     }
-    if (!formData.logo) {
-      newErrors.logo = 'Listing logo is required.';
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+
+    return [...sharedInitial, ...flowSteps, ...sharedFinal];
+  }, [businessTypes]);
+
+  const validateStep = () => {
+      const currentSchema = steps[currentStep - 1].schema;
+      const result = currentSchema.partial().safeParse(formData);
+
+      if(!result.success) {
+          const newErrors: Record<string, string> = {};
+          result.error.errors.forEach(err => {
+              newErrors[err.path.join('.')] = err.message;
+          });
+          setErrors(newErrors);
+          return false;
+      }
+
+      setErrors({});
+      return true;
+  }
 
   const nextStep = () => {
-    if (currentStep === 1) {
-      if (!validateStep1()) return;
+    if (validateStep()) {
+        setCurrentStep(prev => Math.min(prev + 1, steps.length));
     }
-    setCurrentStep(prev => Math.min(prev + 1, 3));
   };
 
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));
 
   const handleSubmit = () => {
-    const urlPattern = new RegExp(
-      '^(https?:\\/\\/)?' + // protocol
-        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
-        '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
-        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
-        '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
-        '(\\#[-a-z\\d_]*)?$',
-      'i'
-    ); // fragment locator
-
-    const newErrors: Record<string, string> = {};
-    Object.entries(formData.socials).forEach(([key, value]) => {
-      if (value && !urlPattern.test(value)) {
-        newErrors[
-          `socials.${key}`
-        ] = `Invalid URL format for ${key}. Please enter a valid URL.`;
-      }
-    });
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-
-    const transformedData = {
-      ...formData,
-      keywords: formData.keywords.split(',').map(k => k.trim()),
-      services: formData.services.map(s => ({
-        ...s,
-        price: parseFloat(s.price),
-      })),
-    };
-    addListing(transformedData, {
-      onSuccess: () => {
-        setIsAlertOpen(true);
-      },
-    });
+    // Final validation across all fields would go here
+    console.log('Form Submitted:', JSON.stringify(formData, null, 2));
+    setIsAlertOpen(true);
   };
 
-  const CurrentStepComponent = steps.find(
-    s => s.number === currentStep
-  )!.component;
+  const CurrentStepComponent = steps[currentStep - 1].component;
 
   const formVariants = {
     hidden: { opacity: 0, x: 50 },
@@ -186,23 +248,27 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
     exit: { opacity: 0, x: -50 },
   };
 
+  const getTitle = () => {
+    if (businessTypes.length > 1) return 'Product & Service';
+    return businessTypes[0];
+  }
+
   return (
     <>
       <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Verify Your Listing</AlertDialogTitle>
+            <AlertDialogTitle>Listing Submitted!</AlertDialogTitle>
             <AlertDialogDescription>
-              To verify your listing, a £1 GBP fee is required.
+              Your listing data has been logged to the console. In a real app, this would go to an API.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => router.push('/pricing')}
-              className="bg-orange-600 hover:bg-orange-700"
+              onClick={() => router.push('/dashboard')}
+              className="bg-orange-700 hover:bg-orange-800"
             >
-              Continue
+              Back to Dashboard
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -210,54 +276,49 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">
-          <CardTitle className="text-2xl font-bold">
-            Create a new <span className="text-primary">{category}</span>{' '}
-            Listing
-          </CardTitle>
-          <Button variant="ghost" onClick={onBack}>
-            &larr; Back to categories
-          </Button>
-        </div>
-      </CardHeader>
-      <Separator />
-      <CardContent className="pt-6">
-        <StepIndicator currentStep={currentStep} />
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentStep}
-            variants={formVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            transition={{ type: 'tween', ease: 'easeInOut', duration: 0.4 }}
-          >
-            <CurrentStepComponent
-              formData={formData}
-              setFormData={setFormData}
-              errors={errors}
-            />
-          </motion.div>
-        </AnimatePresence>
-      </CardContent>
-      <Separator />
-      <CardFooter className="flex justify-between mt-6">
-        {currentStep > 1 ? (
-          <Button variant="outline" onClick={prevStep}>
+            <CardTitle className="text-2xl font-bold">
+              Add a New <span className="text-orange-700">{getTitle()}</span> Listing
+            </CardTitle>
+            <Button variant="ghost" onClick={onBack} className="text-blue-600 hover:text-blue-700">
+              &larr; Back to selection
+            </Button>
+          </div>
+        </CardHeader>
+        <Separator />
+        <CardContent className="pt-6">
+          <StepIndicator currentStep={currentStep} steps={steps} />
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentStep}
+              variants={formVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              transition={{ type: 'tween', ease: 'easeInOut', duration: 0.4 }}
+            >
+              <CurrentStepComponent
+                formData={formData}
+                setFormData={setFormData}
+                errors={errors}
+              />
+            </motion.div>
+          </AnimatePresence>
+        </CardContent>
+        <Separator />
+        <CardFooter className="flex justify-between mt-6">
+          <Button variant="outline" onClick={prevStep} className={`${currentStep === 1 ? 'invisible' : 'visible'} text-blue-600 border-blue-600 hover:bg-blue-50`}>
             Back
           </Button>
-        ) : (
-          <div />
-        )}
 
-        {currentStep < 3 ? (
-          <Button onClick={nextStep}>Next</Button>
-        ) : (
-          <Button onClick={handleSubmit} disabled={isPending}>
-            {isPending ? 'Submitting...' : 'Submit'}
-          </Button>
-        )}
-      </CardFooter>
-    </Card>
+          {currentStep < steps.length ? (
+            <Button onClick={nextStep} className="bg-orange-700 hover:bg-orange-800">Next</Button>
+          ) : (
+            <Button onClick={handleSubmit} className="bg-orange-700 hover:bg-orange-800">
+              Publish
+            </Button>
+          )}
+        </CardFooter>
+      </Card>
     </>
   );
 };
