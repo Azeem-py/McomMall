@@ -238,24 +238,23 @@ const Auth = ({ children }: { children?: React.ReactNode }) => {
   };
 
   return (
-    <>
-      <Dialog
-        open={isLoginModalOpen}
-        onOpenChange={isOpen => dispatch(setLoginModalOpen(isOpen))}
-      >
-        <DialogTrigger asChild>
-          <Button
-            variant="outline"
-            className="text-orange-500"
-            onClick={() => dispatch(setLoginModalOpen(true))}
-          >
-            {children || 'Sign In'}
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:min-w-[425px] mx-2">
-          <DialogHeader>
-            <div>
-              <div className="flex justify-center mb-4">
+    <Dialog
+      open={isLoginModalOpen}
+      onOpenChange={isOpen => dispatch(setLoginModalOpen(isOpen))}
+    >
+      <DialogTrigger asChild>
+        <Button
+          variant="outline"
+          className="text-orange-500"
+          onClick={() => dispatch(setLoginModalOpen(true))}
+        >
+          {children || 'Sign In'}
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:min-w-[425px] mx-2">
+        <DialogHeader>
+          <div>
+            <div className="flex justify-center mb-4">
               <Button
                 variant="link"
                 className={`mr-4 text-lg ${
