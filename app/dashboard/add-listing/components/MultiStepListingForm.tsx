@@ -93,6 +93,10 @@ const productCategorySchema = z.object({
     }).optional(),
 }).passthrough();
 
+const productLocationSchema = z.object({
+    address: z.string().optional(),
+}).passthrough();
+
 const sellingModesSchema = z.object({
     productData: z.object({
         sellingModes: z.object({
@@ -195,7 +199,7 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
     const sharedInitial = [{ title: 'Business Info', component: BusinessInfoStep, schema: businessInfoSchema }];
     const productSteps = [
       { title: 'Product Categories', component: ProductCategoryStep, schema: productCategorySchema },
-      { title: 'Location', component: ProductLocationStep, schema: z.any() },
+      { title: 'Location', component: ProductLocationStep, schema: productLocationSchema },
       { title: 'Hours', component: ProductHoursStep, schema: z.any() },
       { title: 'Selling Modes', component: SellingModesStep, schema: sellingModesSchema },
     ];

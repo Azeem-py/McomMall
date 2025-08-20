@@ -72,7 +72,7 @@ const AddListingPage = () => {
             transition={pageTransition}
           >
             <MultiStepListingForm
-              category={selectedCategory}
+              businessTypes={selectedCategory ? [selectedCategory] : []}
               onBack={handleBack}
             />
           </motion.div>

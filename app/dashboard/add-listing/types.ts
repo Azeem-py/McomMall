@@ -90,6 +90,7 @@ export interface ListingFormData {
   vatNo?: string;
   shortDesc: string;
   longDesc?: string;
+  address?: string;
   phone: string;
   email: string;
   socials: Socials;
