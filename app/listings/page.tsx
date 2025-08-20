@@ -2,9 +2,13 @@
 
 import { useState, useMemo, useEffect, Suspense } from 'react';
 import dynamic from 'next/dynamic';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/service/store/store';
+import { setLoginModalOpen } from '@/service/store/uiSlice';
+import { toast } from 'sonner';
 import {
   Select,
   SelectContent,
@@ -28,6 +32,22 @@ const initialFilters: FilterState = {
 };
 
 function ListingsPageContent() {
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const { accessToken, userRole } = useSelector((state: RootState) => state.auth);
+
+  const handleAddNewListing = () => {
+    if (!accessToken) {
+      dispatch(setLoginModalOpen(true));
+    } else {
+      if (userRole === 'owner') {
+        router.push('/add-listing');
+      } else {
+        toast.error('Only business owners can add new listings.');
+      }
+    }
+  };
+
   const searchParams = useSearchParams();
   const queryText = searchParams.get('queryText');
   // Default to Lagos, Nigeria
@@ -155,30 +175,52 @@ function ListingsPageContent() {
 
           <div className="flex-1 flex overflow-hidden">
             <div className="flex-1 p-4 overflow-y-auto">
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                {data &&
-                  data.map(listing => (
-                    <ListingCard key={listing.place_id} listing={listing} />
-                  ))}
-              </div>
-              <div className="flex justify-center items-center mt-8 space-x-2">
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  page => (
-                    <Button
-                      key={page}
-                      onClick={() => setCurrentPage(page)}
-                      size="icon"
-                      className={
-                        currentPage === page
-                          ? 'bg-red-500 text-white hover:bg-red-600'
-                          : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'
-                      }
-                    >
-                      {page}
-                    </Button>
-                  )
-                )}
-              </div>
+              {data && data.length === 0 ? (
+                <div className="text-center">
+                  <h2 className="text-2xl font-semibold mb-4">
+                    No listings found
+                  </h2>
+                  <p className="text-gray-600 mb-6">
+                    There are no listings that match your search criteria.
+                  </p>
+                  <Button
+                    className="bg-orange-600 text-white hover:bg-orange-700"
+                    onClick={handleAddNewListing}
+                  >
+                    Add New Listing
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                    {data &&
+                      data.map(listing => (
+                        <ListingCard
+                          key={listing.place_id}
+                          listing={listing}
+                        />
+                      ))}
+                  </div>
+                  <div className="flex justify-center items-center mt-8 space-x-2">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                      page => (
+                        <Button
+                          key={page}
+                          onClick={() => setCurrentPage(page)}
+                          size="icon"
+                          className={
+                            currentPage === page
+                              ? 'bg-red-500 text-white hover:bg-red-600'
+                              : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'
+                          }
+                        >
+                          {page}
+                        </Button>
+                      )
+                    )}
+                  </div>
+                </>
+              )}
             </div>
             <div className="w-1/3 h-full flex-shrink-0 hidden lg:block">
               <MapComponent
