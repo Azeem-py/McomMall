@@ -128,4 +128,16 @@ export const pluginMenuItems: MenuItem[] = [
       { title: 'Settings', href: '/dashboard/loyalty/settings' },
     ],
   },
+  {
+    title: 'Gift Card',
+    href: '/dashboard/gift-card',
+    icon: Settings,
+    subMenu: [
+      { title: 'Dashboard', href: '/dashboard/gift-card' },
+      { title: 'Check Balance', href: '/dashboard/gift-card/check-balance' },
+      { title: 'Promotion', href: '/dashboard/loyalty/promotion' },
+      { title: 'Offers', href: '/dashboard/loyalty/offers' },
+      { title: 'Settings', href: '/dashboard/loyalty/settings' },
+    ],
+  },
 ];
