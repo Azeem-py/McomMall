@@ -3,6 +3,16 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Check } from 'lucide-react';
 
 import BasicInfoStep from './BasicInfoStep';
@@ -101,6 +111,7 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
     socials: {},
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
   const router = useRouter();
   const { mutate: addListing, isPending } = useAddListing();
 
@@ -160,7 +171,7 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
     };
     addListing(transformedData, {
       onSuccess: () => {
-        router.push('/dashboard/my-listings');
+        setIsAlertOpen(true);
       },
     });
   };
@@ -176,9 +187,29 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex justify-between items-center">
+    <>
+      <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Verify Your Listing</AlertDialogTitle>
+            <AlertDialogDescription>
+              To verify your listing, a £1 GBP fee is required.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => router.push('/pricing')}
+              className="bg-orange-600 hover:bg-orange-700"
+            >
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-center">
           <CardTitle className="text-2xl font-bold">
             Create a new <span className="text-primary">{category}</span>{' '}
             Listing
@@ -227,6 +258,7 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
         )}
       </CardFooter>
     </Card>
+    </>
   );
 };
 
