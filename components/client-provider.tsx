@@ -5,6 +5,23 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import React, { useEffect } from 'react';
 import Cookies from 'js-cookie';
 import { setBearerToken } from '@/service/api';
+import { Provider, useDispatch } from 'react-redux';
+import { store } from '@/service/store/store';
+import { loadAuthFromCookies } from '@/service/store/authSlice';
+
+const AuthLoader = ({ children }: { children: React.ReactNode }) => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const token = Cookies.get('access');
+    if (token) {
+      setBearerToken(token);
+      dispatch(loadAuthFromCookies());
+    }
+  }, [dispatch]);
+
+  return <>{children}</>;
+};
 
 export default function ClientProviders({
   children,
@@ -13,17 +30,12 @@ export default function ClientProviders({
 }) {
   const [queryClient] = React.useState(() => new QueryClient());
 
-  useEffect(() => {
-    const token = Cookies.get('access');
-    if (token) {
-      setBearerToken(token);
-    }
-  }, []);
-
   return (
-    <QueryClientProvider client={queryClient}>
-      {children}
-      <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+    <Provider store={store}>
+      <QueryClientProvider client={queryClient}>
+        <AuthLoader>{children}</AuthLoader>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
+    </Provider>
   );
 }

@@ -20,8 +20,13 @@ import { toast } from 'sonner';
 import { ErrorResponse, useCreateUser, useLogin } from '@/service/auth/hook';
 import { UserRole } from '@/service/auth/types';
 import { useRouter } from 'next/navigation';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState, AppDispatch } from '@/service/store/store';
+import { setLoginModalOpen } from '@/service/store/uiSlice';
 
 const Auth = ({ children }: { children?: React.ReactNode }) => {
+  const dispatch: AppDispatch = useDispatch();
+  const { isLoginModalOpen } = useSelector((state: RootState) => state.ui);
   const [newAccount, setNewAccount] = useState(false);
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
   const [formData, setFormData] = useState({
@@ -203,6 +208,7 @@ const Auth = ({ children }: { children?: React.ReactNode }) => {
           description: `Welcome, ${response.name}!`,
         });
         handleToggleMode(false); // Switch to login mode after successful signup
+        dispatch(setLoginModalOpen(false)); // Close the modal
       } catch (error: unknown) {
         const err = error as ErrorResponse;
         toast.error('Failed to create account', {
@@ -220,6 +226,7 @@ const Auth = ({ children }: { children?: React.ReactNode }) => {
           description: `Welcome, ${response.name}!`,
         });
         handleToggleMode(false); // Switch to login mode after successful signup
+        dispatch(setLoginModalOpen(false)); // Close the modal
         router.push('/dashboard'); // Redirect to dashboard after login
       } catch (error: unknown) {
         const err = error as ErrorResponse;
@@ -231,9 +238,16 @@ const Auth = ({ children }: { children?: React.ReactNode }) => {
   };
 
   return (
-    <Dialog>
+    <Dialog
+      open={isLoginModalOpen}
+      onOpenChange={isOpen => dispatch(setLoginModalOpen(isOpen))}
+    >
       <DialogTrigger asChild>
-        <Button variant="outline" className="text-orange-500">
+        <Button
+          variant="outline"
+          className="text-orange-500"
+          onClick={() => dispatch(setLoginModalOpen(true))}
+        >
           {children || 'Sign In'}
         </Button>
       </DialogTrigger>

@@ -2,6 +2,7 @@
 
 'use client';
 
+import ProtectedRoute from '@/components/ProtectedRoute';
 import { useState } from 'react';
 import Link from 'next/link';
 import { Menu } from 'lucide-react';
@@ -103,7 +104,9 @@ export default function DashboardLayout({
         </header>
 
         {/* Page Content */}
-        <div className="sm:p-5 p-2 overflow-y-auto flex-grow">{children}</div>
+        <div className="sm:p-5 p-2 overflow-y-auto flex-grow">
+          <ProtectedRoute>{children}</ProtectedRoute>
+        </div>
       </main>
     </section>
   );

@@ -105,7 +105,7 @@ export default function ClientListingDetail({
                     onClick={handleClaimListing}
                   >
                     <AlertTriangle className="mr-2 h-4 w-4" />
-                    Not Verified - Claim Listing
+                    Not Verified - Claim with Mcom
                   </Button>
                 )}
               </div>
