@@ -233,7 +233,7 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
 
       if(!result.success) {
           const newErrors: Record<string, string> = {};
-          result.error.errors.forEach(err => {
+          result.error.issues.forEach(err => {
               newErrors[err.path.join('.')] = err.message;
           });
           setErrors(newErrors);

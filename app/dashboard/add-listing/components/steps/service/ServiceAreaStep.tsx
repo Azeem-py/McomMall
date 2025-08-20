@@ -3,7 +3,7 @@ import { ListingFormData, ServiceProviderData } from '../../../types';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import ServiceAreaEditor from '../shared/ServiceAreaEditor';
+import ServiceAreaEditor from '../../shared/ServiceAreaEditor';
 
 interface StepProps {
   formData: ListingFormData;

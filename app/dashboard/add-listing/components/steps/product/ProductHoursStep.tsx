@@ -3,7 +3,7 @@ import { ListingFormData, ProductSellerData } from '../../../types';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import WeeklyHoursEditor from '../shared/WeeklyHoursEditor';
+import WeeklyHoursEditor from '../../shared/WeeklyHoursEditor';
 
 interface StepProps {
   formData: ListingFormData;
