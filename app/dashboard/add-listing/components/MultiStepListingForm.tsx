@@ -61,89 +61,176 @@ interface MultiStepListingFormProps {
 
 // Profanity filter (simple version)
 const badWords = ['profanity', 'badword'];
-const profanityCheck = (value: string) => !badWords.some(word => value.toLowerCase().includes(word));
+const profanityCheck = (value: string) =>
+  !badWords.some(word => value.toLowerCase().includes(word));
 
 // Zod Schemas for validation
-const businessInfoSchema = z.object({
-  businessName: z.string().min(1, { message: "Business name is required." }).refine(profanityCheck, { message: "Business name contains inappropriate language." }),
-  legalName: z.string().optional(),
-  companyRegNo: z.string().optional(),
-  vatNo: z.string().optional(),
-  shortDesc: z.string().min(20, { message: "Must be 20-180 characters." }).max(180, { message: "Must be 20-180 characters." }).refine(profanityCheck, { message: "Description contains inappropriate language." }),
-  longDesc: z.string().optional(),
-  phone: z.string().regex(/^\+44\d{10}$/, { message: "Invalid UK phone. Use +44 format." }),
-  email: z.string().email({ message: "Invalid email." }).optional().or(z.literal('')),
-  socials: z.object({
-    website: z.string().url({ message: "Invalid URL." }).optional().or(z.literal('')),
-    facebook: z.string().url({ message: "Invalid URL." }).optional().or(z.literal('')),
-    instagram: z.string().url({ message: "Invalid URL." }).optional().or(z.literal('')),
-    twitter: z.string().url({ message: "Invalid URL." }).optional().or(z.literal('')),
-    youtube: z.string().url({ message: "Invalid URL." }).optional().or(z.literal('')),
-    linkedin: z.string().url({ message: "Invalid URL." }).optional().or(z.literal('')),
-  }).optional(),
-}).passthrough();
+const businessInfoSchema = z
+  .object({
+    businessName: z
+      .string()
+      .min(1, { message: 'Business name is required.' })
+      .refine(profanityCheck, {
+        message: 'Business name contains inappropriate language.',
+      }),
+    legalName: z.string().optional(),
+    companyRegNo: z.string().optional(),
+    vatNo: z.string().optional(),
+    shortDesc: z
+      .string()
+      .min(20, { message: 'Must be 20-180 characters.' })
+      .max(180, { message: 'Must be 20-180 characters.' })
+      .refine(profanityCheck, {
+        message: 'Description contains inappropriate language.',
+      }),
+    longDesc: z.string().optional(),
+    phone: z
+      .string()
+      .regex(/^\+44\d{10}$/, { message: 'Invalid UK phone. Use +44 format.' }),
+    email: z
+      .string()
+      .email({ message: 'Invalid email.' })
+      .optional()
+      .or(z.literal('')),
+    socials: z
+      .object({
+        website: z
+          .string()
+          .url({ message: 'Invalid URL.' })
+          .optional()
+          .or(z.literal('')),
+        facebook: z
+          .string()
+          .url({ message: 'Invalid URL.' })
+          .optional()
+          .or(z.literal('')),
+        instagram: z
+          .string()
+          .url({ message: 'Invalid URL.' })
+          .optional()
+          .or(z.literal('')),
+        twitter: z
+          .string()
+          .url({ message: 'Invalid URL.' })
+          .optional()
+          .or(z.literal('')),
+        youtube: z
+          .string()
+          .url({ message: 'Invalid URL.' })
+          .optional()
+          .or(z.literal('')),
+        linkedin: z
+          .string()
+          .url({ message: 'Invalid URL.' })
+          .optional()
+          .or(z.literal('')),
+      })
+      .optional(),
+  })
+  .passthrough();
 
-const mediaSchema = z.object({
-  logo: z.object({
-    file: z.instanceof(File).nullable(),
-    altText: z.string(),
-  }).refine(data => data.file ? data.altText.length > 0 : true, {
-    message: "Logo alt text is required when an image is uploaded.",
-    path: ['altText'],
-  }).nullable(),
-  banner: z.object({
-    file: z.instanceof(File).nullable(),
-    altText: z.string(),
-  }).refine(data => data.file ? data.altText.length > 0 : true, {
-    message: "Banner alt text is required when an image is uploaded.",
-    path: ['altText'],
-  }).nullable(),
-}).passthrough();
+const mediaSchema = z
+  .object({
+    logo: z
+      .object({
+        file: z.instanceof(File).nullable(),
+        altText: z.string(),
+      })
+      .refine(data => (data.file ? data.altText.length > 0 : true), {
+        message: 'Logo alt text is required when an image is uploaded.',
+        path: ['altText'],
+      })
+      .nullable(),
+    banner: z
+      .object({
+        file: z.instanceof(File).nullable(),
+        altText: z.string(),
+      })
+      .refine(data => (data.file ? data.altText.length > 0 : true), {
+        message: 'Banner alt text is required when an image is uploaded.',
+        path: ['altText'],
+      })
+      .nullable(),
+  })
+  .passthrough();
 
-const productCategorySchema = z.object({
-    productData: z.object({
-        primaryCategory: z.string().min(1, { message: "Primary category is required." }),
-    }).optional(),
-}).passthrough();
+const productCategorySchema = z
+  .object({
+    productData: z
+      .object({
+        primaryCategory: z
+          .string()
+          .min(1, { message: 'Primary category is required.' }),
+      })
+      .optional(),
+  })
+  .passthrough();
 
-const productLocationSchema = z.object({
+const productLocationSchema = z
+  .object({
     address: z.string().optional(),
-}).passthrough();
+  })
+  .passthrough();
 
-const sellingModesSchema = z.object({
-    productData: z.object({
-        sellingModes: z.object({
+const sellingModesSchema = z
+  .object({
+    productData: z
+      .object({
+        sellingModes: z
+          .object({
             inStorePickup: z.boolean(),
             localDelivery: z.boolean(),
             ukWideShipping: z.boolean(),
-        }).refine(data => data.inStorePickup || data.localDelivery || data.ukWideShipping, {
-            message: "At least one selling mode must be selected.",
-            path: ['sellingModes'],
-        }),
-    }).optional(),
-}).passthrough();
+          })
+          .refine(
+            data =>
+              data.inStorePickup || data.localDelivery || data.ukWideShipping,
+            {
+              message: 'At least one selling mode must be selected.',
+              path: ['sellingModes'],
+            }
+          ),
+      })
+      .optional(),
+  })
+  .passthrough();
 
-const serviceCategorySchema = z.object({
-    serviceData: z.object({
-        tradeCategory: z.string().min(1, { message: "Trade category is required." }),
-    }).optional(),
-}).passthrough();
+const serviceCategorySchema = z
+  .object({
+    serviceData: z
+      .object({
+        tradeCategory: z
+          .string()
+          .min(1, { message: 'Trade category is required.' }),
+      })
+      .optional(),
+  })
+  .passthrough();
 
-const bookingSchema = z.object({
-    serviceData: z.object({
+const bookingSchema = z
+  .object({
+    serviceData: z
+      .object({
         bookingMethod: z.string(),
         bookingURL: z.string().optional(),
-    }).refine(data => {
-        if (data.bookingMethod === 'online') {
-            return data.bookingURL && z.string().url().safeParse(data.bookingURL).success;
+      })
+      .refine(
+        data => {
+          if (data.bookingMethod === 'online') {
+            return (
+              data.bookingURL &&
+              z.string().url().safeParse(data.bookingURL).success
+            );
+          }
+          return true;
+        },
+        {
+          message: 'A valid booking URL is required for online booking.',
+          path: ['bookingURL'],
         }
-        return true;
-    }, {
-        message: "A valid booking URL is required for online booking.",
-        path: ['bookingURL'],
-    }),
-}).passthrough();
-
+      ),
+  })
+  .passthrough();
 
 const StepIndicator = ({
   currentStep,
@@ -161,8 +248,8 @@ const StepIndicator = ({
               currentStep > index + 1
                 ? 'bg-blue-600 text-white'
                 : currentStep === index + 1
-                  ? 'bg-orange-700 text-white'
-                  : 'bg-muted text-muted-foreground'
+                ? 'bg-orange-700 text-white'
+                : 'bg-muted text-muted-foreground'
             }`}
           >
             {currentStep > index + 1 ? <Check /> : index + 1}
@@ -346,7 +433,7 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
     if (data.productData?.weeklyHours) {
       for (const [day, times] of Object.entries(data.productData.weeklyHours)) {
         if (times) {
-          times.forEach(time => {
+          (times as { start: string; end: string }[]).forEach(time => {
             businessHours.push({
               dayOfWeek: dayMapping[day],
               openTime: time.start,
@@ -491,7 +578,7 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
               animate="visible"
               exit="exit"
               transition={{ type: 'tween', ease: 'easeInOut', duration: 0.4 }}
-.             >
+            >
               <CurrentStepComponent
                 formData={formData}
                 setFormData={setFormData}
