@@ -4,11 +4,10 @@ import { Star, Bookmark, CheckCircle, AlertTriangle } from 'lucide-react';
 
 import { useGetGoogleListing } from '@/service/listings/hook';
 import { Button } from '@/components/ui/button';
-import { ClaimBusinessModal } from '@/components/ClaimBusinessModal';
+import { VerificationFeeDialog } from '@/components/VerificationFeeDialog';
 import BookingSidebar from '@/components/BookingSidebar';
 import ContentTabs from '@/components/ContentTabs';
 import ImageGallery from '@/components/ImageGallery';
-import { useClaimBusiness } from '@/service/auth/hook';
 
 type ClientListingDetailProps = {
   placeId: string;
@@ -24,20 +23,6 @@ export default function ClientListingDetail({
   } = useGetGoogleListing({
     place_id: placeId,
   });
-
-  const {
-    isPending,
-    isSuccess: claimReqSuccess,
-    data: claimData,
-    mutate,
-  } = useClaimBusiness();
-
-  const handleClaimListing = () => {
-    mutate({
-      plaid_id: placeId,
-      returnUrl: 'http://localhost:3000/listings/ChIJBznabJeNOxARouRvw_Gltd0',
-    });
-  };
 
   if (isLoading) return <p>Loading...</p>;
 
@@ -98,15 +83,7 @@ export default function ClientListingDetail({
                     </span>
                   </div>
                 ) : (
-                  // <ClaimBusinessModal />
-                  <Button
-                    variant="outline"
-                    className="border-yellow-500 text-yellow-600 hover:bg-yellow-50 hover:text-yellow-700 cursor-pointer"
-                    onClick={handleClaimListing}
-                  >
-                    <AlertTriangle className="mr-2 h-4 w-4" />
-                    Not Verified - Claim with Mcom
-                  </Button>
+                  <VerificationFeeDialog listingId={placeId} />
                 )}
               </div>
             </div>

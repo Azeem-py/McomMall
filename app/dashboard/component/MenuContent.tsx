@@ -2,8 +2,10 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
+import { RootState } from '@/service/store/store';
 import {
   mainMenuItems,
   listingMenuItems,
@@ -18,8 +20,18 @@ interface MenuContentProps {
 }
 
 export const MenuContent = ({ onLinkClick }: MenuContentProps) => {
+  const { userRole } = useSelector((state: RootState) => state.auth);
+
   const [openSubMenus, setOpenSubMenus] = useState<{ [key: string]: boolean }>(
     {}
+  );
+
+  const customerListingMenu = listingMenuItems.filter(item =>
+    ['My Bookings', 'Messages', 'Reviews', 'Bookmarks'].includes(item.title)
+  );
+
+  const customerAccountMenu = accountMenuItems.filter(item =>
+    ['My Profile', 'Logout'].includes(item.title)
   );
 
   const toggleSubMenu = (title: string) => {
@@ -86,36 +98,60 @@ export const MenuContent = ({ onLinkClick }: MenuContentProps) => {
 
   return (
     <>
-      <nav>
-        <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2 px-2">
-          Main
-        </h3>
-        {renderMenuItems(mainMenuItems)}
-      </nav>
-      <nav className="mt-6">
-        <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2 px-2">
-          Listing
-        </h3>
-        {renderMenuItems(listingMenuItems)}
-      </nav>
-      <nav className="mt-6">
-        <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2 px-2">
-          Store
-        </h3>
-        {renderMenuItems(storeMenuItems)}
-      </nav>
-      <nav className="mt-6">
-        <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2 px-2">
-          Plugin
-        </h3>
-        {renderMenuItems(pluginMenuItems)}
-      </nav>
-      <nav className="mt-6">
-        <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2 px-2">
-          Account
-        </h3>
-        {renderMenuItems(accountMenuItems)}
-      </nav>
+      {userRole !== 'customer' && (
+        <>
+          <nav>
+            <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2 px-2">
+              Main
+            </h3>
+            {renderMenuItems(mainMenuItems)}
+          </nav>
+          <nav className="mt-6">
+            <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2 px-2">
+              Listing
+            </h3>
+            {renderMenuItems(listingMenuItems)}
+          </nav>
+          <nav className="mt-6">
+            <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2 px-2">
+              Store
+            </h3>
+            {renderMenuItems(storeMenuItems)}
+          </nav>
+          <nav className="mt-6">
+            <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2 px-2">
+              Plugin
+            </h3>
+            {renderMenuItems(pluginMenuItems)}
+          </nav>
+        </>
+      )}
+
+      {userRole === 'customer' && (
+        <>
+          <nav className="mt-6">
+            <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2 px-2">
+              Listing
+            </h3>
+            {renderMenuItems(customerListingMenu)}
+          </nav>
+          <nav className="mt-6">
+            <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2 px-2">
+              Account
+            </h3>
+            {renderMenuItems(customerAccountMenu)}
+          </nav>
+        </>
+      )}
+
+      {userRole !== 'customer' && (
+        <nav className="mt-6">
+          <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2 px-2">
+            Account
+          </h3>
+          {renderMenuItems(accountMenuItems)}
+        </nav>
+      )}
     </>
   );
 };

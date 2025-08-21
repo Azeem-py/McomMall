@@ -10,14 +10,32 @@ import {
 import { Button } from '@/components/ui/button';
 import { Check, ChevronDown, ChevronUp } from 'lucide-react';
 import { PricingTier } from '../types/index';
+import { PaymentConfirmationDialog } from '@/components/PaymentConfirmationDialog';
 
 interface PricingCardProps {
   tier: PricingTier & { accent: 'teal' | 'purple' | 'yellow' };
   isPayg?: boolean;
+  listingId: string | null;
 }
 
-export default function PricingCard({ tier, isPayg }: PricingCardProps) {
+export default function PricingCard({
+  tier,
+  isPayg,
+  listingId,
+}: PricingCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isTrial, setIsTrial] = useState(false);
+
+  const handlePayNow = () => {
+    setIsTrial(false);
+    setIsDialogOpen(true);
+  };
+
+  const handleStartTrial = () => {
+    setIsTrial(true);
+    setIsDialogOpen(true);
+  };
 
   const accentClasses = {
     teal: '',
@@ -74,6 +92,7 @@ export default function PricingCard({ tier, isPayg }: PricingCardProps) {
           {isPayg && (
             <CardFooter className="flex gap-2 ">
               <Button
+                onClick={handlePayNow}
                 className={`w-full md:w-1/2 text-white cursor-pointer ${
                   buttonColor[tier.accent]
                 } `}
@@ -81,6 +100,7 @@ export default function PricingCard({ tier, isPayg }: PricingCardProps) {
                 Pay Now
               </Button>
               <Button
+                onClick={handleStartTrial}
                 className={`w-full md:w-1/2 border bg-white cursor-pointer ${
                   outlineButtonColor[tier.accent]
                 }`}
@@ -151,6 +171,14 @@ export default function PricingCard({ tier, isPayg }: PricingCardProps) {
           )}
         </CardContent>
       </Card>
+      <PaymentConfirmationDialog
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        planName={tier.name}
+        planPrice={tier.price}
+        listingId={listingId}
+        isTrial={isTrial}
+      />
     </motion.div>
   );
 }
