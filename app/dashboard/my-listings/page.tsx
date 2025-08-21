@@ -10,6 +10,7 @@ import {
   Calendar,
   Building2,
 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { useGetUserListings } from '@/service/listings/hook';
 import { UserListing } from '@/service/listings/types';
@@ -135,6 +136,13 @@ const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
             <h3 className="text-lg font-bold text-slate-800">
               {listing.businessName}
             </h3>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {listing.listingType.map(type => (
+                <Badge key={type} variant="secondary">
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                </Badge>
+              ))}
+            </div>
             <div className="mt-1 flex items-center gap-2 text-sm text-slate-500">
               <MapPin className="h-4 w-4 flex-shrink-0" />
               <span>{listing.location.addressLine1}</span>
