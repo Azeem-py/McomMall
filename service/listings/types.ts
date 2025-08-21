@@ -92,28 +92,49 @@ export interface User {
   role: string;
 }
 
+interface Category {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  name: string;
+  description: string | null;
+}
+
+interface Location {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  postcode: string;
+  addressLine1: string;
+  addressLine2: string | null;
+  city: string;
+  showPublicly: boolean;
+  deliveryRadiusKm: number | null;
+  servicePostcodes: string[];
+  serviceModel: string | null;
+}
+
 export interface UserListing {
   id: string;
   created_at: string;
   updated_at: string;
-  category: string;
-  title: string;
-  description: string;
+  listingType: string[];
+  businessName: string;
+  legalName: string;
+  companyRegistrationNumber: string;
+  vatNumber: string;
+  shortDescription: string;
+  about: string;
+  website: string;
+  businessPhone: string;
+  businessEmail: string;
   logoUrl: string | null;
-  keywords: string[];
-  address: string;
-  googleMapsPlaceId: string;
-  socials: {
-    twitter: string;
-    youtube: string;
-    facebook: string;
-    instagram: string;
-  };
-  services: UserService[];
-  galleryImages: any[];
-  operatingHours: any[];
-  availabilityOverrides: any[];
-  user: User;
+  bannerUrl: string | null;
+  logoAltText: string;
+  bannerAltText: string;
+  status: string;
+  categories: Category[];
+  location: Location;
 }
 
 // --- Enums as String Literal Types ---
