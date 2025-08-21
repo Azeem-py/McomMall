@@ -245,7 +245,7 @@ const Auth = ({ children }: { children?: React.ReactNode }) => {
       <DialogTrigger asChild>
         <Button
           variant="outline"
-          className="text-orange-500"
+          className="text-orange-500 "
           onClick={() => dispatch(setLoginModalOpen(true))}
         >
           {children || 'Sign In'}

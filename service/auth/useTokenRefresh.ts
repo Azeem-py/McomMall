@@ -40,9 +40,12 @@ export const useTokenRefresh = () => {
 
       // Reset the timer
       if (intervalId.current) {
-        clearInterval(intervalId.current);
+        clearTimeout(intervalId.current as unknown as number);
       }
-      intervalId.current = setInterval(refreshToken, REFRESH_INTERVAL);
+      intervalId.current = setTimeout(
+        refreshToken,
+        REFRESH_INTERVAL
+      ) as unknown as NodeJS.Timeout;
     } catch (error) {
       console.error('Failed to refresh token:', error);
       dispatch(logout());
