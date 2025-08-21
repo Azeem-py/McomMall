@@ -87,7 +87,6 @@ const Card: React.FC<CardProps> = ({ children, className, ...props }) => {
   );
 };
 
-
 // --- Reusable Components ---
 
 const SearchBar: React.FC<SearchBarProps> = ({ searchTerm, setSearchTerm }) => (
@@ -150,9 +149,12 @@ const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
               </Button>
             </div>
             {!listing.isGoogleVerified && (
-              <Button variant="primary" className="text-xs px-3 py-1.5 mt-2">
+              <Button
+                variant="primary"
+                className="px-3 py-2 mt-2 bg-blue-600 text-white font-medium rounded-lg flex items-center justify-center cursor-pointer"
+              >
                 <GoogleLogo className="mr-2 h-4 w-4" />
-                Verify with Google
+                <p className="te">Verify with Google</p>
               </Button>
             )}
           </div>
@@ -246,9 +248,7 @@ export default function MyListingsPage() {
     if (!searchTerm) return listingsData;
     return listingsData.filter(
       (listing: Listing) =>
-        listing.businessName
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase()) ||
+        listing.businessName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         listing.location.addressLine1
           .toLowerCase()
           .includes(searchTerm.toLowerCase())
@@ -338,7 +338,10 @@ export default function MyListingsPage() {
             </div>
           )}
           <div className="w-full sm:w-auto">
-            <Button variant="primary" className="w-full">
+            <Button
+              variant="primary"
+              className="w-full bg-orange-600 px-3 py-3 rounded-xl text-white font-medium"
+            >
               Submit New Listing
             </Button>
           </div>
