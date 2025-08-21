@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import PricingCard from './PricingCard';
 import ComparisonTable from './ComparisonTable';
@@ -5,6 +6,7 @@ import { PricingTier, TableFeature, FeatureGroup } from '../types/index';
 import { ShieldCheck, LayoutDashboard, Rocket, Headset } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CardFooter } from '@/components/ui/card';
+import { PaymentConfirmationDialog } from '@/components/PaymentConfirmationDialog';
 
 const coBrandedTiers: PricingTier[] = [
   {
@@ -230,9 +232,23 @@ interface CoBrandedContentProps {
 export default function CoBrandedContent({
   listingId,
 }: CoBrandedContentProps) {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isTrial, setIsTrial] = useState(false);
+
+  const handlePayNow = () => {
+    setIsTrial(false);
+    setIsDialogOpen(true);
+  };
+
+  const handleStartTrial = () => {
+    setIsTrial(true);
+    setIsDialogOpen(true);
+  };
+
   return (
-    <motion.div
-      initial="initial"
+    <>
+      <motion.div
+        initial="initial"
       animate="animate"
       variants={{
         initial: { opacity: 0 },
@@ -352,11 +368,13 @@ export default function CoBrandedContent({
 
           <CardFooter className="flex gap-2 full items-center justify-center py-3">
             <Button
+              onClick={handlePayNow}
               className={`w-full md:w-1/5 text-white cursor-pointer bg-orange-600  hover:bg-orange-700`}
             >
               Pay Now
             </Button>
             <Button
+              onClick={handleStartTrial}
               className={`w-full md:w-1/5 border bg-white cursor-pointer text-orange-600 border-orange-600  hover:border-orange-700 hover:bg-white`}
             >
               Start Trial
@@ -390,5 +408,14 @@ export default function CoBrandedContent({
         accentHeaders={['blue-900', 'orange-800', 'black-500']}
       />
     </motion.div>
+    <PaymentConfirmationDialog
+      isOpen={isDialogOpen}
+      onClose={() => setIsDialogOpen(false)}
+      planName="Co-Branded Launchpad"
+      planPrice="£365"
+      listingId={listingId}
+      isTrial={isTrial}
+    />
+  </>
   );
 }
