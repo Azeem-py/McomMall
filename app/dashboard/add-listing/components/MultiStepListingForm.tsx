@@ -1,26 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   AlertDialog,
   AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Check } from 'lucide-react';
-
-import BasicInfoStep from './BasicInfoStep';
-import OfferingScheduleStep from './OfferingScheduleStep';
-import FinalDetailsStep from './FinalDetailsStep';
-import { ListingFormData } from '../types';
 import { Button } from '@/components/ui/button';
-import { useAddListing } from '@/service/listings/hook';
 import {
   Card,
   CardContent,
@@ -28,50 +20,243 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { useAddListing } from '@/service/listings/hook';
+import {
+  type BookingMethod,
+  type BusinessHourPayload,
+  type CreateBusinessPayload,
+  type DayOfWeek,
+  type ListingType,
+  type ProductSellerProfilePayload,
+  type SellingMode,
+  type ServiceModel,
+  type ServiceProviderProfilePayload,
+  type SocialLinkPayload,
+  type SpecialDayPayload,
+  type StorefrontLinkPayload,
+} from '@/service/listings/types';
 import { Separator } from '@/components/ui/separator';
+import { Check, Loader2 } from 'lucide-react';
+import { z } from 'zod';
+import { ListingFormData } from '../types';
+
+// Import all step components
+import BusinessInfoStep from './steps/shared/BusinessInfoStep';
+import MediaStep from './steps/shared/MediaStep';
+import ReviewStep from './steps/shared/ReviewStep';
+import ProductCategoryStep from './steps/product/ProductCategoryStep';
+import ProductLocationStep from './steps/product/ProductLocationStep';
+import ProductHoursStep from './steps/product/ProductHoursStep';
+import SellingModesStep from './steps/product/SellingModesStep';
+import ServiceCategoryStep from './steps/service/ServiceCategoryStep';
+import ServiceAreaStep from './steps/service/ServiceAreaStep';
+import ServiceHoursStep from './steps/service/ServiceHoursStep';
+import BookingStep from './steps/service/BookingStep';
+import CredentialsStep from './steps/service/CredentialsStep';
 
 interface MultiStepListingFormProps {
-  category: string;
+  businessTypes: string[];
   onBack: () => void;
 }
 
-const steps = [
-  {
-    number: 1,
-    title: 'Basic Information',
-    component: BasicInfoStep,
-  },
-  {
-    number: 2,
-    title: 'Offering & Schedule',
-    component: OfferingScheduleStep,
-  },
-  {
-    number: 3,
-    title: 'Final Details',
-    component: FinalDetailsStep,
-  },
-];
+// Profanity filter (simple version)
+const badWords = ['profanity', 'badword'];
+const profanityCheck = (value: string) =>
+  !badWords.some(word => value.toLowerCase().includes(word));
 
-const StepIndicator = ({ currentStep }: { currentStep: number }) => (
-  <div className="flex justify-center items-center mb-8">
+// Zod Schemas for validation
+const businessInfoSchema = z
+  .object({
+    businessName: z
+      .string()
+      .min(1, { message: 'Business name is required.' })
+      .refine(profanityCheck, {
+        message: 'Business name contains inappropriate language.',
+      }),
+    legalName: z.string().optional(),
+    companyRegNo: z.string().optional(),
+    vatNo: z.string().optional(),
+    shortDesc: z
+      .string()
+      .min(20, { message: 'Must be 20-180 characters.' })
+      .max(180, { message: 'Must be 20-180 characters.' })
+      .refine(profanityCheck, {
+        message: 'Description contains inappropriate language.',
+      }),
+    longDesc: z.string().optional(),
+    phone: z
+      .string()
+      .regex(/^\+44\d{10}$/, { message: 'Invalid UK phone. Use +44 format.' }),
+    email: z
+      .string()
+      .email({ message: 'Invalid email.' })
+      .optional()
+      .or(z.literal('')),
+    socials: z
+      .object({
+        website: z
+          .string()
+          .url({ message: 'Invalid URL.' })
+          .optional()
+          .or(z.literal('')),
+        facebook: z
+          .string()
+          .url({ message: 'Invalid URL.' })
+          .optional()
+          .or(z.literal('')),
+        instagram: z
+          .string()
+          .url({ message: 'Invalid URL.' })
+          .optional()
+          .or(z.literal('')),
+        twitter: z
+          .string()
+          .url({ message: 'Invalid URL.' })
+          .optional()
+          .or(z.literal('')),
+        youtube: z
+          .string()
+          .url({ message: 'Invalid URL.' })
+          .optional()
+          .or(z.literal('')),
+        linkedin: z
+          .string()
+          .url({ message: 'Invalid URL.' })
+          .optional()
+          .or(z.literal('')),
+      })
+      .optional(),
+  })
+  .passthrough();
+
+const mediaSchema = z
+  .object({
+    logo: z
+      .object({
+        file: z.instanceof(File).nullable(),
+        altText: z.string(),
+      })
+      .refine(data => (data.file ? data.altText.length > 0 : true), {
+        message: 'Logo alt text is required when an image is uploaded.',
+        path: ['altText'],
+      })
+      .nullable(),
+    banner: z
+      .object({
+        file: z.instanceof(File).nullable(),
+        altText: z.string(),
+      })
+      .refine(data => (data.file ? data.altText.length > 0 : true), {
+        message: 'Banner alt text is required when an image is uploaded.',
+        path: ['altText'],
+      })
+      .nullable(),
+  })
+  .passthrough();
+
+const productCategorySchema = z
+  .object({
+    productData: z
+      .object({
+        primaryCategory: z
+          .string()
+          .min(1, { message: 'Primary category is required.' }),
+      })
+      .optional(),
+  })
+  .passthrough();
+
+const productLocationSchema = z
+  .object({
+    address: z.string().optional(),
+  })
+  .passthrough();
+
+const sellingModesSchema = z
+  .object({
+    productData: z
+      .object({
+        sellingModes: z
+          .object({
+            inStorePickup: z.boolean(),
+            localDelivery: z.boolean(),
+            ukWideShipping: z.boolean(),
+          })
+          .refine(
+            data =>
+              data.inStorePickup || data.localDelivery || data.ukWideShipping,
+            {
+              message: 'At least one selling mode must be selected.',
+              path: ['sellingModes'],
+            }
+          ),
+      })
+      .optional(),
+  })
+  .passthrough();
+
+const serviceCategorySchema = z
+  .object({
+    serviceData: z
+      .object({
+        tradeCategory: z
+          .string()
+          .min(1, { message: 'Trade category is required.' }),
+      })
+      .optional(),
+  })
+  .passthrough();
+
+const bookingSchema = z
+  .object({
+    serviceData: z
+      .object({
+        bookingMethod: z.string(),
+        bookingURL: z.string().optional(),
+      })
+      .refine(
+        data => {
+          if (data.bookingMethod === 'online') {
+            return (
+              data.bookingURL &&
+              z.string().url().safeParse(data.bookingURL).success
+            );
+          }
+          return true;
+        },
+        {
+          message: 'A valid booking URL is required for online booking.',
+          path: ['bookingURL'],
+        }
+      ),
+  })
+  .passthrough();
+
+const StepIndicator = ({
+  currentStep,
+  steps,
+}: {
+  currentStep: number;
+  steps: { title: string; component: React.ElementType }[];
+}) => (
+  <div className="flex justify-center items-center mb-8 overflow-x-auto py-2">
     {steps.map((step, index) => (
-      <div key={step.number} className="flex items-center">
-        <div className="flex flex-col items-center">
+      <div key={step.title} className="flex items-center flex-shrink-0">
+        <div className="flex flex-col items-center w-24">
           <div
             className={`w-10 h-10 rounded-full flex items-center justify-center text-lg font-semibold transition-colors duration-300 ${
-              currentStep > step.number
-                ? 'bg-primary text-primary-foreground'
-                : currentStep === step.number
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground'
+              currentStep > index + 1
+                ? 'bg-blue-600 text-white'
+                : currentStep === index + 1
+                ? 'bg-orange-700 text-white'
+                : 'bg-muted text-muted-foreground'
             }`}
           >
-            {currentStep > step.number ? <Check /> : step.number}
+            {currentStep > index + 1 ? <Check /> : index + 1}
           </div>
           <p
-            className={`mt-2 text-sm font-medium transition-colors duration-300 ${
-              currentStep >= step.number
+            className={`mt-2 text-xs text-center font-medium transition-colors duration-300 ${
+              currentStep >= index + 1
                 ? 'text-primary'
                 : 'text-muted-foreground'
             }`}
@@ -82,7 +267,7 @@ const StepIndicator = ({ currentStep }: { currentStep: number }) => (
         {index < steps.length - 1 && (
           <div
             className={`w-16 h-1 mx-4 transition-colors duration-300 ${
-              currentStep > step.number ? 'bg-primary' : 'bg-muted'
+              currentStep > index + 1 ? 'bg-blue-600' : 'bg-muted'
             }`}
           />
         )}
@@ -92,93 +277,268 @@ const StepIndicator = ({ currentStep }: { currentStep: number }) => (
 );
 
 const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
-  category,
+  businessTypes,
   onBack,
 }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<ListingFormData>({
-    category,
-    title: '',
+    businessTypes: businessTypes as ('Product' | 'Service')[],
+    businessName: '',
+    phone: '',
+    email: '',
+    shortDesc: '',
+    socials: { website: '' },
     logo: null,
-    keywords: '',
-    address: '',
-    googleMapsPlaceId: '',
-    gallery: [],
-    services: [],
-    schedule: {},
-    availability: {},
-    description: '',
-    socials: {},
+    banner: null,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isAlertOpen, setIsAlertOpen] = useState(false);
   const router = useRouter();
   const { mutate: addListing, isPending } = useAddListing();
 
-  const validateStep1 = () => {
-    const newErrors: Record<string, string> = {};
-    if (!formData.title.trim()) {
-      newErrors.title = 'Listing title is required.';
+  const steps = useMemo(() => {
+    const sharedInitial = [
+      {
+        title: 'Business Info',
+        component: BusinessInfoStep,
+        schema: businessInfoSchema,
+      },
+    ];
+    const productSteps = [
+      {
+        title: 'Product Categories',
+        component: ProductCategoryStep,
+        schema: productCategorySchema,
+      },
+      {
+        title: 'Location',
+        component: ProductLocationStep,
+        schema: productLocationSchema,
+      },
+      { title: 'Hours', component: ProductHoursStep, schema: z.any() },
+      {
+        title: 'Selling Modes',
+        component: SellingModesStep,
+        schema: sellingModesSchema,
+      },
+    ];
+    const serviceSteps = [
+      {
+        title: 'Service Categories',
+        component: ServiceCategoryStep,
+        schema: serviceCategorySchema,
+      },
+      { title: 'Service Area', component: ServiceAreaStep, schema: z.any() },
+      { title: 'Availability', component: ServiceHoursStep, schema: z.any() },
+      { title: 'Booking', component: BookingStep, schema: bookingSchema },
+      { title: 'Credentials', component: CredentialsStep, schema: z.any() },
+    ];
+    const sharedFinal = [
+      { title: 'Media', component: MediaStep, schema: mediaSchema },
+      { title: 'Review & Publish', component: ReviewStep, schema: z.any() },
+    ];
+
+    let flowSteps: {
+      title: string;
+      component: React.ElementType;
+      schema: z.ZodSchema<unknown>;
+    }[] = [];
+
+    if (
+      businessTypes.includes('Product') &&
+      businessTypes.includes('Service')
+    ) {
+      flowSteps = [...productSteps, ...serviceSteps];
+    } else if (businessTypes.includes('Product')) {
+      flowSteps = productSteps;
+    } else if (businessTypes.includes('Service')) {
+      flowSteps = serviceSteps;
     }
-    if (!formData.logo) {
-      newErrors.logo = 'Listing logo is required.';
+
+    return [...sharedInitial, ...flowSteps, ...sharedFinal];
+  }, [businessTypes]);
+
+  const validateStep = () => {
+    const currentSchema = steps[currentStep - 1].schema;
+    const result = currentSchema.safeParse(formData);
+
+    if (!result.success) {
+      const newErrors: Record<string, string> = {};
+      result.error.issues.forEach(err => {
+        newErrors[err.path.join('.')] = err.message;
+      });
+      setErrors(newErrors);
+      return false;
     }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+
+    setErrors({});
+    return true;
   };
 
   const nextStep = () => {
-    if (currentStep === 1) {
-      if (!validateStep1()) return;
+    if (validateStep()) {
+      setCurrentStep(prev => Math.min(prev + 1, steps.length));
     }
-    setCurrentStep(prev => Math.min(prev + 1, 3));
   };
 
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));
 
-  const handleSubmit = () => {
-    const urlPattern = new RegExp(
-      '^(https?:\\/\\/)?' + // protocol
-        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
-        '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
-        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
-        '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
-        '(\\#[-a-z\\d_]*)?$',
-      'i'
-    ); // fragment locator
+  const transformFormDataToPayload = (
+    data: ListingFormData
+  ): CreateBusinessPayload => {
+    const listingType = data.businessTypes.map(
+      t => t.toLowerCase() as ListingType
+    );
 
-    const newErrors: Record<string, string> = {};
-    Object.entries(formData.socials).forEach(([key, value]) => {
-      if (value && !urlPattern.test(value)) {
-        newErrors[
-          `socials.${key}`
-        ] = `Invalid URL format for ${key}. Please enter a valid URL.`;
+    // --- Location and Service Area ---
+    const location: CreateBusinessPayload['location'] = {
+      addressLine1: data.address || '',
+      postcode: '', // Note: No postcode in ListingFormData, needs to be extracted from address
+      city: '', // Note: No city in ListingFormData, needs to be extracted from address
+      showPublicly: data.productData?.showAddressPublicly || false,
+      deliveryRadiusKm:
+        data.productData?.deliveryArea?.type === 'radius'
+          ? Number(data.productData.deliveryArea.value)
+          : undefined,
+      servicePostcodes:
+        data.productData?.deliveryArea?.type === 'postcodes'
+          ? (data.productData.deliveryArea.value as string[])
+          : data.serviceData?.serviceArea?.type === 'postcodes'
+          ? data.serviceData.serviceArea.value.split(',').map(p => p.trim())
+          : undefined,
+      serviceModel:
+        data.serviceData?.serviceLocation?.atBusinessLocation &&
+        data.serviceData?.serviceLocation?.customerTravels
+          ? 'both'
+          : data.serviceData?.serviceLocation?.atBusinessLocation
+          ? 'at_location'
+          : data.serviceData?.serviceLocation?.customerTravels
+          ? 'travel_to_customer'
+          : undefined,
+    };
+
+    // --- Social Links ---
+    const socialLinks: SocialLinkPayload[] = Object.entries(data.socials)
+      .map(([platform, url]) => (url ? { platform, url } : null))
+      .filter((link): link is SocialLinkPayload => link !== null);
+
+    // --- Business Hours ---
+    const dayMapping: { [key: string]: DayOfWeek } = {
+      Monday: 1,
+      Tuesday: 2,
+      Wednesday: 3,
+      Thursday: 4,
+      Friday: 5,
+      Saturday: 6,
+      Sunday: 0,
+    };
+    const businessHours: BusinessHourPayload[] = [];
+    if (data.productData?.weeklyHours) {
+      for (const [day, times] of Object.entries(data.productData.weeklyHours)) {
+        if (times) {
+          (times as { start: string; end: string }[]).forEach(time => {
+            businessHours.push({
+              dayOfWeek: dayMapping[day],
+              openTime: time.start,
+              closeTime: time.end,
+            });
+          });
+        }
       }
-    });
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
     }
 
-    const transformedData = {
-      ...formData,
-      keywords: formData.keywords.split(',').map(k => k.trim()),
-      services: formData.services.map(s => ({
-        ...s,
-        price: parseFloat(s.price),
-      })),
+    // --- Special Days ---
+    const specialDays: SpecialDayPayload[] =
+      data.productData?.specialDays?.map(day => ({
+        date: day.date.toISOString().split('T')[0],
+        description: '', // No description field in source
+        isOpen: !day.isClosed,
+        openTime: day.openingHours?.[0]?.start,
+        closeTime: day.openingHours?.[0]?.end,
+      })) || [];
+
+    // --- Product Seller Profile ---
+    let productSellerProfile: ProductSellerProfilePayload | undefined;
+    if (data.productData) {
+      const sellingModes: SellingMode[] = [];
+      if (data.productData.sellingModes?.inStorePickup)
+        sellingModes.push('pickup');
+      if (data.productData.sellingModes?.localDelivery)
+        sellingModes.push('local_delivery');
+      if (data.productData.sellingModes?.ukWideShipping)
+        sellingModes.push('uk_shipping');
+
+      const storefrontLinks: StorefrontLinkPayload[] = Object.entries(
+        data.productData.storefrontLinks || {}
+      )
+        .map(([platform, url]) =>
+          url
+            ? { platform: platform as StorefrontLinkPayload['platform'], url }
+            : null
+        )
+        .filter((link): link is StorefrontLinkPayload => link !== null);
+
+      productSellerProfile = {
+        sellingModes,
+        fulfilmentNotes: data.productData.fulfilmentNotes,
+        returnsPolicy: data.productData.returnsPolicy,
+        hasAgeRestrictedItems: false, // This is not in the form data
+        storefrontLinks,
+      };
+    }
+
+    // --- Service Provider Profile ---
+    let serviceProviderProfile: ServiceProviderProfilePayload | undefined;
+    if (data.serviceData) {
+      serviceProviderProfile = {
+        bookingMethod: data.serviceData.bookingMethod as BookingMethod,
+        bookingUrl: data.serviceData.bookingURL,
+        quoteOnly: data.serviceData.pricingVisibility === 'quote',
+        hasPublicLiabilityInsurance: false, // This is not in the form data
+        certifications: [], // File upload needed
+      };
+    }
+
+    const payload: CreateBusinessPayload = {
+      listingType,
+      businessName: data.businessName,
+      legalName: data.legalName,
+      companyRegistrationNumber: data.companyRegNo,
+      vatNumber: data.vatNo,
+      shortDescription: data.shortDesc,
+      about: data.longDesc,
+      website: data.socials.website,
+      businessPhone: data.phone,
+      businessEmail: data.email,
+      logoUrl: undefined, // Requires file upload handling
+      bannerUrl: undefined, // Requires file upload handling
+      logoAltText: data.logo?.altText,
+      bannerAltText: data.banner?.altText,
+      location,
+      socialLinks,
+      categoryIds: [
+        data.productData?.primaryCategory,
+        data.serviceData?.tradeCategory,
+      ]
+        .filter((id): id is string => !!id)
+        .filter((id, index, self) => self.indexOf(id) === index),
+      businessHours,
+      specialDays,
+      productSellerProfile,
+      serviceProviderProfile,
     };
-    addListing(transformedData, {
-      onSuccess: () => {
-        setIsAlertOpen(true);
-      },
-    });
+
+    return payload;
   };
 
-  const CurrentStepComponent = steps.find(
-    s => s.number === currentStep
-  )!.component;
+  const handleSubmit = () => {
+    // A more comprehensive final validation should be done here
+    // before attempting to submit.
+    const payload = transformFormDataToPayload(formData);
+    console.log('Submitting Payload:', JSON.stringify(payload, null, 2));
+    addListing(payload);
+  };
+
+  const CurrentStepComponent = steps[currentStep - 1].component;
 
   const formVariants = {
     hidden: { opacity: 0, x: 50 },
@@ -186,78 +546,80 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
     exit: { opacity: 0, x: -50 },
   };
 
+  const getTitle = () => {
+    if (businessTypes.length > 1) return 'Product & Service';
+    return businessTypes[0];
+  };
+
   return (
     <>
-      <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Verify Your Listing</AlertDialogTitle>
-            <AlertDialogDescription>
-              To verify your listing, a £1 GBP fee is required.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => router.push('/pricing')}
-              className="bg-orange-600 hover:bg-orange-700"
-            >
-              Continue
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">
-          <CardTitle className="text-2xl font-bold">
-            Create a new <span className="text-primary">{category}</span>{' '}
-            Listing
-          </CardTitle>
-          <Button variant="ghost" onClick={onBack}>
-            &larr; Back to categories
-          </Button>
-        </div>
-      </CardHeader>
-      <Separator />
-      <CardContent className="pt-6">
-        <StepIndicator currentStep={currentStep} />
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentStep}
-            variants={formVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            transition={{ type: 'tween', ease: 'easeInOut', duration: 0.4 }}
+            <CardTitle className="text-2xl font-bold">
+              Add a New <span className="text-orange-700">{getTitle()}</span>{' '}
+              Listing
+            </CardTitle>
+            <Button
+              variant="ghost"
+              onClick={onBack}
+              className="text-blue-600 hover:text-blue-700"
+            >
+              &larr; Back to selection
+            </Button>
+          </div>
+        </CardHeader>
+        <Separator />
+        <CardContent className="pt-6">
+          <StepIndicator currentStep={currentStep} steps={steps} />
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentStep}
+              variants={formVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              transition={{ type: 'tween', ease: 'easeInOut', duration: 0.4 }}
+            >
+              <CurrentStepComponent
+                formData={formData}
+                setFormData={setFormData}
+                errors={errors}
+              />
+            </motion.div>
+          </AnimatePresence>
+        </CardContent>
+        <Separator />
+        <CardFooter className="flex justify-between mt-6">
+          <Button
+            variant="outline"
+            onClick={prevStep}
+            className={`${
+              currentStep === 1 ? 'invisible' : 'visible'
+            } text-blue-600 border-blue-600 hover:bg-blue-50`}
           >
-            <CurrentStepComponent
-              formData={formData}
-              setFormData={setFormData}
-              errors={errors}
-            />
-          </motion.div>
-        </AnimatePresence>
-      </CardContent>
-      <Separator />
-      <CardFooter className="flex justify-between mt-6">
-        {currentStep > 1 ? (
-          <Button variant="outline" onClick={prevStep}>
             Back
           </Button>
-        ) : (
-          <div />
-        )}
 
-        {currentStep < 3 ? (
-          <Button onClick={nextStep}>Next</Button>
-        ) : (
-          <Button onClick={handleSubmit} disabled={isPending}>
-            {isPending ? 'Submitting...' : 'Submit'}
-          </Button>
-        )}
-      </CardFooter>
-    </Card>
+          {currentStep < steps.length ? (
+            <Button
+              onClick={nextStep}
+              className="bg-orange-700 hover:bg-orange-800"
+            >
+              Next
+            </Button>
+          ) : (
+            <Button
+              onClick={handleSubmit}
+              disabled={isPending}
+              className="bg-orange-700 hover:bg-orange-800"
+            >
+              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isPending ? 'Publishing...' : 'Publish'}
+            </Button>
+          )}
+        </CardFooter>
+      </Card>
     </>
   );
 };

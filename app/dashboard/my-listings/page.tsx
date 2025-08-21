@@ -117,7 +117,7 @@ const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
           {imgSrc ? (
             <Image
               src={imgSrc}
-              alt={listing.title}
+              alt={listing.businessName}
               width={128}
               height={128}
               className="h-32 w-full md:h-32 md:w-32 rounded-lg object-cover bg-slate-200"
@@ -132,11 +132,11 @@ const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
           )}
           <div className="flex-grow">
             <h3 className="text-lg font-bold text-slate-800">
-              {listing.title}
+              {listing.businessName}
             </h3>
             <div className="mt-1 flex items-center gap-2 text-sm text-slate-500">
               <MapPin className="h-4 w-4 flex-shrink-0" />
-              <span>{listing.address}</span>
+              <span>{listing.location.addressLine1}</span>
             </div>
           </div>
           <div className="flex w-full shrink-0 flex-row items-center justify-end gap-2 md:w-auto">
@@ -237,8 +237,12 @@ export default function MyListingsPage() {
     if (!searchTerm) return listingsData;
     return listingsData.filter(
       (listing: Listing) =>
-        listing.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        listing.address.toLowerCase().includes(searchTerm.toLowerCase())
+        listing.businessName
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+        listing.location.addressLine1
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())
     );
   }, [searchTerm, listingsData]);
 

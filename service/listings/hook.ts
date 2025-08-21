@@ -1,7 +1,12 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 import api from '../api';
-import { GooglePlaceResult, GooglePlaceResults, Listing } from './types';
+import {
+  CreateBusinessPayload,
+  GooglePlaceResult,
+  GooglePlaceResults,
+} from './types';
 
 export interface ErrorResponse {
   response?: {
@@ -47,7 +52,8 @@ export const useGetGoogleListings = ({
 };
 
 export const useAddListing = () => {
-  const create = async (payload: Listing) => {
+  const router = useRouter();
+  const create = async (payload: CreateBusinessPayload) => {
     try {
       const response = await api.post('listings', { ...payload });
       return response.data;
@@ -64,7 +70,8 @@ export const useAddListing = () => {
   const mutation = useMutation({
     mutationFn: create,
     onSuccess: data => {
-      toast.success(data.message);
+      toast.success(data.message || 'Listing created successfully!');
+      router.push('/dashboard/my-listings');
     },
     onError: (error: Error) => {
       toast.error(error.message);

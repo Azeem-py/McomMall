@@ -1,47 +1,103 @@
-export interface Service {
-  id: number;
-  image: string | null;
-  title: string;
-  description: string;
-  price: string;
-  currency: string;
-  pricingModel: string;
+// Shared types
+export interface Socials {
+  website?: string;
+  facebook?: string;
+  instagram?: string;
+  twitter?: string;
+  youtube?: string;
+  linkedin?: string;
+}
+
+export interface Media {
+  file: File | null;
+  altText: string;
 }
 
 export interface TimeRange {
   start: string;
-  end: string;
+  end:string;
 }
 
-export interface Schedule {
-  [key: string]: TimeRange[];
+export interface WeeklyHours {
+  Monday?: TimeRange[];
+  Tuesday?: TimeRange[];
+  Wednesday?: TimeRange[];
+  Thursday?: TimeRange[];
+  Friday?: TimeRange[];
+  Saturday?: TimeRange[];
+  Sunday?: TimeRange[];
 }
 
-export interface Availability {
-  [key: string]: {
-    blocked: boolean;
-    price?: number;
+export interface SpecialDay {
+  date: Date;
+  isClosed: boolean;
+  openingHours?: TimeRange[];
+}
+
+// Flow-specific data structures
+export interface ProductSellerData {
+  primaryCategory: string;
+  subCategories: string[];
+  showAddressPublicly: boolean;
+  deliveryArea: {
+    type: 'radius' | 'postcodes';
+    value: string | string[];
+  };
+  is247: boolean;
+  weeklyHours: WeeklyHours;
+  specialDays: SpecialDay[];
+  sellingModes: {
+    inStorePickup: boolean;
+    localDelivery: boolean;
+    ukWideShipping: boolean;
+  };
+  fulfilmentNotes?: string;
+  returnsPolicy?: string;
+  storefrontLinks?: {
+    amazon?: string;
+    ebay?: string;
+    etsy?: string;
   };
 }
 
-export interface Socials {
-    youtube?: string;
-    facebook?: string;
-    instagram?: string;
-    twitter?: string;
+export interface ServiceProviderData {
+  tradeCategory: string;
+  serviceLocation: {
+    atBusinessLocation: boolean;
+    customerTravels: boolean;
+  };
+  serviceArea?: {
+    type: 'radius' | 'postcodes';
+    value: string;
+  };
+  hoursType: 'weekly' | 'appointmentOnly';
+  weeklyHours?: WeeklyHours;
+  bookingMethod: 'call' | 'quote' | 'online';
+  bookingURL?: string;
+  pricingVisibility: 'fixed' | 'hourly' | 'quote';
+  insuranceCertificates?: Media[];
+  qualifications?: Media[];
 }
 
+// Main form data structure
 export interface ListingFormData {
-  category: string;
-  title: string;
-  logo: File | null;
-  keywords: string;
-  address: string;
-  googleMapsPlaceId: string;
-  gallery: File[];
-  services: Service[];
-  schedule: Schedule;
-  availability: Availability;
-  description: string;
+  businessTypes: ('Product' | 'Service')[];
+
+  // Shared Business Information
+  businessName: string;
+  legalName?: string;
+  companyRegNo?: string;
+  vatNo?: string;
+  shortDesc: string;
+  longDesc?: string;
+  address?: string;
+  phone: string;
+  email: string;
   socials: Socials;
+  logo: Media | null;
+  banner: Media | null;
+
+  // Conditional data
+  productData?: Partial<ProductSellerData>;
+  serviceData?: Partial<ServiceProviderData>;
 }
