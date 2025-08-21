@@ -18,6 +18,8 @@ import { NavMenuContent } from './component/NavMenuContent';
 // Shadcn UI Components
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { UserAvatar } from './component/UserAvatar';
+import AuthRedirect from '@/components/AuthRedirect';
 
 export default function DashboardLayout({
   children,
@@ -28,86 +30,99 @@ export default function DashboardLayout({
   const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
 
   return (
-    <section className="flex w-screen h-screen overflow-hidden bg-[#F6F6F6]">
-      {/* --- DESKTOP SIDEBAR (Left) --- */}
-      <div className="hidden md:block w-[19rem] p-5">
-        <div className="flex flex-col h-full">
-          <Link href="/" className="flex items-center space-x-2 mb-5 h-[5rem]">
-            <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-sm">M</span>
+    <>
+      <AuthRedirect />
+      <section className="flex w-screen h-screen overflow-hidden bg-[#F6F6F6]">
+        {/* --- DESKTOP SIDEBAR (Left) --- */}
+        <div className="hidden md:block w-[19rem] p-5">
+          <div className="flex flex-col h-full">
+            <Link
+              href="/"
+              className="flex items-center space-x-2 mb-5 h-[5rem]"
+            >
+              <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                <span className="text-white font-bold text-sm">M</span>
+              </div>
+              <span className="text-3xl font-semibold">McomMall</span>
+            </Link>
+            <div className="flex-grow h-calc[(100vh-5rem)] overflow-y-auto">
+              <SideMenu />
             </div>
-            <span className="text-3xl font-semibold">McomMall</span>
-          </Link>
-          <div className="flex-grow h-calc[(100vh-5rem)] overflow-y-auto">
-            <SideMenu />
           </div>
         </div>
-      </div>
 
-      {/* --- MAIN CONTENT AREA --- */}
-      <main className="flex-1 flex flex-col">
-        <header className="flex items-center justify-between w-full h-20 py-3 px-5 border-b bg-slate-800">
-          {/* --- LEFT SIDE: MOBILE MENU TRIGGER (for SideMenu) --- */}
-          <div className="md:hidden">
-            <Sheet open={isSideMenuOpen} onOpenChange={setIsSideMenuOpen}>
-              <SheetTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="w-fit border-0 shadow-none"
-                >
-                  <div className="flex gap-2 items-center">
-                    <Menu className="h-5 w-5" />
-                    <p>Dashbaord Menu</p>
-                  </div>
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="p-0 w-[18rem]">
-                <div className="p-5 border-b">
-                  <Link href="/" className="flex items-center space-x-2">
-                    <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
-                      <span className="text-white font-bold text-sm">M</span>
+        {/* --- MAIN CONTENT AREA --- */}
+        <main className="flex-1 flex flex-col">
+          <header className="flex items-center justify-between w-full h-20 py-3 px-5 border-b bg-slate-800">
+            {/* --- LEFT SIDE: MOBILE MENU TRIGGER (for SideMenu) --- */}
+            <div className="md:hidden">
+              <Sheet open={isSideMenuOpen} onOpenChange={setIsSideMenuOpen}>
+                <SheetTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="w-fit border-0 shadow-none"
+                  >
+                    <div className="flex gap-2 items-center">
+                      <Menu className="h-5 w-5" />
+                      <p>Dashbaord Menu</p>
                     </div>
-                    <span className="text-xl font-semibold">McomMall</span>
-                  </Link>
-                </div>
-                <div className="p-4 overflow-y-auto">
-                  <SideMenuContent
-                    onLinkClick={() => setIsSideMenuOpen(false)}
-                  />
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="p-0 w-[18rem]">
+                  <div className="p-5 border-b">
+                    <Link href="/" className="flex items-center space-x-2">
+                      <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                        <span className="text-white font-bold text-sm">M</span>
+                      </div>
+                      <span className="text-xl font-semibold">McomMall</span>
+                    </Link>
+                  </div>
+                  <div className="p-4 overflow-y-auto">
+                    <SideMenuContent
+                      onLinkClick={() => setIsSideMenuOpen(false)}
+                    />
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
 
-          {/* --- CENTER: DESKTOP NAV MENU --- */}
-          <div className="flex-grow flex justify-center">
-            <NavMenu />
-          </div>
+            {/* --- CENTER: DESKTOP NAV MENU --- */}
+            <div className="flex-grow flex justify-center">
+              <NavMenu />
+            </div>
 
-          {/* --- RIGHT SIDE: MOBILE NAV TRIGGER & other controls --- */}
-          <div className="md:hidden">
-            <Sheet open={isNavMenuOpen} onOpenChange={setIsNavMenuOpen}>
-              <SheetTrigger asChild>
-                <Button variant="outline" size="icon">
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent
-                side="right"
-                className="p-4 w-[18rem] overflow-y-auto"
-              >
-                <NavMenuContent onLinkClick={() => setIsNavMenuOpen(false)} />
-              </SheetContent>
-            </Sheet>
-          </div>
-        </header>
+            {/* --- RIGHT SIDE: User Avatar & Mobile Nav Trigger --- */}
+            <div className="flex items-center gap-4">
+              <div className="hidden md:block">
+                <UserAvatar />
+              </div>
+              <div className="md:hidden">
+                <Sheet open={isNavMenuOpen} onOpenChange={setIsNavMenuOpen}>
+                  <SheetTrigger asChild>
+                    <Button variant="outline" size="icon">
+                      <Menu className="h-5 w-5" />
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent
+                    side="right"
+                    className="p-4 w-[18rem] overflow-y-auto"
+                  >
+                    <NavMenuContent
+                      onLinkClick={() => setIsNavMenuOpen(false)}
+                    />
+                  </SheetContent>
+                </Sheet>
+              </div>
+            </div>
+          </header>
 
-        {/* Page Content */}
-        <div className="sm:p-5 p-2 overflow-y-auto flex-grow">
-          <ProtectedRoute>{children}</ProtectedRoute>
-        </div>
-      </main>
-    </section>
+          {/* Page Content */}
+          <div className="sm:p-5 p-2 overflow-y-auto flex-grow">
+            <ProtectedRoute>{children}</ProtectedRoute>
+          </div>
+        </main>
+      </section>
+    </>
   );
 }
