@@ -212,7 +212,13 @@ const paygFeatureGroups: FeatureGroup[] = [
   { name: 'Premium Features', features: paygFeatures.slice(24) },
 ];
 
-export default function PayAsYouGoContent() {
+interface PayAsYouGoContentProps {
+  listingId: string | null;
+}
+
+export default function PayAsYouGoContent({
+  listingId,
+}: PayAsYouGoContentProps) {
   return (
     <motion.div
       initial="initial"
@@ -245,6 +251,7 @@ export default function PayAsYouGoContent() {
                 tier as PricingTier & { accent: 'teal' | 'purple' | 'yellow' }
               }
               isPayg={true}
+              listingId={listingId}
             />
           </motion.div>
         ))}

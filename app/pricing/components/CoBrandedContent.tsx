@@ -223,7 +223,13 @@ const coBrandedFeatureGroups: FeatureGroup[] = [
   { name: 'Premium Features', features: coBrandedFeatures.slice(24) },
 ];
 
-export default function CoBrandedContent() {
+interface CoBrandedContentProps {
+  listingId: string | null;
+}
+
+export default function CoBrandedContent({
+  listingId,
+}: CoBrandedContentProps) {
   return (
     <motion.div
       initial="initial"
@@ -373,6 +379,7 @@ export default function CoBrandedContent() {
                 tier as PricingTier & { accent: 'teal' | 'purple' | 'yellow' }
               }
               isPayg={false}
+              listingId={listingId}
             />
           </motion.div>
         ))}
