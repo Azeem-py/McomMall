@@ -13,6 +13,7 @@ import {
 import Image from 'next/image';
 import { useGetUserListings } from '@/service/listings/hook';
 import { UserListing } from '@/service/listings/types';
+import GoogleLogo from '@/app/components/GoogleLogo';
 
 // --- Type Definitions ---
 
@@ -139,13 +140,21 @@ const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
               <span>{listing.location.addressLine1}</span>
             </div>
           </div>
-          <div className="flex w-full shrink-0 flex-row items-center justify-end gap-2 md:w-auto">
-            <Button variant="default" className="text-xs px-3 py-1.5">
-              <Edit className="mr-1 h-3 w-3" /> Edit
-            </Button>
-            <Button variant="default" className="text-xs px-3 py-1.5">
-              <Trash2 className="mr-1 h-3 w-3" /> Delete
-            </Button>
+          <div className="flex w-full shrink-0 flex-col items-end justify-between gap-2 md:w-auto">
+            <div className="flex flex-row items-center gap-2">
+              <Button variant="default" className="text-xs px-3 py-1.5">
+                <Edit className="mr-1 h-3 w-3" /> Edit
+              </Button>
+              <Button variant="default" className="text-xs px-3 py-1.5">
+                <Trash2 className="mr-1 h-3 w-3" /> Delete
+              </Button>
+            </div>
+            {!listing.isGoogleVerified && (
+              <Button variant="primary" className="text-xs px-3 py-1.5 mt-2">
+                <GoogleLogo className="mr-2 h-4 w-4" />
+                Verify with Google
+              </Button>
+            )}
           </div>
         </div>
       </Card>

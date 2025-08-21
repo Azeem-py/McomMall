@@ -135,6 +135,7 @@ export interface UserListing {
   status: string;
   categories: Category[];
   location: Location;
+  isGoogleVerified: boolean;
 }
 
 // --- Enums as String Literal Types ---
