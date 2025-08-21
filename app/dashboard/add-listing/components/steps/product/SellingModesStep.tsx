@@ -5,17 +5,32 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { z } from 'zod';
 
 interface StepProps {
   formData: ListingFormData;
   setFormData: React.Dispatch<React.SetStateAction<ListingFormData>>;
   errors: Record<string, string>;
+  schema?: z.ZodSchema<unknown>;
 }
+
+const isFieldOptional = (schema: z.ZodSchema<unknown>, fieldName: string) => {
+    if (!schema || !('shape' in schema)) {
+      return true; // Default to optional if schema is not as expected
+    }
+    const fieldSchema = (schema as z.ZodObject<z.ZodRawShape>).shape[fieldName];
+    if (!fieldSchema) {
+        return true;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (fieldSchema as any)._def.typeName === 'ZodOptional';
+  };
 
 const SellingModesStep: React.FC<StepProps> = ({
   formData,
   setFormData,
   errors,
+  schema,
 }) => {
   const productData = formData.productData || {};
   const sellingModes = productData.sellingModes || {
@@ -107,7 +122,15 @@ const SellingModesStep: React.FC<StepProps> = ({
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="fulfilmentNotes">Fulfilment Notes</Label>
+            <Label htmlFor="fulfilmentNotes">
+                Fulfilment Notes
+                {isFieldOptional(schema!, 'productData.fulfilmentNotes') && (
+                    <span className="text-muted-foreground font-normal text-sm">
+                        {' '}
+                        (optional)
+                    </span>
+                )}
+            </Label>
             <Textarea
               id="fulfilmentNotes"
               value={productData.fulfilmentNotes || ''}
@@ -116,7 +139,15 @@ const SellingModesStep: React.FC<StepProps> = ({
             />
           </div>
           <div>
-            <Label htmlFor="returnsPolicy">Returns Policy</Label>
+            <Label htmlFor="returnsPolicy">
+                Returns Policy
+                {isFieldOptional(schema!, 'productData.returnsPolicy') && (
+                    <span className="text-muted-foreground font-normal text-sm">
+                        {' '}
+                        (optional)
+                    </span>
+                )}
+            </Label>
             <Textarea
               id="returnsPolicy"
               value={productData.returnsPolicy || ''}
@@ -130,7 +161,15 @@ const SellingModesStep: React.FC<StepProps> = ({
       <Card>
         <CardHeader>
             <CardTitle>External Storefronts</CardTitle>
-            <CardDescription>Link to your stores on other platforms.</CardDescription>
+            <CardDescription>
+                Link to your stores on other platforms.
+                {isFieldOptional(schema!, 'productData.storefrontLinks') && (
+                    <span className="text-muted-foreground font-normal text-sm">
+                        {' '}
+                        (optional)
+                    </span>
+                )}
+            </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
             <div>

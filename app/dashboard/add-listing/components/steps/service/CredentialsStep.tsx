@@ -5,12 +5,26 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PlusCircle, Trash2, FileText } from 'lucide-react';
+import { z } from 'zod';
 
 interface StepProps {
   formData: ListingFormData;
   setFormData: React.Dispatch<React.SetStateAction<ListingFormData>>;
   errors: Record<string, string>;
+  schema?: z.ZodSchema<unknown>;
 }
+
+const isFieldOptional = (schema: z.ZodSchema<unknown>, fieldName: string) => {
+    if (!schema || !('shape' in schema)) {
+      return true; // Default to optional if schema is not as expected
+    }
+    const fieldSchema = (schema as z.ZodObject<z.ZodRawShape>).shape[fieldName];
+    if (!fieldSchema) {
+        return true;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (fieldSchema as any)._def.typeName === 'ZodOptional';
+  };
 
 interface MultiFileUploadProps {
     id: 'insuranceCertificates' | 'qualifications';
@@ -18,9 +32,11 @@ interface MultiFileUploadProps {
     description: string;
     files: Media[];
     onFilesChange: (id: 'insuranceCertificates' | 'qualifications', files: Media[]) => void;
+    isOptional: boolean;
+    error?: string;
 }
 
-const MultiFileUpload: React.FC<MultiFileUploadProps> = ({ id, title, description, files, onFilesChange }) => {
+const MultiFileUpload: React.FC<MultiFileUploadProps> = ({ id, title, description, files, onFilesChange, isOptional, error }) => {
 
     const addFile = () => {
         onFilesChange(id, [...files, { file: null, altText: '' }]);
@@ -45,7 +61,15 @@ const MultiFileUpload: React.FC<MultiFileUploadProps> = ({ id, title, descriptio
     return (
         <Card>
             <CardHeader>
-                <CardTitle>{title}</CardTitle>
+                <CardTitle>
+                    {title}
+                    {isOptional && (
+                        <span className="text-muted-foreground font-normal text-sm">
+                            {' '}
+                            (optional)
+                        </span>
+                    )}
+                </CardTitle>
                 <CardDescription>{description}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -78,6 +102,7 @@ const MultiFileUpload: React.FC<MultiFileUploadProps> = ({ id, title, descriptio
                  <Button variant="outline" onClick={addFile}>
                     <PlusCircle className="w-4 h-4 mr-2" /> Add Document
                 </Button>
+                {error && <p className="text-sm text-red-500 mt-1">{error}</p>}
             </CardContent>
         </Card>
     )
@@ -87,6 +112,7 @@ const CredentialsStep: React.FC<StepProps> = ({
   formData,
   setFormData,
   errors,
+  schema,
 }) => {
   const serviceData = formData.serviceData || {};
 
@@ -105,16 +131,20 @@ const CredentialsStep: React.FC<StepProps> = ({
       <MultiFileUpload
         id="insuranceCertificates"
         title="Insurance & Certifications"
-        description="Upload any insurance documents or industry certifications (optional)."
+        description="Upload any insurance documents or industry certifications."
         files={serviceData.insuranceCertificates || []}
         onFilesChange={handleFilesChange}
+        isOptional={isFieldOptional(schema!, 'serviceData.insuranceCertificates')}
+        error={errors['serviceData.insuranceCertificates']}
       />
       <MultiFileUpload
         id="qualifications"
         title="Qualifications"
-        description="Upload any relevant qualifications or awards (optional)."
+        description="Upload any relevant qualifications or awards."
         files={serviceData.qualifications || []}
         onFilesChange={handleFilesChange}
+        isOptional={isFieldOptional(schema!, 'serviceData.qualifications')}
+        error={errors['serviceData.qualifications']}
       />
     </div>
   );

@@ -585,6 +585,7 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
                 formData={formData}
                 setFormData={setFormData}
                 errors={errors}
+                schema={steps[currentStep - 1].schema}
               />
             </motion.div>
           </AnimatePresence>

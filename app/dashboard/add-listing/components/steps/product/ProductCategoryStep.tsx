@@ -19,12 +19,26 @@ import { Badge } from '@/components/ui/badge';
 import { X } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
+import { z } from 'zod';
 
 interface StepProps {
   formData: ListingFormData;
   setFormData: React.Dispatch<React.SetStateAction<ListingFormData>>;
   errors: Record<string, string>;
+  schema?: z.ZodSchema<unknown>;
 }
+
+const isFieldOptional = (schema: z.ZodSchema<unknown>, fieldName: string) => {
+  if (!schema || !('shape' in schema)) {
+    return true; // Default to optional if schema is not as expected
+  }
+  const fieldSchema = (schema as z.ZodObject<z.ZodRawShape>).shape[fieldName];
+  if (!fieldSchema) {
+    return true;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (fieldSchema as any)._def.typeName === 'ZodOptional';
+};
 
 // Mock data - in a real app, this would come from an API
 const categories = {
@@ -38,6 +52,7 @@ const ProductCategoryStep: React.FC<StepProps> = ({
   formData,
   setFormData,
   errors,
+  schema,
 }) => {
   const [availableSubcategories, setAvailableSubcategories] = useState<string[]>([]);
 
@@ -83,7 +98,15 @@ const ProductCategoryStep: React.FC<StepProps> = ({
   return (
     <div className="space-y-6">
       <div>
-        <Label htmlFor="primaryCategory">Primary Category (Required)</Label>
+        <Label htmlFor="primaryCategory">
+            Primary Category
+            {isFieldOptional(schema!, 'productData.primaryCategory') && (
+                <span className="text-muted-foreground font-normal text-sm">
+                    {' '}
+                    (optional)
+                </span>
+            )}
+        </Label>
         <Select
           value={productData.primaryCategory}
           onValueChange={handlePrimaryCategoryChange}
@@ -105,7 +128,15 @@ const ProductCategoryStep: React.FC<StepProps> = ({
       </div>
 
       <div>
-        <Label>Subcategories (Optional, up to 3)</Label>
+        <Label>
+            Subcategories
+            {isFieldOptional(schema!, 'productData.subCategories') && (
+                <span className="text-muted-foreground font-normal text-sm">
+                    {' '}
+                    (optional, up to 3)
+                </span>
+            )}
+        </Label>
         <Popover>
           <PopoverTrigger asChild>
             <Button

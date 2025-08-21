@@ -58,6 +58,7 @@ const ProductHoursStep: React.FC<StepProps> = ({
               onWeeklyHoursChange={handleWeeklyHoursChange}
             />
           )}
+          {errors['productData.weeklyHours'] && <p className="text-sm text-red-500 mt-1">{errors['productData.weeklyHours']}</p>}
         </CardContent>
       </Card>
 

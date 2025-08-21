@@ -12,17 +12,32 @@ import {
 } from '@/components/ui/tooltip';
 import { Info, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { z } from 'zod';
 
 interface StepProps {
   formData: ListingFormData;
   setFormData: React.Dispatch<React.SetStateAction<ListingFormData>>;
   errors: Record<string, string>;
+  schema?: z.ZodSchema<unknown>;
 }
+
+const isFieldOptional = (schema: z.ZodSchema<unknown>, fieldName: string) => {
+    if (!schema || !('shape' in schema)) {
+      return true; // Default to optional if schema is not as expected
+    }
+    const fieldSchema = (schema as z.ZodObject<z.ZodRawShape>).shape[fieldName];
+    if (!fieldSchema) {
+        return true;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (fieldSchema as any)._def.typeName === 'ZodOptional';
+  };
 
 const ProductLocationStep: React.FC<StepProps> = ({
   formData,
   setFormData,
   errors,
+  schema,
 }) => {
   const [postcode, setPostcode] = useState('');
   const productData = formData.productData || {};
@@ -97,7 +112,15 @@ const ProductLocationStep: React.FC<StepProps> = ({
   return (
     <div className="space-y-6">
       <div>
-        <Label htmlFor="address">Business Address (Manual Entry)</Label>
+        <Label htmlFor="address">
+            Business Address (Manual Entry)
+            {isFieldOptional(schema!, 'address') && (
+                <span className="text-muted-foreground font-normal text-sm">
+                    {' '}
+                    (optional)
+                </span>
+            )}
+        </Label>
         <div className="space-y-2 mt-2">
           <Input
             id="address"
@@ -123,7 +146,15 @@ const ProductLocationStep: React.FC<StepProps> = ({
 
       <div className="border-t pt-6">
         <div className="flex items-center space-x-2">
-          <Label>Optional: Set Delivery Area</Label>
+          <Label>
+              Set Delivery Area
+                {isFieldOptional(schema!, 'productData.deliveryArea') && (
+                    <span className="text-muted-foreground font-normal text-sm">
+                        {' '}
+                        (optional)
+                    </span>
+                )}
+          </Label>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
