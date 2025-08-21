@@ -400,7 +400,9 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
           ? Number(data.productData.deliveryArea.value)
           : undefined,
       servicePostcodes:
-        data.serviceData?.serviceArea?.type === 'postcodes'
+        data.productData?.deliveryArea?.type === 'postcodes'
+          ? (data.productData.deliveryArea.value as string[])
+          : data.serviceData?.serviceArea?.type === 'postcodes'
           ? data.serviceData.serviceArea.value.split(',').map(p => p.trim())
           : undefined,
       serviceModel:

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ListingFormData } from '../../../types';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,7 +10,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { Info } from 'lucide-react';
+import { Info, X } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface StepProps {
   formData: ListingFormData;
@@ -23,23 +24,26 @@ const ProductLocationStep: React.FC<StepProps> = ({
   setFormData,
   errors,
 }) => {
+  const [postcode, setPostcode] = useState('');
   const productData = formData.productData || {};
-  const deliveryArea = productData.deliveryArea || { type: 'radius', value: '' };
+  const deliveryArea = productData.deliveryArea || {
+    type: 'radius',
+    value: '',
+  };
 
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // In a real app, you would likely have separate fields for address lines, city, etc.
-    // For this example, we'll use a single address field.
     const { id, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      // This assumes a general address field on the main formData, adjust if needed
       [id]: value,
     }));
   };
 
   const handleProductDataChange = (
     key: string,
-    value: boolean | { type: 'radius' | 'postcodes'; value: string }
+    value:
+      | boolean
+      | { type: 'radius' | 'postcodes'; value: string | string[] }
   ) => {
     setFormData(prev => ({
       ...prev,
@@ -51,11 +55,43 @@ const ProductLocationStep: React.FC<StepProps> = ({
   };
 
   const handleDeliveryAreaTypeChange = (type: 'radius' | 'postcodes') => {
-    handleProductDataChange('deliveryArea', { ...deliveryArea, type });
+    const newValue = type === 'postcodes' ? [] : '';
+    handleProductDataChange('deliveryArea', { type, value: newValue });
   };
 
-  const handleDeliveryAreaValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    handleProductDataChange('deliveryArea', { ...deliveryArea, value: e.target.value });
+  const handleDeliveryAreaValueChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    handleProductDataChange('deliveryArea', {
+      ...deliveryArea,
+      value: e.target.value,
+    });
+  };
+
+  const handlePostcodeKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (e.key === 'Enter' && postcode.trim()) {
+      e.preventDefault();
+      const newPostcodes = [
+        ...((deliveryArea.value as string[]) || []),
+        postcode.trim().toUpperCase(),
+      ];
+      handleProductDataChange('deliveryArea', {
+        ...deliveryArea,
+        value: newPostcodes,
+      });
+      setPostcode('');
+    }
+  };
+
+  const removePostcode = (index: number) => {
+    const newPostcodes = [...(deliveryArea.value as string[])];
+    newPostcodes.splice(index, 1);
+    handleProductDataChange('deliveryArea', {
+      ...deliveryArea,
+      value: newPostcodes,
+    });
   };
 
   return (
@@ -63,22 +99,26 @@ const ProductLocationStep: React.FC<StepProps> = ({
       <div>
         <Label htmlFor="address">Business Address (Manual Entry)</Label>
         <div className="space-y-2 mt-2">
-            <Input
-                id="address"
-                placeholder="e.g., 123 High Street, London, SW1A 1AA"
-                value={formData.address || ''}
-                onChange={handleAddressChange}
-            />
+          <Input
+            id="address"
+            placeholder="e.g., 123 High Street, London, SW1A 1AA"
+            value={formData.address || ''}
+            onChange={handleAddressChange}
+          />
         </div>
         <div className="flex items-center space-x-2 mt-4">
           <Switch
             id="showAddressPublicly"
             checked={productData.showAddressPublicly !== false}
-            onCheckedChange={(checked) => handleProductDataChange('showAddressPublicly', checked)}
+            onCheckedChange={checked =>
+              handleProductDataChange('showAddressPublicly', checked)
+            }
           />
           <Label htmlFor="showAddressPublicly">Show address publicly</Label>
         </div>
-        {errors.address && <p className="text-sm text-red-500 mt-1">{errors.address}</p>}
+        {errors.address && (
+          <p className="text-sm text-red-500 mt-1">{errors.address}</p>
+        )}
       </div>
 
       <div className="border-t pt-6">
@@ -107,7 +147,7 @@ const ProductLocationStep: React.FC<StepProps> = ({
           </div>
           <div className="flex items-center space-x-2">
             <RadioGroupItem value="postcodes" id="postcodes" />
-            <Label htmlFor="postcodes">By list of postcodes</Label>
+            <Label htmlFor="postcodes">By list of post codes</Label>
           </div>
         </RadioGroup>
 
@@ -120,15 +160,38 @@ const ProductLocationStep: React.FC<StepProps> = ({
               onChange={handleDeliveryAreaValueChange}
             />
           ) : (
-            <Input
-              placeholder="e.g., SW1A, WC2N, SE1"
-              value={deliveryArea.value}
-              onChange={handleDeliveryAreaValueChange}
-            />
+            <div>
+              <Input
+                placeholder="Enter a postcode and press Enter"
+                value={postcode}
+                onChange={e => setPostcode(e.target.value)}
+                onKeyDown={handlePostcodeKeyDown}
+              />
+              <div className="mt-2 flex flex-wrap gap-2">
+                {(deliveryArea.value as string[]).map((p, index) => (
+                  <Badge
+                    key={index}
+                    variant="secondary"
+                    className="flex items-center gap-1"
+                  >
+                    {p}
+                    <button
+                      type="button"
+                      onClick={() => removePostcode(index)}
+                      className="ml-1 rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                ))}
+              </div>
+            </div>
           )}
         </div>
         {errors['productData.deliveryArea'] && (
-            <p className="text-sm text-red-500 mt-1">{errors['productData.deliveryArea']}</p>
+          <p className="text-sm text-red-500 mt-1">
+            {errors['productData.deliveryArea']}
+          </p>
         )}
       </div>
     </div>

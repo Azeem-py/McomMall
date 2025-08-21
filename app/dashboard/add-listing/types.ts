@@ -41,7 +41,7 @@ export interface ProductSellerData {
   showAddressPublicly: boolean;
   deliveryArea: {
     type: 'radius' | 'postcodes';
-    value: string;
+    value: string | string[];
   };
   is247: boolean;
   weeklyHours: WeeklyHours;
