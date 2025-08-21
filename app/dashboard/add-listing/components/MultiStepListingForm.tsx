@@ -20,10 +20,24 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { useAddListing } from '@/service/listings/hook';
+import {
+  type BookingMethod,
+  type BusinessHourPayload,
+  type CreateBusinessPayload,
+  type DayOfWeek,
+  type ListingType,
+  type ProductSellerProfilePayload,
+  type SellingMode,
+  type ServiceModel,
+  type ServiceProviderProfilePayload,
+  type SocialLinkPayload,
+  type SpecialDayPayload,
+  type StorefrontLinkPayload,
+} from '@/service/listings/types';
 import { Separator } from '@/components/ui/separator';
-import { Check } from 'lucide-react';
+import { Check, Loader2 } from 'lucide-react';
 import { z } from 'zod';
-
 import { ListingFormData } from '../types';
 
 // Import all step components
@@ -191,19 +205,41 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
     banner: null,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isAlertOpen, setIsAlertOpen] = useState(false);
   const router = useRouter();
+  const { mutate: addListing, isPending } = useAddListing();
 
   const steps = useMemo(() => {
-    const sharedInitial = [{ title: 'Business Info', component: BusinessInfoStep, schema: businessInfoSchema }];
+    const sharedInitial = [
+      {
+        title: 'Business Info',
+        component: BusinessInfoStep,
+        schema: businessInfoSchema,
+      },
+    ];
     const productSteps = [
-      { title: 'Product Categories', component: ProductCategoryStep, schema: productCategorySchema },
-      { title: 'Location', component: ProductLocationStep, schema: productLocationSchema },
+      {
+        title: 'Product Categories',
+        component: ProductCategoryStep,
+        schema: productCategorySchema,
+      },
+      {
+        title: 'Location',
+        component: ProductLocationStep,
+        schema: productLocationSchema,
+      },
       { title: 'Hours', component: ProductHoursStep, schema: z.any() },
-      { title: 'Selling Modes', component: SellingModesStep, schema: sellingModesSchema },
+      {
+        title: 'Selling Modes',
+        component: SellingModesStep,
+        schema: sellingModesSchema,
+      },
     ];
     const serviceSteps = [
-      { title: 'Service Categories', component: ServiceCategoryStep, schema: serviceCategorySchema },
+      {
+        title: 'Service Categories',
+        component: ServiceCategoryStep,
+        schema: serviceCategorySchema,
+      },
       { title: 'Service Area', component: ServiceAreaStep, schema: z.any() },
       { title: 'Availability', component: ServiceHoursStep, schema: z.any() },
       { title: 'Booking', component: BookingStep, schema: bookingSchema },
@@ -214,9 +250,16 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
       { title: 'Review & Publish', component: ReviewStep, schema: z.any() },
     ];
 
-    let flowSteps: { title: string; component: React.ElementType, schema: z.ZodSchema<unknown> }[] = [];
+    let flowSteps: {
+      title: string;
+      component: React.ElementType;
+      schema: z.ZodSchema<unknown>;
+    }[] = [];
 
-    if (businessTypes.includes('Product') && businessTypes.includes('Service')) {
+    if (
+      businessTypes.includes('Product') &&
+      businessTypes.includes('Service')
+    ) {
       flowSteps = [...productSteps, ...serviceSteps];
     } else if (businessTypes.includes('Product')) {
       flowSteps = productSteps;
@@ -228,34 +271,182 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
   }, [businessTypes]);
 
   const validateStep = () => {
-      const currentSchema = steps[currentStep - 1].schema;
-      const result = currentSchema.safeParse(formData);
+    const currentSchema = steps[currentStep - 1].schema;
+    const result = currentSchema.safeParse(formData);
 
-      if(!result.success) {
-          const newErrors: Record<string, string> = {};
-          result.error.issues.forEach(err => {
-              newErrors[err.path.join('.')] = err.message;
-          });
-          setErrors(newErrors);
-          return false;
-      }
+    if (!result.success) {
+      const newErrors: Record<string, string> = {};
+      result.error.issues.forEach(err => {
+        newErrors[err.path.join('.')] = err.message;
+      });
+      setErrors(newErrors);
+      return false;
+    }
 
-      setErrors({});
-      return true;
-  }
+    setErrors({});
+    return true;
+  };
 
   const nextStep = () => {
     if (validateStep()) {
-        setCurrentStep(prev => Math.min(prev + 1, steps.length));
+      setCurrentStep(prev => Math.min(prev + 1, steps.length));
     }
   };
 
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));
 
+  const transformFormDataToPayload = (
+    data: ListingFormData
+  ): CreateBusinessPayload => {
+    const listingType = data.businessTypes.map(
+      t => t.toLowerCase() as ListingType
+    );
+
+    // --- Location and Service Area ---
+    const location: CreateBusinessPayload['location'] = {
+      addressLine1: data.address || '',
+      postcode: '', // Note: No postcode in ListingFormData, needs to be extracted from address
+      city: '', // Note: No city in ListingFormData, needs to be extracted from address
+      showPublicly: data.productData?.showAddressPublicly || false,
+      deliveryRadiusKm:
+        data.productData?.deliveryArea?.type === 'radius'
+          ? Number(data.productData.deliveryArea.value)
+          : undefined,
+      servicePostcodes:
+        data.serviceData?.serviceArea?.type === 'postcodes'
+          ? data.serviceData.serviceArea.value.split(',').map(p => p.trim())
+          : undefined,
+      serviceModel:
+        data.serviceData?.serviceLocation?.atBusinessLocation &&
+        data.serviceData?.serviceLocation?.customerTravels
+          ? 'both'
+          : data.serviceData?.serviceLocation?.atBusinessLocation
+          ? 'at_location'
+          : data.serviceData?.serviceLocation?.customerTravels
+          ? 'travel_to_customer'
+          : undefined,
+    };
+
+    // --- Social Links ---
+    const socialLinks: SocialLinkPayload[] = Object.entries(data.socials)
+      .map(([platform, url]) => (url ? { platform, url } : null))
+      .filter((link): link is SocialLinkPayload => link !== null);
+
+    // --- Business Hours ---
+    const dayMapping: { [key: string]: DayOfWeek } = {
+      Monday: 1,
+      Tuesday: 2,
+      Wednesday: 3,
+      Thursday: 4,
+      Friday: 5,
+      Saturday: 6,
+      Sunday: 0,
+    };
+    const businessHours: BusinessHourPayload[] = [];
+    if (data.productData?.weeklyHours) {
+      for (const [day, times] of Object.entries(data.productData.weeklyHours)) {
+        if (times) {
+          times.forEach(time => {
+            businessHours.push({
+              dayOfWeek: dayMapping[day],
+              openTime: time.start,
+              closeTime: time.end,
+            });
+          });
+        }
+      }
+    }
+
+    // --- Special Days ---
+    const specialDays: SpecialDayPayload[] =
+      data.productData?.specialDays?.map(day => ({
+        date: day.date.toISOString().split('T')[0],
+        description: '', // No description field in source
+        isOpen: !day.isClosed,
+        openTime: day.openingHours?.[0]?.start,
+        closeTime: day.openingHours?.[0]?.end,
+      })) || [];
+
+    // --- Product Seller Profile ---
+    let productSellerProfile: ProductSellerProfilePayload | undefined;
+    if (data.productData) {
+      const sellingModes: SellingMode[] = [];
+      if (data.productData.sellingModes?.inStorePickup)
+        sellingModes.push('pickup');
+      if (data.productData.sellingModes?.localDelivery)
+        sellingModes.push('local_delivery');
+      if (data.productData.sellingModes?.ukWideShipping)
+        sellingModes.push('uk_shipping');
+
+      const storefrontLinks: StorefrontLinkPayload[] = Object.entries(
+        data.productData.storefrontLinks || {}
+      )
+        .map(([platform, url]) =>
+          url
+            ? { platform: platform as StorefrontLinkPayload['platform'], url }
+            : null
+        )
+        .filter((link): link is StorefrontLinkPayload => link !== null);
+
+      productSellerProfile = {
+        sellingModes,
+        fulfilmentNotes: data.productData.fulfilmentNotes,
+        returnsPolicy: data.productData.returnsPolicy,
+        hasAgeRestrictedItems: false, // This is not in the form data
+        storefrontLinks,
+      };
+    }
+
+    // --- Service Provider Profile ---
+    let serviceProviderProfile: ServiceProviderProfilePayload | undefined;
+    if (data.serviceData) {
+      serviceProviderProfile = {
+        bookingMethod: data.serviceData.bookingMethod as BookingMethod,
+        bookingUrl: data.serviceData.bookingURL,
+        quoteOnly: data.serviceData.pricingVisibility === 'quote',
+        hasPublicLiabilityInsurance: false, // This is not in the form data
+        certifications: [], // File upload needed
+      };
+    }
+
+    const payload: CreateBusinessPayload = {
+      listingType,
+      businessName: data.businessName,
+      legalName: data.legalName,
+      companyRegistrationNumber: data.companyRegNo,
+      vatNumber: data.vatNo,
+      shortDescription: data.shortDesc,
+      about: data.longDesc,
+      website: data.socials.website,
+      businessPhone: data.phone,
+      businessEmail: data.email,
+      logoUrl: undefined, // Requires file upload handling
+      bannerUrl: undefined, // Requires file upload handling
+      logoAltText: data.logo?.altText,
+      bannerAltText: data.banner?.altText,
+      location,
+      socialLinks,
+      categoryIds: [
+        data.productData?.primaryCategory,
+        data.serviceData?.tradeCategory,
+      ]
+        .filter((id): id is string => !!id)
+        .filter((id, index, self) => self.indexOf(id) === index),
+      businessHours,
+      specialDays,
+      productSellerProfile,
+      serviceProviderProfile,
+    };
+
+    return payload;
+  };
+
   const handleSubmit = () => {
-    // Final validation across all fields would go here
-    console.log('Form Submitted:', JSON.stringify(formData, null, 2));
-    setIsAlertOpen(true);
+    // A more comprehensive final validation should be done here
+    // before attempting to submit.
+    const payload = transformFormDataToPayload(formData);
+    console.log('Submitting Payload:', JSON.stringify(payload, null, 2));
+    addListing(payload);
   };
 
   const CurrentStepComponent = steps[currentStep - 1].component;
@@ -269,35 +460,22 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
   const getTitle = () => {
     if (businessTypes.length > 1) return 'Product & Service';
     return businessTypes[0];
-  }
+  };
 
   return (
     <>
-      <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Listing Submitted!</AlertDialogTitle>
-            <AlertDialogDescription>
-              Your listing data has been logged to the console. In a real app, this would go to an API.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction
-              onClick={() => router.push('/dashboard')}
-              className="bg-orange-700 hover:bg-orange-800"
-            >
-              Back to Dashboard
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">
             <CardTitle className="text-2xl font-bold">
-              Add a New <span className="text-orange-700">{getTitle()}</span> Listing
+              Add a New <span className="text-orange-700">{getTitle()}</span>{' '}
+              Listing
             </CardTitle>
-            <Button variant="ghost" onClick={onBack} className="text-blue-600 hover:text-blue-700">
+            <Button
+              variant="ghost"
+              onClick={onBack}
+              className="text-blue-600 hover:text-blue-700"
+            >
               &larr; Back to selection
             </Button>
           </div>
@@ -313,7 +491,7 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
               animate="visible"
               exit="exit"
               transition={{ type: 'tween', ease: 'easeInOut', duration: 0.4 }}
-            >
+.             >
               <CurrentStepComponent
                 formData={formData}
                 setFormData={setFormData}
@@ -324,15 +502,31 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
         </CardContent>
         <Separator />
         <CardFooter className="flex justify-between mt-6">
-          <Button variant="outline" onClick={prevStep} className={`${currentStep === 1 ? 'invisible' : 'visible'} text-blue-600 border-blue-600 hover:bg-blue-50`}>
+          <Button
+            variant="outline"
+            onClick={prevStep}
+            className={`${
+              currentStep === 1 ? 'invisible' : 'visible'
+            } text-blue-600 border-blue-600 hover:bg-blue-50`}
+          >
             Back
           </Button>
 
           {currentStep < steps.length ? (
-            <Button onClick={nextStep} className="bg-orange-700 hover:bg-orange-800">Next</Button>
+            <Button
+              onClick={nextStep}
+              className="bg-orange-700 hover:bg-orange-800"
+            >
+              Next
+            </Button>
           ) : (
-            <Button onClick={handleSubmit} className="bg-orange-700 hover:bg-orange-800">
-              Publish
+            <Button
+              onClick={handleSubmit}
+              disabled={isPending}
+              className="bg-orange-700 hover:bg-orange-800"
+            >
+              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isPending ? 'Publishing...' : 'Publish'}
             </Button>
           )}
         </CardFooter>
