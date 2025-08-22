@@ -1,18 +1,16 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, useFieldArray, FieldErrors } from 'react-hook-form';
+import { useForm, useFieldArray } from 'react-hook-form';
 import * as z from 'zod';
 import {
   UploadCloud,
   Plus,
-  HelpCircle,
   Settings,
   Box,
   Trash2,
   Link as LinkIcon,
   Download,
-  Loader2,
 } from 'lucide-react';
 import React from 'react';
 import { toast } from 'sonner';
@@ -120,7 +118,7 @@ const productFormSchema = z
       } else {
         try {
           new URL(data.productUrl);
-        } catch (error) {
+        } catch {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: 'Please enter a valid URL.',
@@ -178,39 +176,11 @@ export default function AddProductPage() {
   });
 
   const productType = form.watch('productType');
-  const { isSubmitting } = form.formState;
 
   async function onSubmit(data: ProductFormValues) {
-    try {
-      // TODO: Replace with actual API call
-      // const response = await fetch('/api/products', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(data),
-      // });
-      //
-      // if (!response.ok) {
-      //   throw new Error('Something went wrong');
-      // }
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      console.log('Form submitted successfully:', data);
-      toast.success('Product saved successfully!');
-      form.reset(); // Reset form after successful submission
-    } catch (error) {
-      console.error('Failed to save product:', error);
-      toast.error('Failed to save product. Please try again.');
-    }
-  }
-
-  function onInvalid(errors: FieldErrors<ProductFormValues>) {
-    console.error('Form validation failed:', errors);
-    toast.error('Please fix the errors in the form and submit again.');
-    const errorKeys = Object.keys(errors);
-    if (errorKeys.length > 0) {
-      form.setFocus(errorKeys[0] as keyof ProductFormValues);
-    }
+    console.log('Form submitted successfully:', data);
+    toast.success('Product saved successfully!');
+    form.reset(); // Reset form after successful submission
   }
 
   return (
@@ -222,7 +192,7 @@ export default function AddProductPage() {
 
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(onSubmit, onInvalid)}
+            onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-8"
           >
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -234,12 +204,12 @@ export default function AddProductPage() {
                     <FormField
                       control={form.control}
                       name="title"
-                      render={({ field, fieldState: { error } }) => (
+                      render={({ field, fieldState }) => (
                         <FormItem>
                           <FormLabel
                             className={cn(
                               'text-xl font-semibold',
-                              error && 'text-red-500'
+                              fieldState.error && 'text-red-500'
                             )}
                           >
                             Title
@@ -267,10 +237,10 @@ export default function AddProductPage() {
                     <FormField
                       control={form.control}
                       name="productType"
-                      render={({ field, fieldState: { error } }) => (
+                      render={({ field, fieldState }) => (
                         <FormItem className="space-y-3">
                           <FormLabel
-                            className={cn('text-lg', error && 'text-red-500')}
+                            className={cn('text-lg', fieldState.error && 'text-red-500')}
                           >
                             Product Type
                           </FormLabel>
@@ -316,12 +286,12 @@ export default function AddProductPage() {
                       <FormField
                         control={form.control}
                         name="price"
-                        render={({ field, fieldState: { error } }) => (
+                        render={({ field, fieldState }) => (
                           <FormItem>
                             <FormLabel
                               className={cn(
                                 'text-base',
-                                error && 'text-red-500'
+                                fieldState.error && 'text-red-500'
                               )}
                             >
                               Price ($)
@@ -796,12 +766,12 @@ export default function AddProductPage() {
                       <FormField
                         control={form.control}
                         name="productUrl"
-                        render={({ field, fieldState: { error } }) => (
+                        render={({ field, fieldState }) => (
                           <FormItem>
                             <FormLabel
                               className={cn(
                                 'text-base',
-                                error && 'text-red-500'
+                                fieldState.error && 'text-red-500'
                               )}
                             >
                               Product URL
@@ -987,12 +957,12 @@ export default function AddProductPage() {
                     <FormField
                       control={form.control}
                       name="category"
-                      render={({ field, fieldState: { error } }) => (
+                      render={({ field, fieldState }) => (
                         <FormItem>
                           <FormLabel
                             className={cn(
                               'text-2xl font-semibold',
-                              error && 'text-red-500'
+                              fieldState.error && 'text-red-500'
                             )}
                           >
                             Category
@@ -1113,16 +1083,8 @@ export default function AddProductPage() {
                 type="submit"
                 size="lg"
                 className="bg-red-500 hover:bg-red-600 text-white text-lg py-7 px-8 flex items-center"
-                disabled={isSubmitting}
               >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-6 w-6 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  'Save Product'
-                )}
+                Save Product
               </Button>
             </div>
           </form>
