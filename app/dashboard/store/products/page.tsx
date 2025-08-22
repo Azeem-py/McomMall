@@ -1,3 +1,4 @@
+// app/page.tsx
 'use client';
 
 import * as React from 'react';
@@ -21,7 +22,6 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { ChevronRight, PlusCircle, Search, MoreHorizontal } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 
 // --- MOCK DATA ---
 // Expanded mock data for better filtering examples
@@ -175,8 +175,6 @@ export default function StoreDashboard() {
   const [selectedBrand, setSelectedBrand] = React.useState('all');
   const [selectedRows, setSelectedRows] = React.useState<string[]>([]);
 
-  const router = useRouter();
-
   // --- FILTERING LOGIC ---
   const filteredProducts = React.useMemo(() => {
     let tempProducts = [...products];
@@ -325,12 +323,7 @@ export default function StoreDashboard() {
                   </button>
                 ))}
               </div>
-              <Button
-                className="mt-4 sm:mt-0 w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white"
-                onClick={() =>
-                  router.push('/dashboard/store/products/add-product')
-                }
-              >
+              <Button className="mt-4 sm:mt-0 w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white">
                 <PlusCircle className="mr-2 h-4 w-4" /> Add new product
               </Button>
             </div>

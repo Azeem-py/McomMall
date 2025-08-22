@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm, useFieldArray, FieldErrors } from 'react-hook-form';
 import * as z from 'zod';
 import {
   UploadCloud,
@@ -50,7 +50,7 @@ const productFormSchema = z
   .object({
     title: z.string().min(1, { message: 'Product title is required.' }),
     productType: z.enum(['physical', 'downloadable', 'virtual'], {
-      message: 'You must select a product type.',
+      required_error: 'You must select a product type.',
     }),
     category: z.string().min(1, { message: 'Please select a category.' }),
     price: z.coerce
@@ -132,6 +132,13 @@ const productFormSchema = z
 
 type ProductFormValues = z.infer<typeof productFormSchema>;
 
+// NOTE: You will need to install the following dependencies:
+// npm install zod @hookform/resolvers react-hook-form lucide-react
+//
+// Also, ensure you have set up shadcn/ui correctly in your project.
+// You'll need to add the following components from shadcn/ui:
+// npx shadcn-ui@latest add button form input checkbox select textarea card radio-group
+
 export default function AddProductPage() {
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productFormSchema),
@@ -181,15 +188,29 @@ export default function AddProductPage() {
     // e.g., send the data to your API.
   }
 
+  function onInvalid(errors: FieldErrors<ProductFormValues>) {
+    const firstError = Object.keys(errors)[0];
+    if (firstError) {
+      const el = document.querySelector(`[name="${firstError}"]`);
+      el?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }
+  }
+
   return (
-    <div className="bg-gray-50 h-fit p-4 sm:p-6 lg:p-8 text-base">
+    <div className="bg-gray-50 min-h-screen p-4 sm:p-6 lg:p-8 text-base">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl font-bold text-gray-800 mb-6">
           Add New Product
         </h1>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form
+            onSubmit={form.handleSubmit(onSubmit, onInvalid)}
+            className="space-y-8"
+          >
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Main Content Column */}
               <div className="lg:col-span-2 space-y-8">
