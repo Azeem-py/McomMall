@@ -1,6 +1,6 @@
 'use client';
 
-import { useForm, useFieldArray, FieldErrors } from 'react-hook-form';
+import { useForm, useFieldArray, FieldErrors, FieldError } from 'react-hook-form';
 import { useGetUserListings } from '@/service/listings/hook';
 import {
   UploadCloud,
@@ -72,7 +72,7 @@ interface ProductFormValues {
     width?: number;
     height?: number;
   };
-  files?: File[];
+  files?: { fileList: FileList | null }[];
   downloadLimit?: number;
   downloadExpiry?: number;
   productUrl?: string;
@@ -192,9 +192,9 @@ const customResolver = (data: ProductFormValues) => {
       };
     } else {
       let totalSize = 0;
-      data.files.forEach(fileList => {
-        if (fileList) {
-          Array.from(fileList).forEach(file => {
+      data.files.forEach(fileObject => {
+        if (fileObject && fileObject.fileList) {
+          Array.from(fileObject.fileList).forEach(file => {
             totalSize += file.size;
           });
         }
@@ -762,7 +762,7 @@ export default function AddProductPage() {
                             >
                               <FormField
                                 control={form.control}
-                                name={`files.${index}`}
+                                name={`files.${index}.fileList`}
                                 render={({
                                   field: { onChange, value, ...rest },
                                 }) => (
@@ -810,7 +810,7 @@ export default function AddProductPage() {
                           variant="outline"
                           size="lg"
                           className="mt-4 text-base"
-                          onClick={() => append(undefined)}
+                          onClick={() => append({ fileList: null })}
                         >
                           <Plus className="mr-2 h-5 w-5" /> Add More Files
                         </Button>
