@@ -49,8 +49,14 @@ import { cn } from '@/lib/utils';
 
 // Define the validation schema for the form using Zod
 const baseProductSchema = z.object({
-  title: z.string().min(1, { message: 'Product title is required.' }),
-  category: z.string().min(1, { message: 'Please select a category.' }),
+  title: z
+    .string()
+    .trim()
+    .min(1, { message: 'Product title is required.' }),
+  category: z
+    .string()
+    .trim()
+    .min(1, { message: 'Please select a category.' }),
   price: z.coerce
     .number()
     .min(0, { message: 'Price must be a positive number.' }),
@@ -182,7 +188,7 @@ export default function AddProductPage() {
   }
 
   function onInvalid(errors: FieldErrors<ProductFormValues>) {
-    console.error('Form errors:', errors);
+    console.error('Form validation failed:', errors);
     toast.error('Please fix the errors in the form and submit again.');
     const errorKeys = Object.keys(errors);
     if (errorKeys.length > 0) {
