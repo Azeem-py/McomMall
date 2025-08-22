@@ -1,8 +1,6 @@
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, useFieldArray } from 'react-hook-form';
-import * as z from 'zod';
+import { useForm, useFieldArray, FieldErrors } from 'react-hook-form';
 import {
   UploadCloud,
   Plus,
@@ -11,6 +9,7 @@ import {
   Trash2,
   Link as LinkIcon,
   Download,
+  Loader2,
 } from 'lucide-react';
 import React from 'react';
 import { toast } from 'sonner';
@@ -45,91 +44,37 @@ import {
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { cn } from '@/lib/utils';
 
-// Define the validation schema for the form using Zod with superRefine
-const productFormSchema = z
-  .object({
-    title: z.string().trim().min(1, { message: 'Product title is required.' }),
-    productType: z.enum(['physical', 'downloadable', 'virtual'], {
-      message: 'You must select a product type.',
-    }),
-    category: z.string().trim().min(1, { message: 'Please select a category.' }),
-    price: z.coerce
-      .number()
-      .min(0, { message: 'Price must be a positive number.' }),
-    discountedPrice: z.coerce.number().optional(),
-    brand: z.string().optional(),
-    tags: z.string().optional(),
-    shortDescription: z.string().optional(),
-    description: z.string().optional(),
-
-    sku: z.string().optional(),
-    enableStockManagement: z.boolean().default(false),
-    stockQuantity: z.coerce.number().optional(),
-    lowStockThreshold: z.coerce.number().optional(),
-    allowBackorders: z.enum(['no', 'notify', 'yes']).default('no'),
-    allowSingleOrder: z.boolean().default(false),
-    weight: z.coerce.number().optional(),
-    dimensions: z
-      .object({
-        length: z.coerce.number().optional(),
-        width: z.coerce.number().optional(),
-        height: z.coerce.number().optional(),
-      })
-      .optional(),
-
-    // Downloadable Product Fields
-    files: z
-      .array(
-        z.object({
-          name: z.string().min(1, 'File name is required.'),
-          url: z.string().url('Must be a valid URL.'),
-        })
-      )
-      .optional(),
-    downloadLimit: z.coerce.number().optional(),
-    downloadExpiry: z.coerce.number().optional(),
-
-    // Virtual Product Fields
-    productUrl: z.string().optional(),
-
-    // Other Options
-    productStatus: z.enum(['pending', 'published', 'draft']).default('pending'),
-    visibility: z.enum(['visible', 'hidden']).default('visible'),
-    purchaseNote: z.string().optional(),
-    enableReviews: z.boolean().default(true),
-  })
-  .superRefine((data, ctx) => {
-    if (data.productType === 'downloadable') {
-      if (!data.files || data.files.length === 0) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'You must add at least one file for a downloadable product.',
-          path: ['files'],
-        });
-      }
-    }
-    if (data.productType === 'virtual') {
-      if (!data.productUrl || data.productUrl.trim() === '') {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Product URL is required for virtual products.',
-          path: ['productUrl'],
-        });
-      } else {
-        try {
-          new URL(data.productUrl);
-        } catch {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: 'Please enter a valid URL.',
-            path: ['productUrl'],
-          });
-        }
-      }
-    }
-  });
-
-type ProductFormValues = z.infer<typeof productFormSchema>;
+interface ProductFormValues {
+  title: string;
+  productType: 'physical' | 'downloadable' | 'virtual';
+  category: string;
+  price: number;
+  discountedPrice?: number;
+  brand?: string;
+  tags?: string;
+  shortDescription?: string;
+  description?: string;
+  sku?: string;
+  enableStockManagement: boolean;
+  stockQuantity?: number;
+  lowStockThreshold?: number;
+  allowBackorders: 'no' | 'notify' | 'yes';
+  allowSingleOrder: boolean;
+  weight?: number;
+  dimensions?: {
+    length?: number;
+    width?: number;
+    height?: number;
+  };
+  files?: Array<{ name: string; url: string }>;
+  downloadLimit?: number;
+  downloadExpiry?: number;
+  productUrl?: string;
+  productStatus: 'pending' | 'published' | 'draft';
+  visibility: 'visible' | 'hidden';
+  purchaseNote?: string;
+  enableReviews: boolean;
+}
 
 // NOTE: You will need to install the following dependencies:
 // npm install zod @hookform/resolvers react-hook-form lucide-react
@@ -138,9 +83,96 @@ type ProductFormValues = z.infer<typeof productFormSchema>;
 // You'll need to add the following components from shadcn/ui:
 // npx shadcn-ui@latest add button form input checkbox select textarea card radio-group
 
+const customResolver = (data: ProductFormValues) => {
+  const errors: FieldErrors<ProductFormValues> = {};
+
+  if (!data.title.trim()) {
+    errors.title = { type: 'required', message: 'Product title is required.' };
+  }
+  if (!data.productType) {
+    errors.productType = {
+      type: 'required',
+      message: 'You must select a product type.',
+    };
+  }
+  if (!data.category.trim()) {
+    errors.category = {
+      type: 'required',
+      message: 'Please select a category.',
+    };
+  }
+  if (data.price === undefined || data.price < 0) {
+    errors.price = {
+      type: 'min',
+      message: 'Price must be a positive number.',
+    };
+  }
+
+  if (data.productType === 'downloadable') {
+    if (!data.files || data.files.length === 0) {
+      errors.files = {
+        type: 'required',
+        message: 'You must add at least one file for a downloadable product.',
+      };
+    } else {
+      const fileErrors: Array<{ name?: FieldError; url?: FieldError }> = [];
+      data.files.forEach((file, index) => {
+        const fileError: { name?: FieldError; url?: FieldError } = {};
+        if (!file.name.trim()) {
+          fileError.name = {
+            type: 'required',
+            message: 'File name is required.',
+          };
+        }
+        if (!file.url.trim()) {
+          fileError.url = { type: 'required', message: 'Must be a valid URL.' };
+        } else {
+          try {
+            new URL(file.url);
+          } catch {
+            fileError.url = {
+              type: 'pattern',
+              message: 'Please enter a valid URL.',
+            };
+          }
+        }
+        if (Object.keys(fileError).length > 0) {
+          fileErrors[index] = fileError;
+        }
+      });
+      if (fileErrors.length > 0) {
+        (errors.files as unknown) = fileErrors;
+      }
+    }
+  }
+
+  if (data.productType === 'virtual') {
+    if (!data.productUrl || data.productUrl.trim() === '') {
+      errors.productUrl = {
+        type: 'required',
+        message: 'Product URL is required for virtual products.',
+      };
+    } else {
+      try {
+        new URL(data.productUrl);
+      } catch {
+        errors.productUrl = {
+          type: 'pattern',
+          message: 'Please enter a valid URL.',
+        };
+      }
+    }
+  }
+
+  return {
+    values: Object.keys(errors).length > 0 ? {} : data,
+    errors: errors,
+  };
+};
+
 export default function AddProductPage() {
   const form = useForm<ProductFormValues>({
-    resolver: zodResolver(productFormSchema),
+    resolver: customResolver,
     defaultValues: {
       title: '',
       productType: 'physical',
@@ -176,11 +208,28 @@ export default function AddProductPage() {
   });
 
   const productType = form.watch('productType');
+  const { isSubmitting } = form.formState;
 
   async function onSubmit(data: ProductFormValues) {
-    console.log('Form submitted successfully:', data);
-    toast.success('Product saved successfully!');
-    form.reset(); // Reset form after successful submission
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      console.log('Form submitted successfully:', data);
+      toast.success('Product saved successfully!');
+      form.reset(); // Reset form after successful submission
+    } catch (error) {
+      console.error('Failed to save product:', error);
+      toast.error('Failed to save product. Please try again.');
+    }
+  }
+
+  function onInvalid(errors: FieldErrors<ProductFormValues>) {
+    console.error('Form validation failed:', errors);
+    toast.error('Please fix the errors in the form and submit again.');
+    const errorKeys = Object.keys(errors);
+    if (errorKeys.length > 0) {
+      form.setFocus(errorKeys[0] as keyof ProductFormValues);
+    }
   }
 
   return (
@@ -192,7 +241,7 @@ export default function AddProductPage() {
 
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(onSubmit)}
+            onSubmit={form.handleSubmit(onSubmit, onInvalid)}
             className="space-y-8"
           >
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -204,12 +253,12 @@ export default function AddProductPage() {
                     <FormField
                       control={form.control}
                       name="title"
-                      render={({ field, fieldState }) => (
+                      render={({ field, fieldState: { error } }) => (
                         <FormItem>
                           <FormLabel
                             className={cn(
                               'text-xl font-semibold',
-                              fieldState.error && 'text-red-500'
+                              error && 'text-red-500'
                             )}
                           >
                             Title
@@ -237,10 +286,10 @@ export default function AddProductPage() {
                     <FormField
                       control={form.control}
                       name="productType"
-                      render={({ field, fieldState }) => (
+                      render={({ field, fieldState: { error } }) => (
                         <FormItem className="space-y-3">
                           <FormLabel
-                            className={cn('text-lg', fieldState.error && 'text-red-500')}
+                            className={cn('text-lg', error && 'text-red-500')}
                           >
                             Product Type
                           </FormLabel>
@@ -286,12 +335,12 @@ export default function AddProductPage() {
                       <FormField
                         control={form.control}
                         name="price"
-                        render={({ field, fieldState }) => (
+                        render={({ field, fieldState: { error } }) => (
                           <FormItem>
                             <FormLabel
                               className={cn(
                                 'text-base',
-                                fieldState.error && 'text-red-500'
+                                error && 'text-red-500'
                               )}
                             >
                               Price ($)
@@ -766,12 +815,12 @@ export default function AddProductPage() {
                       <FormField
                         control={form.control}
                         name="productUrl"
-                        render={({ field, fieldState }) => (
+                        render={({ field, fieldState: { error } }) => (
                           <FormItem>
                             <FormLabel
                               className={cn(
                                 'text-base',
-                                fieldState.error && 'text-red-500'
+                                error && 'text-red-500'
                               )}
                             >
                               Product URL
@@ -957,12 +1006,12 @@ export default function AddProductPage() {
                     <FormField
                       control={form.control}
                       name="category"
-                      render={({ field, fieldState }) => (
+                      render={({ field, fieldState: { error } }) => (
                         <FormItem>
                           <FormLabel
                             className={cn(
                               'text-2xl font-semibold',
-                              fieldState.error && 'text-red-500'
+                              error && 'text-red-500'
                             )}
                           >
                             Category
@@ -1083,8 +1132,16 @@ export default function AddProductPage() {
                 type="submit"
                 size="lg"
                 className="bg-red-500 hover:bg-red-600 text-white text-lg py-7 px-8 flex items-center"
+                disabled={isSubmitting}
               >
-                Save Product
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-6 w-6 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  'Save Product'
+                )}
               </Button>
             </div>
           </form>
