@@ -29,9 +29,9 @@ export const GoogleVerificationModal: React.FC<
             Authenticate with Google
           </DialogTitle>
           <DialogDescription className="text-center text-gray-600 mt-2">
-            You'll be redirected to Google to authenticate and verify your
-            business. Please select the Gmail account you registered your
-            business with.
+            {
+              " You'll be redirected to Google to authenticate and verify your business. Please select the Gmail account you registered your business with."
+            }
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="p-6 pt-4">
