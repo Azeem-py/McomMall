@@ -188,13 +188,9 @@ export default function AddProductPage() {
   }
 
   function onInvalid(errors: FieldErrors<ProductFormValues>) {
-    const firstError = Object.keys(errors)[0];
-    if (firstError) {
-      const el = document.querySelector(`[name="${firstError}"]`);
-      el?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-      });
+    const errorKeys = Object.keys(errors);
+    if (errorKeys.length > 0) {
+      form.setFocus(errorKeys[0] as keyof ProductFormValues);
     }
   }
 
@@ -944,21 +940,21 @@ export default function AddProductPage() {
 
                 {/* Category */}
                 <Card>
-                  <CardHeader>
-                    <CardTitle className="text-2xl">Category</CardTitle>
-                  </CardHeader>
-                  <CardContent>
+                  <CardContent className="pt-6">
                     <FormField
                       control={form.control}
                       name="category"
                       render={({ field }) => (
                         <FormItem>
+                          <FormLabel className="text-2xl font-semibold">
+                            Category
+                          </FormLabel>
                           <Select
                             onValueChange={field.onChange}
                             defaultValue={field.value}
                           >
                             <FormControl>
-                              <SelectTrigger className="text-base py-6">
+                              <SelectTrigger className="text-base py-6 w-full">
                                 <SelectValue placeholder="Select a category" />
                               </SelectTrigger>
                             </FormControl>
