@@ -50,7 +50,7 @@ const productFormSchema = z
   .object({
     title: z.string().min(1, { message: 'Product title is required.' }),
     productType: z.enum(['physical', 'downloadable', 'virtual'], {
-      required_error: 'You must select a product type.',
+      message: 'You must select a product type.',
     }),
     category: z.string().min(1, { message: 'Please select a category.' }),
     price: z.coerce
@@ -62,7 +62,6 @@ const productFormSchema = z
     shortDescription: z.string().optional(),
     description: z.string().optional(),
 
-    // Physical Product Fields
     sku: z.string().optional(),
     enableStockManagement: z.boolean().default(false),
     stockQuantity: z.coerce.number().optional(),
