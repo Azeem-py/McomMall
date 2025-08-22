@@ -8,9 +8,11 @@ import { setBearerToken } from '@/service/api';
 import { Provider, useDispatch } from 'react-redux';
 import { store } from '@/service/store/store';
 import { loadAuthFromCookies } from '@/service/store/authSlice';
+import { useTokenRefresh } from '@/service/auth/useTokenRefresh';
 
 const AuthLoader = ({ children }: { children: React.ReactNode }) => {
   const dispatch = useDispatch();
+  useTokenRefresh();
 
   useEffect(() => {
     const token = Cookies.get('access');

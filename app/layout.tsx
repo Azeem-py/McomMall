@@ -27,7 +27,7 @@ export default function RootLayout({
       <body className={`${opensans.variable} antialiased `}>
         <ClientProviders>
           <Header />
-          <Auth />
+          {/* <Auth /> */}
           {children}
         </ClientProviders>
         <Toaster />

@@ -32,3 +32,8 @@ export interface ClaimInterface {
   plaid_id: string;
   returnUrl: string;
 }
+
+export interface RefreshTokenResponse {
+  accessToken: string;
+  refreshToken: string;
+}
