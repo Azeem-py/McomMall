@@ -47,72 +47,89 @@ import {
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { cn } from '@/lib/utils';
 
-// Define the validation schema for the form using Zod
-const baseProductSchema = z.object({
-  title: z
-    .string()
-    .trim()
-    .min(1, { message: 'Product title is required.' }),
-  category: z
-    .string()
-    .trim()
-    .min(1, { message: 'Please select a category.' }),
-  price: z.coerce
-    .number()
-    .min(0, { message: 'Price must be a positive number.' }),
-  discountedPrice: z.coerce.number().optional(),
-  brand: z.string().optional(),
-  tags: z.string().optional(),
-  shortDescription: z.string().optional(),
-  description: z.string().optional(),
-  productStatus: z.enum(['pending', 'published', 'draft']).default('pending'),
-  visibility: z.enum(['visible', 'hidden']).default('visible'),
-  purchaseNote: z.string().optional(),
-  enableReviews: z.boolean().default(true),
-});
+// Define the validation schema for the form using Zod with superRefine
+const productFormSchema = z
+  .object({
+    title: z.string().trim().min(1, { message: 'Product title is required.' }),
+    productType: z.enum(['physical', 'downloadable', 'virtual'], {
+      message: 'You must select a product type.',
+    }),
+    category: z.string().trim().min(1, { message: 'Please select a category.' }),
+    price: z.coerce
+      .number()
+      .min(0, { message: 'Price must be a positive number.' }),
+    discountedPrice: z.coerce.number().optional(),
+    brand: z.string().optional(),
+    tags: z.string().optional(),
+    shortDescription: z.string().optional(),
+    description: z.string().optional(),
 
-const physicalProductSchema = baseProductSchema.extend({
-  productType: z.literal('physical'),
-  sku: z.string().optional(),
-  enableStockManagement: z.boolean().default(false),
-  stockQuantity: z.coerce.number().optional(),
-  lowStockThreshold: z.coerce.number().optional(),
-  allowBackorders: z.enum(['no', 'notify', 'yes']).default('no'),
-  allowSingleOrder: z.boolean().default(false),
-  weight: z.coerce.number().optional(),
-  dimensions: z
-    .object({
-      length: z.coerce.number().optional(),
-      width: z.coerce.number().optional(),
-      height: z.coerce.number().optional(),
-    })
-    .optional(),
-});
-
-const downloadableProductSchema = baseProductSchema.extend({
-  productType: z.literal('downloadable'),
-  files: z
-    .array(
-      z.object({
-        name: z.string().min(1, 'File name is required.'),
-        url: z.string().url('Must be a valid URL.'),
+    sku: z.string().optional(),
+    enableStockManagement: z.boolean().default(false),
+    stockQuantity: z.coerce.number().optional(),
+    lowStockThreshold: z.coerce.number().optional(),
+    allowBackorders: z.enum(['no', 'notify', 'yes']).default('no'),
+    allowSingleOrder: z.boolean().default(false),
+    weight: z.coerce.number().optional(),
+    dimensions: z
+      .object({
+        length: z.coerce.number().optional(),
+        width: z.coerce.number().optional(),
+        height: z.coerce.number().optional(),
       })
-    )
-    .min(1, 'You must add at least one file for a downloadable product.'),
-  downloadLimit: z.coerce.number().optional(),
-  downloadExpiry: z.coerce.number().optional(),
-});
+      .optional(),
 
-const virtualProductSchema = baseProductSchema.extend({
-  productType: z.literal('virtual'),
-  productUrl: z.string().url({ message: 'Please enter a valid URL.' }),
-});
+    // Downloadable Product Fields
+    files: z
+      .array(
+        z.object({
+          name: z.string().min(1, 'File name is required.'),
+          url: z.string().url('Must be a valid URL.'),
+        })
+      )
+      .optional(),
+    downloadLimit: z.coerce.number().optional(),
+    downloadExpiry: z.coerce.number().optional(),
 
-const productFormSchema = z.discriminatedUnion('productType', [
-  physicalProductSchema,
-  downloadableProductSchema,
-  virtualProductSchema,
-]);
+    // Virtual Product Fields
+    productUrl: z.string().optional(),
+
+    // Other Options
+    productStatus: z.enum(['pending', 'published', 'draft']).default('pending'),
+    visibility: z.enum(['visible', 'hidden']).default('visible'),
+    purchaseNote: z.string().optional(),
+    enableReviews: z.boolean().default(true),
+  })
+  .superRefine((data, ctx) => {
+    if (data.productType === 'downloadable') {
+      if (!data.files || data.files.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'You must add at least one file for a downloadable product.',
+          path: ['files'],
+        });
+      }
+    }
+    if (data.productType === 'virtual') {
+      if (!data.productUrl || data.productUrl.trim() === '') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Product URL is required for virtual products.',
+          path: ['productUrl'],
+        });
+      } else {
+        try {
+          new URL(data.productUrl);
+        } catch (error) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'Please enter a valid URL.',
+            path: ['productUrl'],
+          });
+        }
+      }
+    }
+  });
 
 type ProductFormValues = z.infer<typeof productFormSchema>;
 
