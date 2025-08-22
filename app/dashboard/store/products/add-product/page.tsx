@@ -12,8 +12,10 @@ import {
   Trash2,
   Link as LinkIcon,
   Download,
+  Loader2,
 } from 'lucide-react';
 import React from 'react';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -46,88 +48,65 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { cn } from '@/lib/utils';
 
 // Define the validation schema for the form using Zod
-const productFormSchema = z
-  .object({
-    title: z.string().min(1, { message: 'Product title is required.' }),
-    productType: z.enum(['physical', 'downloadable', 'virtual'], {
-      message: 'You must select a product type.',
-    }),
-    category: z.string().min(1, { message: 'Please select a category.' }),
-    price: z.coerce
-      .number()
-      .min(0, { message: 'Price must be a positive number.' }),
-    discountedPrice: z.coerce.number().optional(),
-    brand: z.string().optional(),
-    tags: z.string().optional(),
-    shortDescription: z.string().optional(),
-    description: z.string().optional(),
+const baseProductSchema = z.object({
+  title: z.string().min(1, { message: 'Product title is required.' }),
+  category: z.string().min(1, { message: 'Please select a category.' }),
+  price: z.coerce
+    .number()
+    .min(0, { message: 'Price must be a positive number.' }),
+  discountedPrice: z.coerce.number().optional(),
+  brand: z.string().optional(),
+  tags: z.string().optional(),
+  shortDescription: z.string().optional(),
+  description: z.string().optional(),
+  productStatus: z.enum(['pending', 'published', 'draft']).default('pending'),
+  visibility: z.enum(['visible', 'hidden']).default('visible'),
+  purchaseNote: z.string().optional(),
+  enableReviews: z.boolean().default(true),
+});
 
-    sku: z.string().optional(),
-    enableStockManagement: z.boolean().default(false),
-    stockQuantity: z.coerce.number().optional(),
-    lowStockThreshold: z.coerce.number().optional(),
-    allowBackorders: z.enum(['no', 'notify', 'yes']).default('no'),
-    allowSingleOrder: z.boolean().default(false),
-    weight: z.coerce.number().optional(),
-    dimensions: z
-      .object({
-        length: z.coerce.number().optional(),
-        width: z.coerce.number().optional(),
-        height: z.coerce.number().optional(),
+const physicalProductSchema = baseProductSchema.extend({
+  productType: z.literal('physical'),
+  sku: z.string().optional(),
+  enableStockManagement: z.boolean().default(false),
+  stockQuantity: z.coerce.number().optional(),
+  lowStockThreshold: z.coerce.number().optional(),
+  allowBackorders: z.enum(['no', 'notify', 'yes']).default('no'),
+  allowSingleOrder: z.boolean().default(false),
+  weight: z.coerce.number().optional(),
+  dimensions: z
+    .object({
+      length: z.coerce.number().optional(),
+      width: z.coerce.number().optional(),
+      height: z.coerce.number().optional(),
+    })
+    .optional(),
+});
+
+const downloadableProductSchema = baseProductSchema.extend({
+  productType: z.literal('downloadable'),
+  files: z
+    .array(
+      z.object({
+        name: z.string().min(1, 'File name is required.'),
+        url: z.string().url('Must be a valid URL.'),
       })
-      .optional(),
+    )
+    .min(1, 'You must add at least one file for a downloadable product.'),
+  downloadLimit: z.coerce.number().optional(),
+  downloadExpiry: z.coerce.number().optional(),
+});
 
-    // Downloadable Product Fields
-    files: z
-      .array(
-        z.object({
-          name: z.string().min(1, 'File name is required.'),
-          url: z.string().url('Must be a valid URL.'),
-        })
-      )
-      .optional(),
-    downloadLimit: z.coerce.number().optional(),
-    downloadExpiry: z.coerce.number().optional(),
+const virtualProductSchema = baseProductSchema.extend({
+  productType: z.literal('virtual'),
+  productUrl: z.string().url({ message: 'Please enter a valid URL.' }),
+});
 
-    // Virtual Product Fields
-    productUrl: z.string().optional(),
-
-    // Other Options
-    productStatus: z.enum(['pending', 'published', 'draft']).default('pending'),
-    visibility: z.enum(['visible', 'hidden']).default('visible'),
-    purchaseNote: z.string().optional(),
-    enableReviews: z.boolean().default(true),
-  })
-  .superRefine((data, ctx) => {
-    if (data.productType === 'downloadable') {
-      if (!data.files || data.files.length === 0) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'You must add at least one file for a downloadable product.',
-          path: ['files'],
-        });
-      }
-    }
-    if (data.productType === 'virtual') {
-      if (!data.productUrl) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Product URL is required for virtual products.',
-          path: ['productUrl'],
-        });
-      } else {
-        try {
-          new URL(data.productUrl);
-        } catch (error) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: 'Please enter a valid URL.',
-            path: ['productUrl'],
-          });
-        }
-      }
-    }
-  });
+const productFormSchema = z.discriminatedUnion('productType', [
+  physicalProductSchema,
+  downloadableProductSchema,
+  virtualProductSchema,
+]);
 
 type ProductFormValues = z.infer<typeof productFormSchema>;
 
@@ -163,10 +142,6 @@ export default function AddProductPage() {
         width: undefined,
         height: undefined,
       },
-      files: [],
-      downloadLimit: undefined,
-      downloadExpiry: undefined,
-      productUrl: '',
       productStatus: 'pending',
       visibility: 'visible',
       purchaseNote: '',
@@ -180,14 +155,35 @@ export default function AddProductPage() {
   });
 
   const productType = form.watch('productType');
+  const { isSubmitting } = form.formState;
 
-  function onSubmit(data: ProductFormValues) {
-    console.log('Form submitted successfully:', data);
-    // Here you would typically handle the form submission,
-    // e.g., send the data to your API.
+  async function onSubmit(data: ProductFormValues) {
+    try {
+      // TODO: Replace with actual API call
+      // const response = await fetch('/api/products', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify(data),
+      // });
+      //
+      // if (!response.ok) {
+      //   throw new Error('Something went wrong');
+      // }
+
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      console.log('Form submitted successfully:', data);
+      toast.success('Product saved successfully!');
+      form.reset(); // Reset form after successful submission
+    } catch (error) {
+      console.error('Failed to save product:', error);
+      toast.error('Failed to save product. Please try again.');
+    }
   }
 
   function onInvalid(errors: FieldErrors<ProductFormValues>) {
+    console.error('Form errors:', errors);
+    toast.error('Please fix the errors in the form and submit again.');
     const errorKeys = Object.keys(errors);
     if (errorKeys.length > 0) {
       form.setFocus(errorKeys[0] as keyof ProductFormValues);
@@ -1064,9 +1060,17 @@ export default function AddProductPage() {
               <Button
                 type="submit"
                 size="lg"
-                className="bg-red-500 hover:bg-red-600 text-white text-lg py-7 px-8"
+                className="bg-red-500 hover:bg-red-600 text-white text-lg py-7 px-8 flex items-center"
+                disabled={isSubmitting}
               >
-                Save Product
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-6 w-6 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  'Save Product'
+                )}
               </Button>
             </div>
           </form>
