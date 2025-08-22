@@ -9,8 +9,8 @@ import {
   Trash2,
   Link as LinkIcon,
   Download,
-  Loader2,
 } from 'lucide-react';
+import Image from 'next/image';
 import React from 'react';
 import { toast } from 'sonner';
 
@@ -50,11 +50,11 @@ interface ProductFormValues {
   category: string;
   price: number;
   discountedPrice?: number;
-  brand?: string;
-  tags?: string;
-  shortDescription?: string;
-  description?: string;
-  sku?: string;
+  brand: string;
+  tags: string;
+  shortDescription: string;
+  description: string;
+  sku: string;
   enableStockManagement: boolean;
   stockQuantity?: number;
   lowStockThreshold?: number;
@@ -74,6 +74,7 @@ interface ProductFormValues {
   visibility: 'visible' | 'hidden';
   purchaseNote?: string;
   enableReviews: boolean;
+  productImage: FileList | null;
 }
 
 // NOTE: You will need to install the following dependencies:
@@ -107,6 +108,60 @@ const customResolver = (data: ProductFormValues) => {
       message: 'Price must be a positive number.',
     };
   }
+  if (!data.brand.trim()) {
+    errors.brand = { type: 'required', message: 'Brand is required.' };
+  }
+  if (!data.tags.trim()) {
+    errors.tags = { type: 'required', message: 'Tags are required.' };
+  }
+  if (!data.shortDescription.trim()) {
+    errors.shortDescription = {
+      type: 'required',
+      message: 'Short description is required.',
+    };
+  }
+  if (!data.description.trim()) {
+    errors.description = {
+      type: 'required',
+      message: 'Description is required.',
+    };
+  }
+  if (!data.sku.trim()) {
+    errors.sku = { type: 'required', message: 'SKU is required.' };
+  }
+  if (data.enableStockManagement && data.stockQuantity === undefined) {
+    errors.stockQuantity = {
+      type: 'required',
+      message: 'Stock quantity is required when stock management is enabled.',
+    };
+  }
+  if (data.productType === 'physical' && data.weight === undefined) {
+    errors.weight = {
+      type: 'required',
+      message: 'Weight is required for physical products.',
+    };
+  }
+  if (data.productType === 'physical') {
+    const dimErrors: { length?: FieldError; width?: FieldError; height?: FieldError } = {};
+    if (data.dimensions?.length === undefined) {
+      dimErrors.length = { type: 'required', message: 'Length is required.' };
+    }
+    if (data.dimensions?.width === undefined) {
+      dimErrors.width = { type: 'required', message: 'Width is required.' };
+    }
+    if (data.dimensions?.height === undefined) {
+      dimErrors.height = { type: 'required', message: 'Height is required.' };
+    }
+    if (Object.keys(dimErrors).length > 0) {
+      errors.dimensions = dimErrors;
+    }
+  }
+  if (!data.productImage) {
+    errors.productImage = {
+      type: 'required',
+      message: 'Product image is required.',
+    };
+  }
 
   if (data.productType === 'downloadable') {
     if (!data.files || data.files.length === 0) {
@@ -116,6 +171,7 @@ const customResolver = (data: ProductFormValues) => {
       };
     } else {
       const fileErrors: Array<{ name?: FieldError; url?: FieldError }> = [];
+      let hasErrors = false;
       data.files.forEach((file, index) => {
         const fileError: { name?: FieldError; url?: FieldError } = {};
         if (!file.name.trim()) {
@@ -123,9 +179,11 @@ const customResolver = (data: ProductFormValues) => {
             type: 'required',
             message: 'File name is required.',
           };
+          hasErrors = true;
         }
         if (!file.url.trim()) {
           fileError.url = { type: 'required', message: 'Must be a valid URL.' };
+          hasErrors = true;
         } else {
           try {
             new URL(file.url);
@@ -134,14 +192,21 @@ const customResolver = (data: ProductFormValues) => {
               type: 'pattern',
               message: 'Please enter a valid URL.',
             };
+            hasErrors = true;
           }
         }
         if (Object.keys(fileError).length > 0) {
           fileErrors[index] = fileError;
         }
       });
-      if (fileErrors.length > 0) {
-        (errors.files as unknown) = fileErrors;
+      if (hasErrors) {
+        errors.files = fileErrors as FieldError[];
+        if (errors.files) {
+          (errors.files as { root?: FieldError }).root = {
+            type: 'custom',
+            message: 'Please fix the errors in the files.',
+          };
+        }
       }
     }
   }
@@ -199,6 +264,7 @@ export default function AddProductPage() {
       visibility: 'visible',
       purchaseNote: '',
       enableReviews: true,
+      productImage: null,
     },
   });
 
@@ -208,7 +274,6 @@ export default function AddProductPage() {
   });
 
   const productType = form.watch('productType');
-  const { isSubmitting } = form.formState;
 
   async function onSubmit(data: ProductFormValues) {
     try {
@@ -223,15 +288,6 @@ export default function AddProductPage() {
     }
   }
 
-  function onInvalid(errors: FieldErrors<ProductFormValues>) {
-    console.error('Form validation failed:', errors);
-    toast.error('Please fix the errors in the form and submit again.');
-    const errorKeys = Object.keys(errors);
-    if (errorKeys.length > 0) {
-      form.setFocus(errorKeys[0] as keyof ProductFormValues);
-    }
-  }
-
   return (
     <div className="bg-gray-50 min-h-screen p-4 sm:p-6 lg:p-8 text-base">
       <div className="max-w-7xl mx-auto">
@@ -241,7 +297,7 @@ export default function AddProductPage() {
 
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(onSubmit, onInvalid)}
+            onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-8"
           >
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -373,6 +429,7 @@ export default function AddProductPage() {
                                 className="text-base py-6"
                               />
                             </FormControl>
+                            <FormMessage className="text-red-500 text-base font-medium" />
                           </FormItem>
                         )}
                       />
@@ -400,6 +457,7 @@ export default function AddProductPage() {
                               {...field}
                             />
                           </FormControl>
+                          <FormMessage className="text-red-500 text-base font-medium" />
                         </FormItem>
                       )}
                     />
@@ -424,6 +482,7 @@ export default function AddProductPage() {
                               {...field}
                             />
                           </FormControl>
+                          <FormMessage className="text-red-500 text-base font-medium" />
                         </FormItem>
                       )}
                     />
@@ -495,6 +554,7 @@ export default function AddProductPage() {
                                     className="text-base py-6"
                                   />
                                 </FormControl>
+                                <FormMessage className="text-red-500 text-base font-medium" />
                               </FormItem>
                             )}
                           />
@@ -598,63 +658,75 @@ export default function AddProductPage() {
                                   className="text-base py-6"
                                 />
                               </FormControl>
+                              <FormMessage className="text-red-500 text-base font-medium" />
                             </FormItem>
                           )}
                         />
                         <div>
-                          <FormLabel className="font-normal text-base">
-                            Dimensions (cm)
-                          </FormLabel>
-                          <div className="grid grid-cols-3 gap-4 mt-2">
-                            <FormField
-                              control={form.control}
-                              name="dimensions.length"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormControl>
-                                    <Input
-                                      type="number"
-                                      placeholder="Length"
-                                      {...field}
-                                      className="text-base py-6"
-                                    />
-                                  </FormControl>
-                                </FormItem>
-                              )}
-                            />
-                            <FormField
-                              control={form.control}
-                              name="dimensions.width"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormControl>
-                                    <Input
-                                      type="number"
-                                      placeholder="Width"
-                                      {...field}
-                                      className="text-base py-6"
-                                    />
-                                  </FormControl>
-                                </FormItem>
-                              )}
-                            />
-                            <FormField
-                              control={form.control}
-                              name="dimensions.height"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormControl>
-                                    <Input
-                                      type="number"
-                                      placeholder="Height"
-                                      {...field}
-                                      className="text-base py-6"
-                                    />
-                                  </FormControl>
-                                </FormItem>
-                              )}
-                            />
-                          </div>
+                          <FormField
+                            control={form.control}
+                            name="dimensions"
+                            render={() => (
+                              <FormItem>
+                                <FormLabel className="font-normal text-base">
+                                  Dimensions (cm)
+                                </FormLabel>
+                                <div className="grid grid-cols-3 gap-4 mt-2">
+                                  <FormField
+                                    control={form.control}
+                                    name="dimensions.length"
+                                    render={({ field }) => (
+                                      <FormItem>
+                                        <FormControl>
+                                          <Input
+                                            type="number"
+                                            placeholder="Length"
+                                            {...field}
+                                            className="text-base py-6"
+                                          />
+                                        </FormControl>
+                                        <FormMessage className="text-red-500 text-base font-medium" />
+                                      </FormItem>
+                                    )}
+                                  />
+                                  <FormField
+                                    control={form.control}
+                                    name="dimensions.width"
+                                    render={({ field }) => (
+                                      <FormItem>
+                                        <FormControl>
+                                          <Input
+                                            type="number"
+                                            placeholder="Width"
+                                            {...field}
+                                            className="text-base py-6"
+                                          />
+                                        </FormControl>
+                                        <FormMessage className="text-red-500 text-base font-medium" />
+                                      </FormItem>
+                                    )}
+                                  />
+                                  <FormField
+                                    control={form.control}
+                                    name="dimensions.height"
+                                    render={({ field }) => (
+                                      <FormItem>
+                                        <FormControl>
+                                          <Input
+                                            type="number"
+                                            placeholder="Height"
+                                            {...field}
+                                            className="text-base py-6"
+                                          />
+                                        </FormControl>
+                                        <FormMessage className="text-red-500 text-base font-medium" />
+                                      </FormItem>
+                                    )}
+                                  />
+                                </div>
+                              </FormItem>
+                            )}
+                          />
                         </div>
                       </div>
                     </CardContent>
@@ -973,30 +1045,53 @@ export default function AddProductPage() {
                     <CardTitle className="text-2xl">Product Image</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex items-center justify-center w-full">
-                      <label
-                        htmlFor="dropzone-file"
-                        className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
-                      >
-                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                          <UploadCloud className="w-12 h-12 mb-4 text-gray-400" />
-                          <p className="mb-2 text-base text-gray-500">
-                            <span className="font-semibold">
-                              Click to upload
-                            </span>{' '}
-                            or drag and drop
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            SVG, PNG, JPG or GIF (MAX. 800x400px)
-                          </p>
-                        </div>
-                        <input
-                          id="dropzone-file"
-                          type="file"
-                          className="hidden"
-                        />
-                      </label>
-                    </div>
+                    <FormField
+                      control={form.control}
+                      name="productImage"
+                      render={({ field: { onChange, value, ...rest } }) => (
+                        <>
+                          <div className="flex items-center justify-center w-full">
+                            <label
+                              htmlFor="dropzone-file"
+                              className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
+                            >
+                              {value?.[0] ? (
+                                <Image
+                                  src={URL.createObjectURL(value[0])}
+                                  alt="Product preview"
+                                  layout="fill"
+                                  objectFit="cover"
+                                  className="rounded-lg"
+                                />
+                              ) : (
+                                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                  <UploadCloud className="w-12 h-12 mb-4 text-gray-400" />
+                                  <p className="mb-2 text-base text-gray-500">
+                                    <span className="font-semibold">
+                                      Click to upload
+                                    </span>{' '}
+                                    or drag and drop
+                                  </p>
+                                  <p className="text-sm text-gray-500">
+                                    SVG, PNG, JPG or GIF (MAX. 800x400px)
+                                  </p>
+                                </div>
+                              )}
+                              <input
+                                id="dropzone-file"
+                                type="file"
+                                className="hidden"
+                                {...rest}
+                                onChange={(event) => {
+                                  onChange(event.target.files);
+                                }}
+                              />
+                            </label>
+                          </div>
+                          <FormMessage className="text-red-500 text-base font-medium" />
+                        </>
+                      )}
+                    />
                   </CardContent>
                 </Card>
 
@@ -1091,6 +1186,7 @@ export default function AddProductPage() {
                               </SelectItem>
                             </SelectContent>
                           </Select>
+                          <FormMessage className="text-red-500 text-base font-medium" />
                         </FormItem>
                       )}
                     />
@@ -1118,6 +1214,7 @@ export default function AddProductPage() {
                           <FormDescription className="text-sm">
                             Separate tags with commas.
                           </FormDescription>
+                          <FormMessage className="text-red-500 text-base font-medium" />
                         </FormItem>
                       )}
                     />
@@ -1132,16 +1229,8 @@ export default function AddProductPage() {
                 type="submit"
                 size="lg"
                 className="bg-red-500 hover:bg-red-600 text-white text-lg py-7 px-8 flex items-center"
-                disabled={isSubmitting}
               >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-6 w-6 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  'Save Product'
-                )}
+                Save Product
               </Button>
             </div>
           </form>
