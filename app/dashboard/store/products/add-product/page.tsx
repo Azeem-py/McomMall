@@ -211,9 +211,14 @@ export default function AddProductPage() {
                     <FormField
                       control={form.control}
                       name="title"
-                      render={({ field }) => (
+                      render={({ field, fieldState: { error } }) => (
                         <FormItem>
-                          <FormLabel className="text-xl font-semibold">
+                          <FormLabel
+                            className={cn(
+                              'text-xl font-semibold',
+                              error && 'text-red-500'
+                            )}
+                          >
                             Title
                           </FormLabel>
                           <FormControl>
@@ -239,9 +244,11 @@ export default function AddProductPage() {
                     <FormField
                       control={form.control}
                       name="productType"
-                      render={({ field }) => (
+                      render={({ field, fieldState: { error } }) => (
                         <FormItem className="space-y-3">
-                          <FormLabel className="text-lg">
+                          <FormLabel
+                            className={cn('text-lg', error && 'text-red-500')}
+                          >
                             Product Type
                           </FormLabel>
                           <FormControl>
@@ -286,9 +293,14 @@ export default function AddProductPage() {
                       <FormField
                         control={form.control}
                         name="price"
-                        render={({ field }) => (
+                        render={({ field, fieldState: { error } }) => (
                           <FormItem>
-                            <FormLabel className="text-base">
+                            <FormLabel
+                              className={cn(
+                                'text-base',
+                                error && 'text-red-500'
+                              )}
+                            >
                               Price ($)
                             </FormLabel>
                             <FormControl>
@@ -620,7 +632,14 @@ export default function AddProductPage() {
                     </CardHeader>
                     <CardContent className="space-y-6">
                       <div>
-                        <FormLabel className="text-lg">Files</FormLabel>
+                        <FormLabel
+                          className={cn(
+                            'text-lg',
+                            form.formState.errors.files && 'text-red-500'
+                          )}
+                        >
+                          Files
+                        </FormLabel>
                         <div className="space-y-4 mt-2">
                           {fields.map((field, index) => (
                             <div
@@ -642,7 +661,7 @@ export default function AddProductPage() {
                                         className="text-base py-6"
                                       />
                                     </FormControl>
-                                    <FormMessage className="text-base" />
+                                    <FormMessage className="text-red-500 text-base font-medium" />
                                   </FormItem>
                                 )}
                               />
@@ -661,7 +680,7 @@ export default function AddProductPage() {
                                         className="text-base py-6"
                                       />
                                     </FormControl>
-                                    <FormMessage className="text-base" />
+                                    <FormMessage className="text-red-500 text-base font-medium" />
                                   </FormItem>
                                 )}
                               />
@@ -754,9 +773,14 @@ export default function AddProductPage() {
                       <FormField
                         control={form.control}
                         name="productUrl"
-                        render={({ field }) => (
+                        render={({ field, fieldState: { error } }) => (
                           <FormItem>
-                            <FormLabel className="text-base">
+                            <FormLabel
+                              className={cn(
+                                'text-base',
+                                error && 'text-red-500'
+                              )}
+                            >
                               Product URL
                             </FormLabel>
                             <FormControl>
@@ -940,9 +964,14 @@ export default function AddProductPage() {
                     <FormField
                       control={form.control}
                       name="category"
-                      render={({ field }) => (
+                      render={({ field, fieldState: { error } }) => (
                         <FormItem>
-                          <FormLabel className="text-2xl font-semibold">
+                          <FormLabel
+                            className={cn(
+                              'text-2xl font-semibold',
+                              error && 'text-red-500'
+                            )}
+                          >
                             Category
                           </FormLabel>
                           <Select
