@@ -30,7 +30,7 @@ export interface LoginResponse {
 
 export interface ClaimInterface {
   plaid_id: string;
-  returnUrl: string;
+  returnUrl?: string;
 }
 
 export interface RefreshTokenResponse {
