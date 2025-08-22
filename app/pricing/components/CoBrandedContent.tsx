@@ -229,9 +229,7 @@ interface CoBrandedContentProps {
   listingId: string | null;
 }
 
-export default function CoBrandedContent({
-  listingId,
-}: CoBrandedContentProps) {
+export default function CoBrandedContent({ listingId }: CoBrandedContentProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isTrial, setIsTrial] = useState(false);
 
@@ -249,173 +247,145 @@ export default function CoBrandedContent({
     <>
       <motion.div
         initial="initial"
-      animate="animate"
-      variants={{
-        initial: { opacity: 0 },
-        animate: { opacity: 1, transition: { staggerChildren: 0.1 } },
-      }}
-      className="max-w-7xl mx-auto flex flex-col items-center"
-    >
-      <h1 className="text-3xl md:text-4xl font-bold mb-8 text-blue-900">
-        Co-Branded Pricing
-      </h1>
-      <section className="w-full flex flex-col items-center justify-center mb-12">
-        <div className="w-full p-8 bg-white rounded-lg shadow-lg">
-          <h2 className="text-3xl font-bold text-center mb-2">
-            Your Co-Branded Launchpad
-          </h2>
-          <p className="text-center text-gray-600 mb-8 text-lg font-medium">
-            (£365 onboarding fee to unlock your choice of Standard, Pro, or Pro
-            Plus plans)
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Category 1: Verification & Activation */}
-            <div className="flex items-start space-x-4">
-              <div className="flex-shrink-0">
-                <ShieldCheck className="h-8 w-8 text-orange-500" />
+        animate="animate"
+        variants={{
+          initial: { opacity: 0 },
+          animate: { opacity: 1, transition: { staggerChildren: 0.1 } },
+        }}
+        className="max-w-7xl mx-auto flex flex-col items-center"
+      >
+        <h1 className="text-3xl md:text-4xl font-bold mb-8 text-blue-900">
+          Co-Branded Pricing
+        </h1>
+        <section className="w-full flex flex-col items-center justify-center mb-12">
+          <div className="w-full p-8 bg-white rounded-lg shadow-lg">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+              {/* Left Column: Intro + Video */}
+              <div className="flex flex-col items-center lg:items-start">
+                <h2 className="text-3xl font-bold text-center lg:text-left mb-2">
+                  Your Co-Branded Launchpad
+                </h2>
+                <p className="text-center lg:text-left text-gray-600 mb-6 text-lg font-medium">
+                  £365 onboarding unlocks your choice of Standard, Pro, or Pro
+                  Plus plans.
+                </p>
+
+                {/* Video Demo */}
+                <div className="w-full aspect-video">
+                  <iframe
+                    className="w-full h-full rounded-lg shadow-md"
+                    src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                    title="Demo Video"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  ></iframe>
+                </div>
               </div>
-              <div>
-                <h3 className="text-xl font-semibold">
-                  Verification & Activation
-                </h3>
-                <ul className="list-disc list-inside text-gray-700 mt-2">
-                  <li>
-                    Business Verification: Secure your business ownership and
-                    activate your primary account.
-                  </li>
-                  <li>
-                    Full Directory Claim: Get verified and listed across all
-                    247GBS directories and the MCOM Lead Traffic Hub.
-                  </li>
-                </ul>
+
+              {/* Right Column: Features Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Category 1 */}
+                <div className="flex items-start space-x-3">
+                  <ShieldCheck className="h-7 w-7 text-orange-500" />
+                  <div>
+                    <h3 className="text-lg font-semibold">Verification</h3>
+                    <p className="text-gray-700 text-sm mt-1">
+                      Secure your business and get listed across 247GBS
+                      directories.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Category 2 */}
+                <div className="flex items-start space-x-3">
+                  <LayoutDashboard className="h-7 w-7 text-orange-500" />
+                  <div>
+                    <h3 className="text-lg font-semibold">Dashboard Access</h3>
+                    <p className="text-gray-700 text-sm mt-1">
+                      Explore key features with temporary pre-subscription
+                      access.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Category 3 */}
+                <div className="flex items-start space-x-3">
+                  <Rocket className="h-7 w-7 text-orange-500" />
+                  <div>
+                    <h3 className="text-lg font-semibold">Marketing</h3>
+                    <p className="text-gray-700 text-sm mt-1">
+                      Get a co-branded QR code, promo inclusion, and campaign
+                      trial.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Category 4 */}
+                <div className="flex items-start space-x-3">
+                  <Headset className="h-7 w-7 text-orange-500" />
+                  <div>
+                    <h3 className="text-lg font-semibold">Support</h3>
+                    <p className="text-gray-700 text-sm mt-1">
+                      Guided onboarding and flexible payment options.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Category 2: Platform & Dashboard Access */}
-            <div className="flex items-start space-x-4">
-              <div className="flex-shrink-0">
-                <LayoutDashboard className="h-8 w-8 text-orange-500" />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold">
-                  Platform & Dashboard Access
-                </h3>
-                <ul className="list-disc list-inside text-gray-700 mt-2">
-                  <li>
-                    Initial Dashboard Access: Get temporary pre-subscription
-                    access to the MCOM Dashboard to explore key features.
-                  </li>
-                  <li>
-                    Feature Previews: View your Wallet Overview, Loyalty Program
-                    Controls (view-only), and eGift/eCard Previews.
-                  </li>
-                  <li>
-                    Business Tools: Access a basic version of our Spare Capacity
-                    & Stock Audit Tool.
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            {/* Category 3: Marketing & Growth */}
-            <div className="flex items-start space-x-4">
-              <div className="flex-shrink-0">
-                <Rocket className="h-8 w-8 text-orange-500" />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold">Marketing & Growth</h3>
-                <ul className="list-disc list-inside text-gray-700 mt-2">
-                  <li>
-                    Evergreen Rewards: Receive your first co-branded QR code for
-                    our external reward program.
-                  </li>
-                  <li>
-                    Promotional Inclusion: Be featured in our initial co-branded
-                    marketing promotions for immediate exposure.
-                  </li>
-                  <li>
-                    Network Access: Join the 247GBS Co-Branded Network for
-                    collaboration opportunities.
-                  </li>
-                  <li>
-                    Campaign Trial: Gain the option to participate in one
-                    seasonal marketing campaign.
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            {/* Category 4: Support & Flexibility */}
-            <div className="flex items-start space-x-4">
-              <div className="flex-shrink-0">
-                <Headset className="h-8 w-8 text-orange-500" />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold">Support & Flexibility</h3>
-                <ul className="list-disc list-inside text-gray-700 mt-2">
-                  <li>
-                    Guided Onboarding: Receive step-by-step support and a guided
-                    walkthrough of all co-branded options.
-                  </li>
-                  <li>
-                    Extended Payment Window: Choose a 14 or 30-day window to pay
-                    the remaining balance for your chosen plan.
-                  </li>
-                </ul>
-              </div>
+            {/* Action Buttons */}
+            <div className="flex gap-4 w-full justify-center mt-8">
+              <Button
+                onClick={handlePayNow}
+                className="w-full md:w-1/5 text-white bg-orange-600 hover:bg-orange-700"
+              >
+                Pay Now
+              </Button>
+              <Button
+                onClick={handleStartTrial}
+                className="w-full md:w-1/5 border bg-white text-orange-600 border-orange-600 hover:border-orange-700 hover:bg-white"
+              >
+                Start Trial
+              </Button>
             </div>
           </div>
+        </section>
 
-          <CardFooter className="flex gap-2 full items-center justify-center py-3">
-            <Button
-              onClick={handlePayNow}
-              className={`w-full md:w-1/5 text-white cursor-pointer bg-orange-600  hover:bg-orange-700`}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          {coBrandedTiers.map((tier, index) => (
+            <motion.div
+              key={tier.name}
+              variants={{
+                initial: { opacity: 0, y: 20 },
+                animate: { opacity: 1, y: 0 },
+              }}
+              transition={{ delay: index * 0.1 }}
             >
-              Pay Now
-            </Button>
-            <Button
-              onClick={handleStartTrial}
-              className={`w-full md:w-1/5 border bg-white cursor-pointer text-orange-600 border-orange-600  hover:border-orange-700 hover:bg-white`}
-            >
-              Start Trial
-            </Button>
-          </CardFooter>
+              <PricingCard
+                tier={
+                  tier as PricingTier & { accent: 'teal' | 'purple' | 'yellow' }
+                }
+                isPayg={false}
+                listingId={listingId}
+              />
+            </motion.div>
+          ))}
         </div>
-      </section>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-        {coBrandedTiers.map((tier, index) => (
-          <motion.div
-            key={tier.name}
-            variants={{
-              initial: { opacity: 0, y: 20 },
-              animate: { opacity: 1, y: 0 },
-            }}
-            transition={{ delay: index * 0.1 }}
-          >
-            <PricingCard
-              tier={
-                tier as PricingTier & { accent: 'teal' | 'purple' | 'yellow' }
-              }
-              isPayg={false}
-              listingId={listingId}
-            />
-          </motion.div>
-        ))}
-      </div>
-      <ComparisonTable
-        plans={coBrandedPlans}
-        featureGroups={coBrandedFeatureGroups}
-        accentHeaders={['blue-900', 'orange-800', 'black-500']}
+        <ComparisonTable
+          plans={coBrandedPlans}
+          featureGroups={coBrandedFeatureGroups}
+          accentHeaders={['blue-900', 'orange-800', 'black-500']}
+        />
+      </motion.div>
+      <PaymentGatewayDialog
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        planName="Co-Branded Launchpad"
+        planPrice="£365"
+        listingId={listingId}
+        isTrial={isTrial}
       />
-    </motion.div>
-    <PaymentGatewayDialog
-      isOpen={isDialogOpen}
-      onClose={() => setIsDialogOpen(false)}
-      planName="Co-Branded Launchpad"
-      planPrice="£365"
-      listingId={listingId}
-      isTrial={isTrial}
-    />
-  </>
+    </>
   );
 }
