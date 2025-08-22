@@ -258,20 +258,22 @@ export default function CoBrandedContent({ listingId }: CoBrandedContentProps) {
           Co-Branded Pricing
         </h1>
         <section className="w-full flex flex-col items-center justify-center mb-12">
-          <div className="w-full p-8 bg-white rounded-lg shadow-lg">
+          <div className="w-full p-6 sm:p-8 bg-white rounded-lg shadow-lg">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
               {/* Left Column: Intro + Video */}
               <div className="flex flex-col items-center lg:items-start">
-                <h2 className="text-3xl font-bold text-center lg:text-left mb-2">
+                <h2 className="text-2xl sm:text-3xl font-bold text-center lg:text-left mb-2">
                   Your Co-Branded Launchpad
                 </h2>
-                <p className="text-center lg:text-left text-gray-600 mb-6 text-lg font-medium">
-                  £365 onboarding unlocks your choice of Standard, Pro, or Pro
-                  Plus plans.
+                <p className="text-center lg:text-left text-gray-600 mb-6 text-base sm:text-lg font-medium">
+                  Unlock your brand’s growth with a £365 onboarding fee. Choose
+                  from Standard, Pro, or Pro Plus plans and gain access to
+                  tools, support, and marketing designed to boost your
+                  visibility from day one.
                 </p>
 
                 {/* Video Demo */}
-                <div className="w-full aspect-video">
+                <div className="w-full aspect-video mb-6">
                   <iframe
                     className="w-full h-full rounded-lg shadow-md"
                     src="https://www.youtube.com/embed/dQw4w9WgXcQ"
@@ -284,50 +286,63 @@ export default function CoBrandedContent({ listingId }: CoBrandedContentProps) {
               </div>
 
               {/* Right Column: Features Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {/* Category 1 */}
                 <div className="flex items-start space-x-3">
-                  <ShieldCheck className="h-7 w-7 text-orange-500" />
+                  <ShieldCheck className="h-6 w-6 sm:h-7 sm:w-7 text-orange-500" />
                   <div>
-                    <h3 className="text-lg font-semibold">Verification</h3>
+                    <h3 className="text-base sm:text-lg font-semibold">
+                      Verification
+                    </h3>
                     <p className="text-gray-700 text-sm mt-1">
-                      Secure your business and get listed across 247GBS
-                      directories.
+                      Confirm your business ownership and get listed across the
+                      full 247GBS directory network for instant credibility and
+                      trust.
                     </p>
                   </div>
                 </div>
 
                 {/* Category 2 */}
                 <div className="flex items-start space-x-3">
-                  <LayoutDashboard className="h-7 w-7 text-orange-500" />
+                  <LayoutDashboard className="h-6 w-6 sm:h-7 sm:w-7 text-orange-500" />
                   <div>
-                    <h3 className="text-lg font-semibold">Dashboard Access</h3>
+                    <h3 className="text-base sm:text-lg font-semibold">
+                      Dashboard
+                    </h3>
                     <p className="text-gray-700 text-sm mt-1">
-                      Explore key features with temporary pre-subscription
-                      access.
+                      Preview the MCOM Dashboard, explore wallet and loyalty
+                      features, and try essential tools that give you a taste of
+                      what’s ahead.
                     </p>
                   </div>
                 </div>
 
                 {/* Category 3 */}
                 <div className="flex items-start space-x-3">
-                  <Rocket className="h-7 w-7 text-orange-500" />
+                  <Rocket className="h-6 w-6 sm:h-7 sm:w-7 text-orange-500" />
                   <div>
-                    <h3 className="text-lg font-semibold">Marketing</h3>
+                    <h3 className="text-base sm:text-lg font-semibold">
+                      Marketing
+                    </h3>
                     <p className="text-gray-700 text-sm mt-1">
-                      Get a co-branded QR code, promo inclusion, and campaign
-                      trial.
+                      Gain exposure with co-branded promotions, your own QR
+                      code, and access to seasonal campaigns to attract new
+                      customers quickly.
                     </p>
                   </div>
                 </div>
 
                 {/* Category 4 */}
                 <div className="flex items-start space-x-3">
-                  <Headset className="h-7 w-7 text-orange-500" />
+                  <Headset className="h-6 w-6 sm:h-7 sm:w-7 text-orange-500" />
                   <div>
-                    <h3 className="text-lg font-semibold">Support</h3>
+                    <h3 className="text-base sm:text-lg font-semibold">
+                      Support
+                    </h3>
                     <p className="text-gray-700 text-sm mt-1">
-                      Guided onboarding and flexible payment options.
+                      Get guided onboarding, expert help at every step, and
+                      flexible payment options that make launching easier than
+                      ever.
                     </p>
                   </div>
                 </div>
@@ -335,16 +350,16 @@ export default function CoBrandedContent({ listingId }: CoBrandedContentProps) {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-4 w-full justify-center mt-8">
+            <div className="flex flex-col sm:flex-row gap-4 w-full justify-center mt-8">
               <Button
                 onClick={handlePayNow}
-                className="w-full md:w-1/5 text-white bg-orange-600 hover:bg-orange-700"
+                className="w-full sm:w-1/2 md:w-1/4 text-white bg-orange-600 hover:bg-orange-700"
               >
                 Pay Now
               </Button>
               <Button
                 onClick={handleStartTrial}
-                className="w-full md:w-1/5 border bg-white text-orange-600 border-orange-600 hover:border-orange-700 hover:bg-white"
+                className="w-full sm:w-1/2 md:w-1/4 border bg-white text-orange-600 border-orange-600 hover:border-orange-700 hover:bg-white"
               >
                 Start Trial
               </Button>
