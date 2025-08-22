@@ -151,7 +151,15 @@ export const useClaimBusiness = () => {
     mutationFn: claim,
     onSuccess: data => {
       if (data.authUrl) {
-        window.location.href = data.authUrl;
+        const width = 600;
+        const height = 700;
+        const left = window.screen.width / 2 - width / 2;
+        const top = window.screen.height / 2 - height / 2;
+        window.open(
+          data.authUrl,
+          'GoogleAuth',
+          `width=${width},height=${height},top=${top},left=${left}`
+        );
       } else {
         alert('Unable to start Google verification.');
       }
