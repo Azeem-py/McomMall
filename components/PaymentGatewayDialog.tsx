@@ -20,17 +20,16 @@ import {
   useStripe,
   useElements,
 } from '@stripe/react-stripe-js';
-import {
-  PayPalScriptProvider,
-  PayPalButtons,
-} from '@paypal/react-paypal-js';
+import dynamic from 'next/dynamic';
 
 const stripePromise = loadStripe(
   'pk_test_51RyiHq7EcmCfbEvlg70VZQdMUXMWKfFVfOctc73nAzdllQcdH41v4sdX8dyPBGWnM91uHheLoih73OnOeQOOecGO00o5ZZ6oTr'
 );
 
-const PAYPAL_CLIENT_ID =
-  'AdMnk_v1AaH8-ntOEM6y58zDTWkb5VzOAn285XcoSwDxnecLJb0OcPFCSUYGmiRQHR8x2o97JHnYXPuJ';
+const PayPalButtonWrapper = dynamic(
+  () => import('./PayPalButtonWrapper'),
+  { ssr: false }
+);
 
 interface PaymentGatewayDialogProps {
   isOpen: boolean;
@@ -178,36 +177,10 @@ function PaymentGatewayDialogComponent({
         )}
 
         {paymentMethod === 'paypal' && (
-          <PayPalScriptProvider
-            options={{
-              clientId: PAYPAL_CLIENT_ID,
-              currency: 'GBP',
-            }}
-          >
-            <PayPalButtons
-              style={{ layout: 'vertical' }}
-              createOrder={(data, actions) => {
-                return actions.order.create({
-                  intent: 'CAPTURE',
-                  purchase_units: [
-                    {
-                      amount: {
-                        value: paypalAmount,
-                        currency_code: 'GBP',
-                      },
-                    },
-                  ],
-                });
-              }}
-              onApprove={(data, actions) => {
-                // In a real application, you would capture the order on the server
-                // For this simulation, we'll just assume the payment is successful.
-                console.log('Simulating PayPal payment approval');
-                handleSuccess();
-                return Promise.resolve();
-              }}
-            />
-          </PayPalScriptProvider>
+          <PayPalButtonWrapper
+            paypalAmount={paypalAmount}
+            handleSuccess={handleSuccess}
+          />
         )}
 
         <DialogFooter>
