@@ -66,7 +66,7 @@ interface ProductFormValues {
     width?: number;
     height?: number;
   };
-  files?: Array<{ name: string; url: string }>;
+  files?: File[];
   downloadLimit?: number;
   downloadExpiry?: number;
   productUrl?: string;
@@ -164,49 +164,26 @@ const customResolver = (data: ProductFormValues) => {
   }
 
   if (data.productType === 'downloadable') {
-    if (!data.files || data.files.length === 0) {
+    if (!data.files || data.files.length === 0 || data.files.every(f => f === null)) {
       errors.files = {
         type: 'required',
         message: 'You must add at least one file for a downloadable product.',
       };
     } else {
-      const fileErrors: Array<{ name?: FieldError; url?: FieldError }> = [];
-      let hasErrors = false;
-      data.files.forEach((file, index) => {
-        const fileError: { name?: FieldError; url?: FieldError } = {};
-        if (!file.name.trim()) {
-          fileError.name = {
-            type: 'required',
-            message: 'File name is required.',
-          };
-          hasErrors = true;
-        }
-        if (!file.url.trim()) {
-          fileError.url = { type: 'required', message: 'Must be a valid URL.' };
-          hasErrors = true;
-        } else {
-          try {
-            new URL(file.url);
-          } catch {
-            fileError.url = {
-              type: 'pattern',
-              message: 'Please enter a valid URL.',
-            };
-            hasErrors = true;
-          }
-        }
-        if (Object.keys(fileError).length > 0) {
-          fileErrors[index] = fileError;
+      let totalSize = 0;
+      data.files.forEach(fileList => {
+        if (fileList) {
+          Array.from(fileList).forEach(file => {
+            totalSize += file.size;
+          });
         }
       });
-      if (hasErrors) {
-        errors.files = fileErrors as FieldError[];
-        if (errors.files) {
-          (errors.files as { root?: FieldError }).root = {
-            type: 'custom',
-            message: 'Please fix the errors in the files.',
-          };
-        }
+
+      if (totalSize > 100 * 1024 * 1024) {
+        (errors.files as { root?: FieldError }).root = {
+          type: 'maxSize',
+          message: 'Total file size cannot exceed 100 MB.',
+        };
       }
     }
   }
@@ -260,6 +237,7 @@ export default function AddProductPage() {
         width: undefined,
         height: undefined,
       },
+      files: [],
       productStatus: 'pending',
       visibility: 'visible',
       purchaseNote: '',
@@ -758,55 +736,41 @@ export default function AddProductPage() {
                           {fields.map((field, index) => (
                             <div
                               key={field.id}
-                              className="grid grid-cols-1 md:grid-cols-[1fr,1fr,auto] gap-4 p-4 border rounded-md"
+                              className="flex items-center gap-4 p-4 border rounded-md"
                             >
                               <FormField
                                 control={form.control}
-                                name={`files.${index}.name`}
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel className="text-base">
-                                      Name
-                                    </FormLabel>
-                                    <FormControl>
+                                name={`files.${index}`}
+                                render={({ field: { onChange, value, ...rest } }) => (
+                                  <div className="w-full">
+                                    <div className="flex items-center gap-4">
                                       <Input
-                                        placeholder="File name"
-                                        {...field}
-                                        className="text-base py-6"
+                                        type="file"
+                                        multiple
+                                        {...rest}
+                                        onChange={(event) => {
+                                          onChange(event.target.files);
+                                        }}
+                                        className="w-full"
                                       />
-                                    </FormControl>
-                                    <FormMessage className="text-red-500 text-base font-medium" />
-                                  </FormItem>
+                                      <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => remove(index)}
+                                        className="text-red-500 hover:text-red-600"
+                                      >
+                                        <Trash2 className="h-6 w-6" />
+                                      </Button>
+                                    </div>
+                                    {value && Array.from(value).map((file: File) => (
+                                      <div key={file.name} className="text-sm text-gray-500 mt-2">
+                                        {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                                      </div>
+                                    ))}
+                                  </div>
                                 )}
                               />
-                              <FormField
-                                control={form.control}
-                                name={`files.${index}.url`}
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel className="text-base">
-                                      File URL
-                                    </FormLabel>
-                                    <FormControl>
-                                      <Input
-                                        placeholder="https://..."
-                                        {...field}
-                                        className="text-base py-6"
-                                      />
-                                    </FormControl>
-                                    <FormMessage className="text-red-500 text-base font-medium" />
-                                  </FormItem>
-                                )}
-                              />
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => remove(index)}
-                                className="self-end text-red-500 hover:text-red-600"
-                              >
-                                <Trash2 className="h-6 w-6" />
-                              </Button>
                             </div>
                           ))}
                         </div>
@@ -815,9 +779,9 @@ export default function AddProductPage() {
                           variant="outline"
                           size="lg"
                           className="mt-4 text-base"
-                          onClick={() => append({ name: '', url: '' })}
+                          onClick={() => append(undefined)}
                         >
-                          <Plus className="mr-2 h-5 w-5" /> Add File
+                          <Plus className="mr-2 h-5 w-5" /> Add More Files
                         </Button>
                         <FormMessage className="text-red-500 text-base font-medium mt-2">
                           {form.formState.errors.files?.message}
