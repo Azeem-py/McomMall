@@ -1,6 +1,7 @@
 'use client';
 
 import { useForm, useFieldArray, FieldErrors } from 'react-hook-form';
+import { useGetUserListings } from '@/service/listings/hook';
 import {
   UploadCloud,
   Plus,
@@ -44,6 +45,11 @@ import {
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { cn } from '@/lib/utils';
 
+interface Listing {
+  _id: string;
+  business_name: string;
+}
+
 interface ProductFormValues {
   title: string;
   productType: 'physical' | 'downloadable' | 'virtual';
@@ -75,6 +81,7 @@ interface ProductFormValues {
   purchaseNote?: string;
   enableReviews: boolean;
   productImage: FileList | null;
+  businessId: string;
 }
 
 // NOTE: You will need to install the following dependencies:
@@ -162,6 +169,12 @@ const customResolver = (data: ProductFormValues) => {
       message: 'Product image is required.',
     };
   }
+  if (!data.businessId) {
+    errors.businessId = {
+      type: 'required',
+      message: 'Please select a business.',
+    };
+  }
 
   if (data.productType === 'downloadable') {
     if (!data.files || data.files.length === 0 || data.files.every(f => f === null)) {
@@ -243,6 +256,7 @@ export default function AddProductPage() {
       purchaseNote: '',
       enableReviews: true,
       productImage: null,
+      businessId: '',
     },
   });
 
@@ -250,6 +264,8 @@ export default function AddProductPage() {
     control: form.control,
     name: 'files',
   });
+
+  const { data: userListings, isLoading: isLoadingListings } = useGetUserListings();
 
   const productType = form.watch('productType');
 
@@ -1003,6 +1019,42 @@ export default function AddProductPage() {
 
               {/* Sidebar Column */}
               <div className="space-y-8">
+                {/* Business Listing */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-2xl">Business</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <FormField
+                      control={form.control}
+                      name="businessId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            disabled={isLoadingListings}
+                          >
+                            <FormControl>
+                              <SelectTrigger className="text-base py-6">
+                                <SelectValue placeholder="Select a business" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {userListings?.data.map((listing: Listing) => (
+                                <SelectItem key={listing._id} value={listing._id}>
+                                  {listing.business_name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage className="text-red-500 text-base font-medium" />
+                        </FormItem>
+                      )}
+                    />
+                  </CardContent>
+                </Card>
+
                 {/* Product Image */}
                 <Card>
                   <CardHeader>
