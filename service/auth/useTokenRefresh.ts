@@ -35,7 +35,7 @@ export const useTokenRefresh = () => {
       const { accessToken, refreshToken: newRefreshToken } = response.data;
 
       setBearerToken(accessToken);
-      dispatch(setAuthTokens({ accessToken }));
+      dispatch(setAuthTokens({ accessToken, refreshToken }));
       Cookies.set('refresh', newRefreshToken, { expires: 7 }); // Assuming refresh token is valid for 7 days
 
       // Reset the timer
