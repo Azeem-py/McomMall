@@ -46,8 +46,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { cn } from '@/lib/utils';
 
 interface Listing {
-  _id: string;
-  business_name: string;
+  id: string;
+  businessName: string;
 }
 
 interface ProductFormValues {
@@ -81,7 +81,7 @@ interface ProductFormValues {
   purchaseNote?: string;
   enableReviews: boolean;
   productImage: FileList | null;
-  businessId: string;
+  businessId?: string;
 }
 
 // NOTE: You will need to install the following dependencies:
@@ -1041,11 +1041,17 @@ export default function AddProductPage() {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {userListings?.data.map((listing: Listing) => (
-                                <SelectItem key={listing._id} value={listing._id}>
-                                  {listing.business_name}
+                              {isLoadingListings ? (
+                                <SelectItem value="loading" disabled>
+                                  Loading businesses...
                                 </SelectItem>
-                              ))}
+                              ) : (
+                                userListings?.map((listing: Listing) => (
+                                  <SelectItem key={listing.id} value={listing.id}>
+                                    {listing.businessName}
+                                  </SelectItem>
+                                ))
+                              )}
                             </SelectContent>
                           </Select>
                           <FormMessage className="text-red-500 text-base font-medium" />
