@@ -253,6 +253,7 @@ export default function MyListingsPage() {
   const [selectedListingId, setSelectedListingId] = useState<string | null>(
     null
   );
+  const [modalPlaceId, setModalPlaceId] = useState('');
   const itemsPerPage = 5;
 
   const {
@@ -265,14 +266,16 @@ export default function MyListingsPage() {
 
   const handleVerifyClick = (listingId: string) => {
     setSelectedListingId(listingId);
+    setModalPlaceId('');
     setIsVerificationModalOpen(true);
   };
 
   const handleModalContinue = () => {
-    if (selectedListingId) {
-      claimBusiness({ place_id: selectedListingId });
+    if (modalPlaceId) {
+      claimBusiness({ place_id: modalPlaceId });
       setIsVerificationModalOpen(false);
       setSelectedListingId(null);
+      setModalPlaceId('');
     }
   };
 
@@ -388,6 +391,8 @@ export default function MyListingsPage() {
         isOpen={isVerificationModalOpen}
         onClose={() => setIsVerificationModalOpen(false)}
         onContinue={handleModalContinue}
+        placeId={modalPlaceId}
+        onPlaceIdChange={setModalPlaceId}
       />
     </div>
   );

@@ -11,16 +11,20 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import GoogleLogo from '@/app/components/GoogleLogo';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface GoogleVerificationModalProps {
   isOpen: boolean;
   onClose: () => void;
   onContinue: () => void;
+  placeId: string;
+  onPlaceIdChange: (value: string) => void;
 }
 
 export const GoogleVerificationModal: React.FC<
   GoogleVerificationModalProps
-> = ({ isOpen, onClose, onContinue }) => {
+> = ({ isOpen, onClose, onContinue, placeId, onPlaceIdChange }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md bg-white p-0">
@@ -34,6 +38,19 @@ export const GoogleVerificationModal: React.FC<
             }
           </DialogDescription>
         </DialogHeader>
+        <div className="px-6 pb-4 space-y-2">
+          <Label htmlFor="placeId" className="text-left">
+            Google Place ID
+          </Label>
+          <Input
+            id="placeId"
+            type="text"
+            placeholder="Enter your Google Place ID"
+            value={placeId}
+            onChange={e => onPlaceIdChange(e.target.value)}
+            className="w-full"
+          />
+        </div>
         <DialogFooter className="p-6 pt-4">
           <Button
             onClick={onContinue}
