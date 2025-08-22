@@ -288,13 +288,13 @@ export default function CoBrandedContent({ listingId }: CoBrandedContentProps) {
               {/* Right Column: Features Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {/* Category 1 */}
-                <div className="flex items-start space-x-3">
-                  <ShieldCheck className="h-6 w-6 sm:h-7 sm:w-7 text-orange-500" />
+                <div className="flex items-start space-x-4">
+                  <ShieldCheck className="h-6 w-6 text-orange-500 flex-shrink-0" />
                   <div>
-                    <h3 className="text-base sm:text-lg font-semibold">
+                    <h3 className="text-lg sm:text-xl font-semibold">
                       Verification
                     </h3>
-                    <p className="text-gray-700 text-sm mt-1">
+                    <p className="text-gray-700 text-sm sm:text-base mt-1">
                       Confirm your business ownership and get listed across the
                       full 247GBS directory network for instant credibility and
                       trust.
@@ -303,13 +303,13 @@ export default function CoBrandedContent({ listingId }: CoBrandedContentProps) {
                 </div>
 
                 {/* Category 2 */}
-                <div className="flex items-start space-x-3">
-                  <LayoutDashboard className="h-6 w-6 sm:h-7 sm:w-7 text-orange-500" />
+                <div className="flex items-start space-x-4">
+                  <LayoutDashboard className="h-6 w-6 text-orange-500 flex-shrink-0" />
                   <div>
-                    <h3 className="text-base sm:text-lg font-semibold">
+                    <h3 className="text-lg sm:text-xl font-semibold">
                       Dashboard
                     </h3>
-                    <p className="text-gray-700 text-sm mt-1">
+                    <p className="text-gray-700 text-sm sm:text-base mt-1">
                       Preview the MCOM Dashboard, explore wallet and loyalty
                       features, and try essential tools that give you a taste of
                       what’s ahead.
@@ -318,13 +318,13 @@ export default function CoBrandedContent({ listingId }: CoBrandedContentProps) {
                 </div>
 
                 {/* Category 3 */}
-                <div className="flex items-start space-x-3">
-                  <Rocket className="h-6 w-6 sm:h-7 sm:w-7 text-orange-500" />
+                <div className="flex items-start space-x-4">
+                  <Rocket className="h-6 w-6 text-orange-500 flex-shrink-0" />
                   <div>
-                    <h3 className="text-base sm:text-lg font-semibold">
+                    <h3 className="text-lg sm:text-xl font-semibold">
                       Marketing
                     </h3>
-                    <p className="text-gray-700 text-sm mt-1">
+                    <p className="text-gray-700 text-sm sm:text-base mt-1">
                       Gain exposure with co-branded promotions, your own QR
                       code, and access to seasonal campaigns to attract new
                       customers quickly.
@@ -333,13 +333,13 @@ export default function CoBrandedContent({ listingId }: CoBrandedContentProps) {
                 </div>
 
                 {/* Category 4 */}
-                <div className="flex items-start space-x-3">
-                  <Headset className="h-6 w-6 sm:h-7 sm:w-7 text-orange-500" />
+                <div className="flex items-start space-x-4">
+                  <Headset className="h-6 w-6 text-orange-500 flex-shrink-0" />
                   <div>
-                    <h3 className="text-base sm:text-lg font-semibold">
+                    <h3 className="text-lg sm:text-xl font-semibold">
                       Support
                     </h3>
-                    <p className="text-gray-700 text-sm mt-1">
+                    <p className="text-gray-700 text-sm sm:text-base mt-1">
                       Get guided onboarding, expert help at every step, and
                       flexible payment options that make launching easier than
                       ever.
