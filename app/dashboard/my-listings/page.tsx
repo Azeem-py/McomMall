@@ -106,7 +106,10 @@ const SearchBar: React.FC<SearchBarProps> = ({ searchTerm, setSearchTerm }) => (
   </div>
 );
 
-const ListingCard: React.FC<ListingCardProps> = ({ listing, onVerifyClick }) => {
+const ListingCard: React.FC<ListingCardProps> = ({
+  listing,
+  onVerifyClick,
+}) => {
   const [imgSrc, setImgSrc] = useState(listing.logoUrl);
 
   const cardVariants = {
@@ -246,10 +249,7 @@ const Pagination: React.FC<PaginationProps> = ({
 export default function MyListingsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [
-    isVerificationModalOpen,
-    setIsVerificationModalOpen,
-  ] = useState(false);
+  const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
   const [selectedListingId, setSelectedListingId] = useState<string | null>(
     null
   );
