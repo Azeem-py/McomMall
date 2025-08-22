@@ -50,7 +50,7 @@ const productFormSchema = z
   .object({
     title: z.string().min(1, { message: 'Product title is required.' }),
     productType: z.enum(['physical', 'downloadable', 'virtual'], {
-      required_error: 'You must select a product type.',
+      message: 'You must select a product type.',
     }),
     category: z.string().min(1, { message: 'Please select a category.' }),
     price: z.coerce
@@ -132,13 +132,6 @@ const productFormSchema = z
 
 type ProductFormValues = z.infer<typeof productFormSchema>;
 
-// NOTE: You will need to install the following dependencies:
-// npm install zod @hookform/resolvers react-hook-form lucide-react
-//
-// Also, ensure you have set up shadcn/ui correctly in your project.
-// You'll need to add the following components from shadcn/ui:
-// npx shadcn-ui@latest add button form input checkbox select textarea card radio-group
-
 export default function AddProductPage() {
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productFormSchema),
@@ -189,7 +182,7 @@ export default function AddProductPage() {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen p-4 sm:p-6 lg:p-8 text-base">
+    <div className="bg-gray-50 h-fit p-4 sm:p-6 lg:p-8 text-base">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl font-bold text-gray-800 mb-6">
           Add New Product
