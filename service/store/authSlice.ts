@@ -26,7 +26,9 @@ const authSlice = createSlice({
     ) => {
       state.accessToken = action.payload.accessToken;
       Cookies.set('access', action.payload.accessToken, { expires: 1 / 72 }); // 20 minutes
+
       Cookies.set('refresh', action.payload.refreshToken, { expires: 7 });
+
     },
     setUserData: (
       state,
