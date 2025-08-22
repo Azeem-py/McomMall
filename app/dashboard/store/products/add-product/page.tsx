@@ -149,7 +149,11 @@ const customResolver = (data: ProductFormValues) => {
     };
   }
   if (data.productType === 'physical') {
-    const dimErrors: { length?: FieldError; width?: FieldError; height?: FieldError } = {};
+    const dimErrors: {
+      length?: FieldError;
+      width?: FieldError;
+      height?: FieldError;
+    } = {};
     if (data.dimensions?.length === undefined) {
       dimErrors.length = { type: 'required', message: 'Length is required.' };
     }
@@ -177,7 +181,11 @@ const customResolver = (data: ProductFormValues) => {
   }
 
   if (data.productType === 'downloadable') {
-    if (!data.files || data.files.length === 0 || data.files.every(f => f === null)) {
+    if (
+      !data.files ||
+      data.files.length === 0 ||
+      data.files.every(f => f === null)
+    ) {
       errors.files = {
         type: 'required',
         message: 'You must add at least one file for a downloadable product.',
@@ -265,14 +273,15 @@ export default function AddProductPage() {
     name: 'files',
   });
 
-  const { data: userListings, isLoading: isLoadingListings } = useGetUserListings();
+  const { data: userListings, isLoading: isLoadingListings } =
+    useGetUserListings();
 
   const productType = form.watch('productType');
 
   async function onSubmit(data: ProductFormValues) {
     try {
       // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 2000));
       console.log('Form submitted successfully:', data);
       toast.success('Product saved successfully!');
       form.reset(); // Reset form after successful submission
@@ -290,10 +299,7 @@ export default function AddProductPage() {
         </h1>
 
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-8"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Main Content Column */}
               <div className="lg:col-span-2 space-y-8">
@@ -757,14 +763,16 @@ export default function AddProductPage() {
                               <FormField
                                 control={form.control}
                                 name={`files.${index}`}
-                                render={({ field: { onChange, value, ...rest } }) => (
+                                render={({
+                                  field: { onChange, value, ...rest },
+                                }) => (
                                   <div className="w-full">
                                     <div className="flex items-center gap-4">
                                       <Input
                                         type="file"
                                         multiple
                                         {...rest}
-                                        onChange={(event) => {
+                                        onChange={event => {
                                           onChange(event.target.files);
                                         }}
                                         className="w-full"
@@ -779,11 +787,18 @@ export default function AddProductPage() {
                                         <Trash2 className="h-6 w-6" />
                                       </Button>
                                     </div>
-                                    {value && Array.from(value).map((file: File) => (
-                                      <div key={file.name} className="text-sm text-gray-500 mt-2">
-                                        {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
-                                      </div>
-                                    ))}
+                                    {value instanceof FileList &&
+                                      value.length > 0 &&
+                                      Array.from(value).map((file: File) => (
+                                        <div
+                                          key={file.name}
+                                          className="text-sm text-gray-500 mt-2"
+                                        >
+                                          {file.name} (
+                                          {(file.size / 1024 / 1024).toFixed(2)}{' '}
+                                          MB)
+                                        </div>
+                                      ))}
                                   </div>
                                 )}
                               />
@@ -1047,7 +1062,10 @@ export default function AddProductPage() {
                                 </SelectItem>
                               ) : (
                                 userListings?.map((listing: Listing) => (
-                                  <SelectItem key={listing.id} value={listing.id}>
+                                  <SelectItem
+                                    key={listing.id}
+                                    value={listing.id}
+                                  >
                                     {listing.businessName}
                                   </SelectItem>
                                 ))
@@ -1104,7 +1122,7 @@ export default function AddProductPage() {
                                 type="file"
                                 className="hidden"
                                 {...rest}
-                                onChange={(event) => {
+                                onChange={event => {
                                   onChange(event.target.files);
                                 }}
                               />

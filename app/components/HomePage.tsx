@@ -27,6 +27,15 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import { McomFeatureSection } from '../homepage/components/McomFeatureSection';
+import { SeasonalMarketingSection } from '../homepage/components/SeasonalMarketingSection';
+import { BusinessTrustSection } from '../homepage/components/BusinessTrustSection';
+import { LoyaltyProgramSection } from '../homepage/components/LoyaltyProgramSection';
+import { StockAuditSection } from '../homepage/components/StockAuditSection';
+import { McomVCardEGiftCardsSection } from '../homepage/components/McomVCardEGiftCardsSection';
+import { McomVouchersCouponsSection } from '../homepage/components/McomVouchersCouponsSection';
+import { McomMallBrandsSection } from '../homepage/components/McomMallBrandsSection';
+import { PopularCategoriesSection } from '../homepage/components/PopularCategoriesSection';
 
 // --- Helper Components ---
 const ScrollAnimatedSection = ({ children }: { children: React.ReactNode }) => {
@@ -516,51 +525,8 @@ export default function HomePage() {
         </section>
 
         {/* --- Categories Section --- */}
-        <ScrollAnimatedSection>
-          <div className="py-16 px-4 md:px-8 lg:px-16 max-w-7xl mx-auto">
-            <div className="text-center mb-12">
-              <a
-                href="#"
-                className="text-[#f58220] font-semibold hover:underline"
-              >
-                Browse All Different 45+ Categories &rarr;
-              </a>
-            </div>
-            <div className="relative flex items-center">
-              <button
-                onClick={() => handleScroll(-300)}
-                className="absolute -left-4 z-10 bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition-colors hidden md:block"
-              >
-                <ChevronLeft />
-              </button>
-              <div
-                ref={scrollContainerRef}
-                className="flex items-center justify-start gap-4 md:gap-8 overflow-x-auto pb-4 no-scrollbar"
-              >
-                {categories.map((category, index) => (
-                  <div
-                    key={index}
-                    className="flex flex-col items-center gap-2 flex-shrink-0 text-center w-28"
-                  >
-                    <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 shadow-md hover:shadow-lg hover:scale-105 hover:bg-gray-300 transition-all cursor-pointer">
-                      {category.icon}
-                    </div>
-                    <h3 className="font-bold text-lg">{category.name}</h3>
-                    <p className="text-sm text-gray-500">
-                      {category.listings} Listings
-                    </p>
-                  </div>
-                ))}
-              </div>
-              <button
-                onClick={() => handleScroll(300)}
-                className="absolute -right-4 z-10 bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition-colors hidden md:block"
-              >
-                <ChevronRight />
-              </button>
-            </div>
-          </div>
-        </ScrollAnimatedSection>
+
+        <PopularCategoriesSection />
 
         {/* --- Featured Ads Section --- */}
         <ScrollAnimatedSection>
@@ -687,7 +653,7 @@ export default function HomePage() {
         </ScrollAnimatedSection>
 
         {/* --- How It Works Section --- */}
-        <ScrollAnimatedSection>
+        {/* <ScrollAnimatedSection>
           <div className="py-20 px-4 md:px-8 lg:px-16">
             <h2 className="text-4xl font-bold text-center mb-16">
               How McomMall Works For You
@@ -729,50 +695,61 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-        </ScrollAnimatedSection>
+        </ScrollAnimatedSection> */}
+      </main>
 
-        {/* --- Our Latest Blog Post Section --- */}
-        <ScrollAnimatedSection>
-          <div className="py-16 px-4 md:px-8 lg:px-16 bg-gray-50">
-            <h2 className="text-4xl font-bold text-center mb-12">
-              Our Latest Blog Post
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
-              {blogPosts.map((post, index) => (
-                <div
-                  key={index}
-                  className="bg-white rounded-2xl shadow-md overflow-hidden group"
-                >
-                  <div className="relative">
-                    <img
-                      src={post.image}
-                      alt={post.title}
-                      className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
-                    <div className="absolute top-4 right-4 bg-gray-800 text-white text-xs px-3 py-1 rounded-full">
-                      {post.date}
-                    </div>
-                  </div>
-                  <div className="p-6">
-                    <span className="text-gray-500 text-sm font-semibold">
-                      {post.category}
-                    </span>
-                    <h3 className="font-bold text-lg mt-2 mb-4 h-14">
-                      {post.title}
-                    </h3>
-                    <a
-                      href="#"
-                      className="text-[#f58220] font-semibold hover:underline"
-                    >
-                      Read More &rarr;
-                    </a>
+      {/* NEW SECTION */}
+      <McomFeatureSection />
+      <SeasonalMarketingSection />
+      {/* <BusinessTrustSection /> */}
+      <LoyaltyProgramSection />
+      <StockAuditSection />
+      <McomVCardEGiftCardsSection />
+      <McomVouchersCouponsSection />
+      <McomMallBrandsSection />
+      {/* NEW SECTION ENDS */}
+
+      {/* --- Our Latest Blog Post Section --- */}
+      <ScrollAnimatedSection>
+        <div className="py-16 px-4 md:px-8 lg:px-16 bg-gray-50">
+          <h2 className="text-4xl font-bold text-center mb-12">
+            Our Latest Blog Post
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+            {blogPosts.map((post, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-2xl shadow-md overflow-hidden group"
+              >
+                <div className="relative">
+                  <img
+                    src={post.image}
+                    alt={post.title}
+                    className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+                  />
+                  <div className="absolute top-4 right-4 bg-gray-800 text-white text-xs px-3 py-1 rounded-full">
+                    {post.date}
                   </div>
                 </div>
-              ))}
-            </div>
+                <div className="p-6">
+                  <span className="text-gray-500 text-sm font-semibold">
+                    {post.category}
+                  </span>
+                  <h3 className="font-bold text-lg mt-2 mb-4 h-14">
+                    {post.title}
+                  </h3>
+                  <a
+                    href="#"
+                    className="text-[#f58220] font-semibold hover:underline"
+                  >
+                    Read More &rarr;
+                  </a>
+                </div>
+              </div>
+            ))}
           </div>
-        </ScrollAnimatedSection>
-      </main>
+        </div>
+      </ScrollAnimatedSection>
 
       {/* --- Footer Section --- */}
       <footer className="bg-slate-900 text-slate-300 py-16 px-4 md:px-8 lg:px-16">
