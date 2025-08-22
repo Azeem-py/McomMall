@@ -69,6 +69,7 @@ export const useLogin = () => {
       dispatch(
         setAuthTokens({
           accessToken: data.auth.accessToken,
+          refreshToken: data.auth.refreshToken,
         })
       );
       dispatch(
@@ -78,7 +79,44 @@ export const useLogin = () => {
         })
       );
       setBearerToken(data.auth.accessToken);
-      Cookies.set('refresh', data.auth.refreshToken, { expires: 7 });
+    },
+  });
+  return mutation;
+};
+
+export const useRefreshToken = () => {
+  const dispatch: AppDispatch = useDispatch();
+  const refresh = async (
+    refreshToken: string
+  ): Promise<LoginResponse['auth']> => {
+    try {
+      const response = await api.post('auth/refresh', {
+        refreshToken,
+      });
+      return response.data;
+    } catch (error: unknown) {
+      const err = error as ErrorResponse;
+      throw new Error(
+        err.response?.data?.message ||
+          err.message ||
+          'Failed to refresh token'
+      );
+    }
+  };
+
+  const mutation = useMutation({
+    mutationFn: refresh,
+    onSuccess: data => {
+      dispatch(
+        setAuthTokens({
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken,
+        })
+      );
+      setBearerToken(data.accessToken);
+    },
+    onError: () => {
+      dispatch(logoutAction());
     },
   });
   return mutation;

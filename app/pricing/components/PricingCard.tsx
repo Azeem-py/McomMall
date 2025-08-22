@@ -10,7 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Check, ChevronDown, ChevronUp } from 'lucide-react';
 import { PricingTier } from '../types/index';
-import { PaymentConfirmationDialog } from '@/components/PaymentConfirmationDialog';
+import { PaymentGatewayDialog } from '@/components/PaymentGatewayDialog';
 
 interface PricingCardProps {
   tier: PricingTier & { accent: 'teal' | 'purple' | 'yellow' };
@@ -171,7 +171,7 @@ export default function PricingCard({
           )}
         </CardContent>
       </Card>
-      <PaymentConfirmationDialog
+      <PaymentGatewayDialog
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
         planName={tier.name}

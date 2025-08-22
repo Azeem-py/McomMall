@@ -140,4 +140,19 @@ export const pluginMenuItems: MenuItem[] = [
       { title: 'Settings', href: '/dashboard/gift-card/settings' },
     ],
   },
+
+  {
+    title: 'Voucher',
+    href: '/dashboard/voucher',
+    icon: Settings,
+    subMenu: [
+      { title: 'Dashboard', href: '/dashboard/voucher' },
+      { title: 'Admin', href: '/dashboard/gift-card/admin' },
+      { title: 'Reports', href: '/dashboard/voucher/reports' },
+      { title: 'Offers', href: '/dashboard/loyalty/offers' },
+      { title: 'Pay your price', href: '/dashboard/voucher/pay-your-price' },
+      { title: 'Settings', href: '/dashboard/voucher/settings' },
+      { title: 'Notification', href: '/dashboard/voucher/notification' },
+    ],
+  },
 ];

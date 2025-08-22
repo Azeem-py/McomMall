@@ -10,9 +10,11 @@ import {
   Calendar,
   Building2,
 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { useGetUserListings } from '@/service/listings/hook';
 import { UserListing } from '@/service/listings/types';
+import GoogleLogo from '@/app/components/GoogleLogo';
 
 // --- Type Definitions ---
 
@@ -86,7 +88,6 @@ const Card: React.FC<CardProps> = ({ children, className, ...props }) => {
   );
 };
 
-
 // --- Reusable Components ---
 
 const SearchBar: React.FC<SearchBarProps> = ({ searchTerm, setSearchTerm }) => (
@@ -134,18 +135,36 @@ const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
             <h3 className="text-lg font-bold text-slate-800">
               {listing.businessName}
             </h3>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {listing.listingType.map(type => (
+                <Badge key={type} variant="secondary">
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                </Badge>
+              ))}
+            </div>
             <div className="mt-1 flex items-center gap-2 text-sm text-slate-500">
               <MapPin className="h-4 w-4 flex-shrink-0" />
               <span>{listing.location.addressLine1}</span>
             </div>
           </div>
-          <div className="flex w-full shrink-0 flex-row items-center justify-end gap-2 md:w-auto">
-            <Button variant="default" className="text-xs px-3 py-1.5">
-              <Edit className="mr-1 h-3 w-3" /> Edit
-            </Button>
-            <Button variant="default" className="text-xs px-3 py-1.5">
-              <Trash2 className="mr-1 h-3 w-3" /> Delete
-            </Button>
+          <div className="flex w-full shrink-0 flex-col items-end justify-between gap-2 md:w-auto">
+            <div className="flex flex-row items-center gap-2">
+              <Button variant="default" className="text-xs px-3 py-1.5">
+                <Edit className="mr-1 h-3 w-3" /> Edit
+              </Button>
+              <Button variant="default" className="text-xs px-3 py-1.5">
+                <Trash2 className="mr-1 h-3 w-3" /> Delete
+              </Button>
+            </div>
+            {!listing.isGoogleVerified && (
+              <Button
+                variant="primary"
+                className="px-3 py-2 mt-2 bg-blue-600 text-white font-medium rounded-lg flex items-center justify-center cursor-pointer"
+              >
+                <GoogleLogo className="mr-2 h-4 w-4" />
+                <p className="te">Verify with Google</p>
+              </Button>
+            )}
           </div>
         </div>
       </Card>
@@ -237,9 +256,7 @@ export default function MyListingsPage() {
     if (!searchTerm) return listingsData;
     return listingsData.filter(
       (listing: Listing) =>
-        listing.businessName
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase()) ||
+        listing.businessName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         listing.location.addressLine1
           .toLowerCase()
           .includes(searchTerm.toLowerCase())
@@ -329,7 +346,10 @@ export default function MyListingsPage() {
             </div>
           )}
           <div className="w-full sm:w-auto">
-            <Button variant="primary" className="w-full">
+            <Button
+              variant="primary"
+              className="w-full bg-orange-600 px-3 py-3 rounded-xl text-white font-medium"
+            >
               Submit New Listing
             </Button>
           </div>

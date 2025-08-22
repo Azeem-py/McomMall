@@ -8,12 +8,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { z } from 'zod';
 
 interface StepProps {
   formData: ListingFormData;
   setFormData: React.Dispatch<React.SetStateAction<ListingFormData>>;
   errors: Record<string, string>;
+  schema?: z.ZodSchema<unknown>;
 }
+
+const isFieldOptional = (schema: z.ZodSchema<unknown>, fieldName: string) => {
+    if (!schema || !('shape' in schema)) {
+      return true; // Default to optional if schema is not as expected
+    }
+    const fieldSchema = (schema as z.ZodObject<z.ZodRawShape>).shape[fieldName];
+    if (!fieldSchema) {
+        return true;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (fieldSchema as any)._def.typeName === 'ZodOptional';
+  };
 
 // Mock data
 const serviceCategories = [
@@ -30,6 +44,7 @@ const ServiceCategoryStep: React.FC<StepProps> = ({
   formData,
   setFormData,
   errors,
+  schema,
 }) => {
   const serviceData = formData.serviceData || {};
 
@@ -46,7 +61,15 @@ const ServiceCategoryStep: React.FC<StepProps> = ({
   return (
     <div className="space-y-6">
       <div>
-        <Label htmlFor="tradeCategory">Trade/Industry Category (Required)</Label>
+        <Label htmlFor="tradeCategory">
+            Trade/Industry Category
+            {isFieldOptional(schema!, 'serviceData.tradeCategory') && (
+                <span className="text-muted-foreground font-normal text-sm">
+                    {' '}
+                    (optional)
+                </span>
+            )}
+        </Label>
         <Select
           value={serviceData.tradeCategory}
           onValueChange={handleCategoryChange}

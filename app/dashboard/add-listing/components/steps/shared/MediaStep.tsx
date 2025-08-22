@@ -11,12 +11,26 @@ import {
 import { Info, UploadCloud } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
+import { z } from 'zod';
 
 interface StepProps {
   formData: ListingFormData;
   setFormData: React.Dispatch<React.SetStateAction<ListingFormData>>;
   errors: Record<string, string>;
+  schema?: z.ZodSchema<unknown>;
 }
+
+const isFieldOptional = (schema: z.ZodSchema<unknown>, fieldName: string) => {
+  if (!schema || !('shape' in schema)) {
+    return true; // Default to optional if schema is not as expected
+  }
+  const fieldSchema = (schema as z.ZodObject<z.ZodRawShape>).shape[fieldName];
+  if (!fieldSchema) {
+    return true;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (fieldSchema as any)._def.typeName === 'ZodOptional';
+};
 
 interface ImageUploadProps {
   id: 'logo' | 'banner';
@@ -25,6 +39,7 @@ interface ImageUploadProps {
   value: Media | null;
   onChange: (id: 'logo' | 'banner', value: Media | null) => void;
   error?: string;
+  isOptional: boolean;
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({
@@ -34,6 +49,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   value,
   onChange,
   error,
+  isOptional,
 }) => {
   const [preview, setPreview] = React.useState<string | null>(
     value?.file ? URL.createObjectURL(value.file) : null
@@ -57,7 +73,15 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   return (
     <div className="space-y-2">
       <div className="flex items-center space-x-2">
-        <Label htmlFor={`${id}-alt`}>{label}</Label>
+        <Label htmlFor={`${id}-alt`}>
+            {label}
+            {isOptional && (
+                <span className="text-muted-foreground font-normal text-sm">
+                    {' '}
+                    (optional)
+                </span>
+            )}
+        </Label>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -95,13 +119,12 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
             onChange={handleFileChange}
             className="cursor-pointer"
           />
-          <Label htmlFor={`${id}-alt`}>Alt Text (Required)</Label>
+          <Label htmlFor={`${id}-alt`}>Alt Text</Label>
           <Input
             id={`${id}-alt`}
             value={value?.altText || ''}
             onChange={handleAltTextChange}
             placeholder="A descriptive caption for the image"
-            required
           />
         </div>
       </div>
@@ -110,7 +133,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   );
 };
 
-const MediaStep: React.FC<StepProps> = ({ formData, setFormData, errors }) => {
+const MediaStep: React.FC<StepProps> = ({ formData, setFormData, errors, schema }) => {
   const handleMediaChange = (id: 'logo' | 'banner', value: Media | null) => {
     setFormData(prev => ({ ...prev, [id]: value }));
   };
@@ -124,6 +147,7 @@ const MediaStep: React.FC<StepProps> = ({ formData, setFormData, errors }) => {
         value={formData.logo}
         onChange={handleMediaChange}
         error={errors.logo}
+        isOptional={isFieldOptional(schema!, 'logo')}
       />
       <ImageUpload
         id="banner"
@@ -132,6 +156,7 @@ const MediaStep: React.FC<StepProps> = ({ formData, setFormData, errors }) => {
         value={formData.banner}
         onChange={handleMediaChange}
         error={errors.banner}
+        isOptional={isFieldOptional(schema!, 'banner')}
       />
     </div>
   );

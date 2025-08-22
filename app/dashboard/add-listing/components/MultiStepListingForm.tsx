@@ -161,14 +161,13 @@ const productCategorySchema = z
         primaryCategory: z
           .string()
           .min(1, { message: 'Primary category is required.' }),
-      })
-      .optional(),
+      }),
   })
   .passthrough();
 
 const productLocationSchema = z
   .object({
-    address: z.string().optional(),
+    address: z.string().min(1, { message: 'Address is required.' }),
   })
   .passthrough();
 
@@ -190,8 +189,7 @@ const sellingModesSchema = z
               path: ['sellingModes'],
             }
           ),
-      })
-      .optional(),
+      }),
   })
   .passthrough();
 
@@ -202,8 +200,7 @@ const serviceCategorySchema = z
         tradeCategory: z
           .string()
           .min(1, { message: 'Trade category is required.' }),
-      })
-      .optional(),
+      }),
   })
   .passthrough();
 
@@ -281,15 +278,47 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
   onBack,
 }) => {
   const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState<ListingFormData>({
-    businessTypes: businessTypes as ('Product' | 'Service')[],
-    businessName: '',
-    phone: '',
-    email: '',
-    shortDesc: '',
-    socials: { website: '' },
-    logo: null,
-    banner: null,
+  const [formData, setFormData] = useState<ListingFormData>(() => {
+    const initialData: ListingFormData = {
+      businessTypes: businessTypes as ('Product' | 'Service')[],
+      businessName: '',
+      phone: '',
+      email: '',
+      shortDesc: '',
+      socials: { website: '' },
+      logo: null,
+      banner: null,
+    };
+    if (businessTypes.includes('Product')) {
+      initialData.productData = {
+        primaryCategory: '',
+        subCategories: [],
+        showAddressPublicly: true,
+        deliveryArea: { type: 'radius', value: '' },
+        sellingModes: {
+          inStorePickup: false,
+          localDelivery: false,
+          ukWideShipping: false,
+        },
+        fulfilmentNotes: '',
+        returnsPolicy: '',
+        storefrontLinks: {},
+      };
+    }
+    if (businessTypes.includes('Service')) {
+      initialData.serviceData = {
+        tradeCategory: '',
+        serviceLocation: {
+          atBusinessLocation: false,
+          customerTravels: false,
+        },
+        serviceArea: { type: 'radius', value: '' },
+        hoursType: 'weekly',
+        bookingMethod: 'call',
+        pricingVisibility: 'quote',
+      };
+    }
+    return initialData;
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const router = useRouter();
@@ -585,6 +614,7 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
                 formData={formData}
                 setFormData={setFormData}
                 errors={errors}
+                schema={steps[currentStep - 1].schema}
               />
             </motion.div>
           </AnimatePresence>

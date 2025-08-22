@@ -6,7 +6,7 @@ import { PricingTier, TableFeature, FeatureGroup } from '../types/index';
 import { ShieldCheck, LayoutDashboard, Rocket, Headset } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CardFooter } from '@/components/ui/card';
-import { PaymentConfirmationDialog } from '@/components/PaymentConfirmationDialog';
+import { PaymentGatewayDialog } from '@/components/PaymentGatewayDialog';
 
 const coBrandedTiers: PricingTier[] = [
   {
@@ -408,7 +408,7 @@ export default function CoBrandedContent({
         accentHeaders={['blue-900', 'orange-800', 'black-500']}
       />
     </motion.div>
-    <PaymentConfirmationDialog
+    <PaymentGatewayDialog
       isOpen={isDialogOpen}
       onClose={() => setIsDialogOpen(false)}
       planName="Co-Branded Launchpad"

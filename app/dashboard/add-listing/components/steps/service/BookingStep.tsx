@@ -4,17 +4,32 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { z } from 'zod';
 
 interface StepProps {
   formData: ListingFormData;
   setFormData: React.Dispatch<React.SetStateAction<ListingFormData>>;
   errors: Record<string, string>;
+  schema?: z.ZodSchema<unknown>;
 }
+
+const isFieldOptional = (schema: z.ZodSchema<unknown>, fieldName: string) => {
+    if (!schema || !('shape' in schema)) {
+      return true; // Default to optional if schema is not as expected
+    }
+    const fieldSchema = (schema as z.ZodObject<z.ZodRawShape>).shape[fieldName];
+    if (!fieldSchema) {
+        return true;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (fieldSchema as any)._def.typeName === 'ZodOptional';
+  };
 
 const BookingStep: React.FC<StepProps> = ({
   formData,
   setFormData,
   errors,
+  schema,
 }) => {
   const serviceData = formData.serviceData || {};
   const bookingMethod = serviceData.bookingMethod || 'call';
@@ -35,7 +50,15 @@ const BookingStep: React.FC<StepProps> = ({
       <Card>
         <CardHeader>
           <CardTitle>Booking Method</CardTitle>
-          <CardDescription>How should customers book your services? (Required)</CardDescription>
+          <CardDescription>
+              How should customers book your services?
+                {isFieldOptional(schema!, 'serviceData.bookingMethod') && (
+                    <span className="text-muted-foreground font-normal text-sm">
+                        {' '}
+                        (optional)
+                    </span>
+                )}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <RadioGroup
@@ -58,7 +81,15 @@ const BookingStep: React.FC<StepProps> = ({
           </RadioGroup>
           {bookingMethod === 'online' && (
             <div className="mt-4">
-              <Label htmlFor="bookingURL">Booking URL</Label>
+              <Label htmlFor="bookingURL">
+                  Booking URL
+                    {isFieldOptional(schema!, 'serviceData.bookingURL') && (
+                        <span className="text-muted-foreground font-normal text-sm">
+                            {' '}
+                            (optional)
+                        </span>
+                    )}
+              </Label>
               <Input
                 id="bookingURL"
                 type="url"
@@ -75,7 +106,15 @@ const BookingStep: React.FC<StepProps> = ({
       <Card>
         <CardHeader>
           <CardTitle>Pricing Visibility</CardTitle>
-          <CardDescription>How do you want to display your pricing?</CardDescription>
+          <CardDescription>
+              How do you want to display your pricing?
+                {isFieldOptional(schema!, 'serviceData.pricingVisibility') && (
+                    <span className="text-muted-foreground font-normal text-sm">
+                        {' '}
+                        (optional)
+                    </span>
+                )}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <RadioGroup
