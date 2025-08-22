@@ -180,7 +180,7 @@ function PaymentGatewayDialogComponent({
         {paymentMethod === 'paypal' && (
           <PayPalScriptProvider
             options={{
-              'client-id': PAYPAL_CLIENT_ID,
+              clientId: PAYPAL_CLIENT_ID,
               currency: 'GBP',
             }}
           >
@@ -188,10 +188,12 @@ function PaymentGatewayDialogComponent({
               style={{ layout: 'vertical' }}
               createOrder={(data, actions) => {
                 return actions.order.create({
+                  intent: 'CAPTURE',
                   purchase_units: [
                     {
                       amount: {
                         value: paypalAmount,
+                        currency_code: 'GBP',
                       },
                     },
                   ],
