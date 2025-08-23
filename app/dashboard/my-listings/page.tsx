@@ -15,6 +15,8 @@ import Image from 'next/image';
 import { useGetUserListings } from '@/service/listings/hook';
 import { UserListing } from '@/service/listings/types';
 import GoogleLogo from '@/app/components/GoogleLogo';
+import { GoogleVerificationModal } from '@/components/GoogleVerificationModal';
+import { useClaimBusiness } from '@/service/auth/hook';
 
 // --- Type Definitions ---
 
@@ -36,6 +38,7 @@ type SearchBarProps = {
 
 type ListingCardProps = {
   listing: Listing;
+  onVerifyClick: (listingId: string) => void;
 };
 
 type PaginationProps = {
@@ -103,7 +106,10 @@ const SearchBar: React.FC<SearchBarProps> = ({ searchTerm, setSearchTerm }) => (
   </div>
 );
 
-const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
+const ListingCard: React.FC<ListingCardProps> = ({
+  listing,
+  onVerifyClick,
+}) => {
   const [imgSrc, setImgSrc] = useState(listing.logoUrl);
 
   const cardVariants = {
@@ -160,6 +166,7 @@ const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
               <Button
                 variant="primary"
                 className="px-3 py-2 mt-2 bg-blue-600 text-white font-medium rounded-lg flex items-center justify-center cursor-pointer"
+                onClick={() => onVerifyClick(listing.id)}
               >
                 <GoogleLogo className="mr-2 h-4 w-4" />
                 <p className="te">Verify with Google</p>
@@ -242,6 +249,11 @@ const Pagination: React.FC<PaginationProps> = ({
 export default function MyListingsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
+  const [selectedListingId, setSelectedListingId] = useState<string | null>(
+    null
+  );
+  const [modalPlaceId, setModalPlaceId] = useState('');
   const itemsPerPage = 5;
 
   const {
@@ -250,6 +262,22 @@ export default function MyListingsPage() {
     isError,
     error,
   } = useGetUserListings();
+  const { mutate: claimBusiness } = useClaimBusiness();
+
+  const handleVerifyClick = (listingId: string) => {
+    setSelectedListingId(listingId);
+    setModalPlaceId('');
+    setIsVerificationModalOpen(true);
+  };
+
+  const handleModalContinue = () => {
+    if (modalPlaceId) {
+      claimBusiness({ place_id: modalPlaceId });
+      setIsVerificationModalOpen(false);
+      setSelectedListingId(null);
+      setModalPlaceId('');
+    }
+  };
 
   const filteredListings = useMemo(() => {
     if (!listingsData) return [];
@@ -320,7 +348,11 @@ export default function MyListingsPage() {
               </div>
             ) : paginatedListings.length > 0 ? (
               paginatedListings.map((listing: Listing) => (
-                <ListingCard key={listing.id} listing={listing} />
+                <ListingCard
+                  key={listing.id}
+                  listing={listing}
+                  onVerifyClick={handleVerifyClick}
+                />
               ))
             ) : (
               <div className="py-12 text-center text-slate-500">
@@ -355,6 +387,13 @@ export default function MyListingsPage() {
           </div>
         </footer>
       </main>
+      <GoogleVerificationModal
+        isOpen={isVerificationModalOpen}
+        onClose={() => setIsVerificationModalOpen(false)}
+        onContinue={handleModalContinue}
+        placeId={modalPlaceId}
+        onPlaceIdChange={setModalPlaceId}
+      />
     </div>
   );
 }

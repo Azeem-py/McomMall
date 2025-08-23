@@ -29,8 +29,8 @@ export interface LoginResponse {
 }
 
 export interface ClaimInterface {
-  plaid_id: string;
-  returnUrl: string;
+  place_id: string;
+  returnUrl?: string;
 }
 
 export interface RefreshTokenResponse {
