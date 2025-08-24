@@ -14,7 +14,7 @@ export default function TrialInfo() {
         <CardHeader className="flex flex-row items-center gap-2">
           <Gift className="h-5 w-5 text-yellow-500" />
           <CardTitle className="text-xl font-semibold text-blue-900">
-            30-Day Free Trial
+            30-Day Trial
           </CardTitle>
         </CardHeader>
         <CardContent>
