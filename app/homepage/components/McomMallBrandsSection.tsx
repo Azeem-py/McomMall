@@ -23,9 +23,10 @@ export function McomMallBrandsSection() {
             View all exhibitors
           </a>
         </div>
-
-        <ParticipationSection />
       </div>
+      <section className="mt-[2rem]">
+        <ParticipationSection />
+      </section>
     </div>
   );
 }
