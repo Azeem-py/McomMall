@@ -50,7 +50,10 @@ const BusinessCategoryMenu = () => {
               {category.subCategories.map(subCategory => {
                 const isOpen = openSubCategory === subCategory.name;
                 return (
-                  <li key={subCategory.name}>
+                  <li
+                    key={subCategory.name}
+                    onMouseLeave={() => setOpenSubCategory(null)}
+                  >
                     <button
                       className="flex w-full items-center justify-between text-left font-semibold text-gray-800 hover:text-red-500"
                       onMouseEnter={() => setOpenSubCategory(subCategory.name)}
