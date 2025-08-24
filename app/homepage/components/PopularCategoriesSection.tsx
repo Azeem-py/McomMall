@@ -94,11 +94,11 @@ export function PopularCategoriesSection() {
             {categories.map((category, index) => (
               <motion.div
                 key={index}
-                className="flex-shrink-0 w-48 h-48 bg-gray-50 border border-gray-200 rounded-lg flex flex-col items-center justify-center text-center p-4 cursor-pointer hover:bg-orange-700 text-gray-800 hover:text-white"
+                className="flex-shrink-0 w-48 h-48 bg-gray-50 border border-gray-200 rounded-lg flex flex-col items-center justify-center text-center p-4 cursor-pointer hover:bg-orange-500 text-gray-800 hover:text-white"
                 variants={cardVariants}
                 whileHover="hover"
               >
-                <div className="text-orange-500 mb-3">
+                <div className=" hover:text-gray-200 mb-3">
                   {React.cloneElement(category.icon, {
                     size: 40,
                     strokeWidth: 1.5,
