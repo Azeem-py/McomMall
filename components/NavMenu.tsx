@@ -36,70 +36,102 @@ const ListItem = ({
 
 // --- Business Category Menu Component ---
 const BusinessCategoryMenu = () => {
-  const [openSubCategory, setOpenSubCategory] = useState<string | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [activeSubCategory, setActiveSubCategory] = useState<string | null>(
+    null
+  );
+
+  const handleCategoryHover = (category: string) => {
+    setActiveCategory(category);
+    setActiveSubCategory(null); // Reset sub-category when main category changes
+  };
+
+  const currentCategory = businessCategories.find(
+    c => c.category === activeCategory
+  );
+  const currentSubCategory = currentCategory?.subCategories.find(
+    sc => sc.name === activeSubCategory
+  );
 
   return (
-    <div className="w-screen max-w-full p-6 sm:p-8">
-      <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-        {businessCategories.map(category => (
-          <div key={category.category}>
+    <div className="flex" onMouseLeave={() => setActiveCategory(null)}>
+      {/* Panel 1: Main Categories */}
+      <div className="w-64 border-r border-gray-200 p-4">
+        <ul className="space-y-2">
+          {businessCategories.map(category => (
+            <li key={category.category}>
+              <button
+                className="flex w-full items-center justify-between rounded-md p-2 text-left font-semibold text-gray-800 hover:bg-gray-100"
+                onMouseEnter={() => handleCategoryHover(category.category)}
+              >
+                <span>{category.category}</span>
+                <ChevronDown className="h-4 w-4 -rotate-90" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Panel 2: Sub-categories */}
+      <AnimatePresence>
+        {currentCategory && (
+          <motion.div
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -10 }}
+            className="w-64 border-r border-gray-200 p-4"
+          >
             <h3 className="mb-4 text-lg font-bold text-gray-900">
-              {category.category}
+              {currentCategory.category}
             </h3>
             <ul className="space-y-2">
-              {category.subCategories.map(subCategory => {
-                const isOpen = openSubCategory === subCategory.name;
-                return (
-                  <li
-                    key={subCategory.name}
-                    onMouseLeave={() => setOpenSubCategory(null)}
+              {currentCategory.subCategories.map(subCategory => (
+                <li key={subCategory.name}>
+                  <button
+                    className="flex w-full items-center justify-between rounded-md p-2 text-left font-semibold text-gray-800 hover:bg-gray-100"
+                    onMouseEnter={() => setActiveSubCategory(subCategory.name)}
                   >
-                    <button
-                      className="flex w-full items-center justify-between text-left font-semibold text-gray-800 hover:text-red-500"
-                      onMouseEnter={() => setOpenSubCategory(subCategory.name)}
-                      onClick={() =>
-                        setOpenSubCategory(isOpen ? null : subCategory.name)
-                      }
-                    >
-                      <span>{subCategory.name}</span>
-                      {subCategory.items.length > 0 && (
-                        <ChevronDown
-                          className={`h-4 w-4 transition-transform ${
-                            isOpen ? 'rotate-180' : ''
-                          }`}
-                        />
-                      )}
-                    </button>
-                    <AnimatePresence>
-                      {isOpen && subCategory.items.length > 0 && (
-                        <motion.ul
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: 'auto', opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          className="mt-1.5 space-y-1.5 overflow-hidden pl-2"
-                        >
-                          {subCategory.items.map(item => (
-                            <li key={item}>
-                              <Link
-                                href={`/categories/${item
-                                  .toLowerCase()
-                                  .replace(/ /g, '-')}`}
-                                className="text-sm text-gray-500 hover:text-gray-900"
-                              >
-                                {item}
-                              </Link>
-                            </li>
-                          ))}
-                        </motion.ul>
-                      )}
-                    </AnimatePresence>
-                  </li>
-                );
-              })}
+                    <span>{subCategory.name}</span>
+                    {subCategory.items.length > 0 && (
+                      <ChevronDown className="h-4 w-4 -rotate-90" />
+                    )}
+                  </button>
+                </li>
+              ))}
             </ul>
-          </div>
-        ))}
-      </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Panel 3: Items */}
+      <AnimatePresence>
+        {currentSubCategory && currentSubCategory.items.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -10 }}
+            className="w-64 p-4"
+          >
+            <h3 className="mb-4 text-lg font-bold text-gray-900">
+              {currentSubCategory.name}
+            </h3>
+            <ul className="space-y-2">
+              {currentSubCategory.items.map(item => (
+                <li key={item}>
+                  <Link
+                    href={`/categories/${item
+                      .toLowerCase()
+                      .replace(/ /g, '-')}`}
+                    className="block rounded-md p-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+                  >
+                    {item}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
