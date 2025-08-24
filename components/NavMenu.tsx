@@ -20,17 +20,84 @@ const ListItem = ({
   return (
     <Link
       href={href}
-      className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-slate-600 focus:bg-slate-600"
+      className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100 focus:bg-gray-100"
     >
-      <div className="text-sm font-semibold leading-none text-white">
+      <div className="text-sm font-semibold leading-none text-gray-900">
         {title}
       </div>
       {children && (
-        <p className="line-clamp-2 text-sm leading-snug text-slate-300">
+        <p className="line-clamp-2 text-sm leading-snug text-gray-500">
           {children}
         </p>
       )}
     </Link>
+  );
+};
+
+// --- Business Category Menu Component ---
+const BusinessCategoryMenu = () => {
+  const [openSubCategory, setOpenSubCategory] = useState<string | null>(null);
+
+  return (
+    <div className="w-screen max-w-full p-6 sm:p-8">
+      <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        {businessCategories.map(category => (
+          <div key={category.category}>
+            <h3 className="mb-4 text-lg font-bold text-gray-900">
+              {category.category}
+            </h3>
+            <ul className="space-y-2">
+              {category.subCategories.map(subCategory => {
+                const isOpen = openSubCategory === subCategory.name;
+                return (
+                  <li key={subCategory.name}>
+                    <button
+                      className="flex w-full items-center justify-between text-left font-semibold text-gray-800 hover:text-red-500"
+                      onMouseEnter={() => setOpenSubCategory(subCategory.name)}
+                      onClick={() =>
+                        setOpenSubCategory(isOpen ? null : subCategory.name)
+                      }
+                    >
+                      <span>{subCategory.name}</span>
+                      {subCategory.items.length > 0 && (
+                        <ChevronDown
+                          className={`h-4 w-4 transition-transform ${
+                            isOpen ? 'rotate-180' : ''
+                          }`}
+                        />
+                      )}
+                    </button>
+                    <AnimatePresence>
+                      {isOpen && subCategory.items.length > 0 && (
+                        <motion.ul
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="mt-1.5 space-y-1.5 overflow-hidden pl-2"
+                        >
+                          {subCategory.items.map(item => (
+                            <li key={item}>
+                              <Link
+                                href={`/categories/${item
+                                  .toLowerCase()
+                                  .replace(/ /g, '-')}`}
+                                className="text-sm text-gray-500 hover:text-gray-900"
+                              >
+                                {item}
+                              </Link>
+                            </li>
+                          ))}
+                        </motion.ul>
+                      )}
+                    </AnimatePresence>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 };
 
@@ -61,42 +128,7 @@ const menuItems = [
   },
   {
     title: 'Business Category',
-    content: (
-      <div className="w-screen max-w-full p-6 sm:p-8">
-        <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {businessCategories.map(category => (
-            <div key={category.category}>
-              <h3 className="mb-4 text-lg font-bold text-white">
-                {category.category}
-              </h3>
-              <ul className="space-y-3">
-                {category.subCategories.map(subCategory => (
-                  <li key={subCategory.name}>
-                    <p className="font-semibold text-slate-200">
-                      {subCategory.name}
-                    </p>
-                    <ul className="mt-1.5 space-y-1.5 pl-2">
-                      {subCategory.items.map(item => (
-                        <li key={item}>
-                          <Link
-                            href={`/categories/${item
-                              .toLowerCase()
-                              .replace(/ /g, '-')}`}
-                            className="text-sm text-slate-400 hover:text-white"
-                          >
-                            {item}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      </div>
-    ),
+    content: <BusinessCategoryMenu />,
   },
   {
     title: 'Listings',
@@ -171,15 +203,15 @@ export function NavMenu() {
             initial="closed"
             animate="open"
             exit="closed"
-            className="fixed inset-0 z-50 flex flex-col bg-slate-800 p-4"
+            className="fixed inset-0 z-50 flex flex-col bg-white p-4"
           >
             <div className="flex items-center justify-between">
-              <Link href="/" className="text-xl font-semibold text-white">
+              <Link href="/" className="text-xl font-semibold text-gray-900">
                 McomMall
               </Link>
               <button
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2 text-white"
+                className="p-2 text-gray-900"
               >
                 <XIcon className="h-6 w-6" />
               </button>
@@ -194,7 +226,7 @@ export function NavMenu() {
                       key={item.title}
                       href={item.href}
                       onClick={() => setMobileMenuOpen(false)}
-                      className="rounded-md px-4 py-2 text-lg text-white transition-colors hover:bg-slate-700"
+                      className="rounded-md px-4 py-2 text-lg text-gray-900 transition-colors hover:bg-gray-100"
                     >
                       {item.title}
                     </Link>
@@ -207,7 +239,7 @@ export function NavMenu() {
                       onClick={() =>
                         setOpenMobileSubMenu(isSubMenuOpen ? null : item.title)
                       }
-                      className="flex w-full items-center justify-between rounded-md px-4 py-2 text-lg text-white transition-colors hover:bg-slate-700"
+                      className="flex w-full items-center justify-between rounded-md px-4 py-2 text-lg text-gray-900 transition-colors hover:bg-gray-100"
                     >
                       <span>{item.title}</span>
                       <ChevronDown
@@ -225,7 +257,7 @@ export function NavMenu() {
                           className="overflow-hidden pl-4"
                         >
                           <div
-                            className="mt-2 border-l-2 border-slate-600 pl-4"
+                            className="mt-2 border-l-2 border-gray-200 pl-4"
                             onClick={() => setMobileMenuOpen(false)}
                           >
                             {item.content}
@@ -278,7 +310,7 @@ export function NavMenu() {
                 initial="hidden"
                 animate="visible"
                 exit="hidden"
-                className={`absolute top-full z-20 mt-2 rounded-lg bg-slate-700 text-white shadow-lg 
+                className={`absolute top-full z-20 mt-2 rounded-lg bg-white text-gray-900 shadow-lg
                   ${
                     item.title === 'Business Category'
                       ? 'left-1/2 -translate-x-1/2'
