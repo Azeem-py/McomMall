@@ -5,7 +5,8 @@
 import React, { useRef } from 'react';
 import Image from 'next/image';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { Gift, Star, Users } from 'lucide-react';
+import { ArrowRight, Gift, Star, Users } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export function LoyaltyProgramSection() {
   const targetRef = useRef<HTMLDivElement | null>(null);
@@ -20,7 +21,7 @@ export function LoyaltyProgramSection() {
   const lineHeight = useTransform(scrollYProgress, [0, 0.8], ['0%', '100%']);
 
   return (
-    <div ref={targetRef} className="relative bg-white py-20 sm:py-24">
+    <div ref={targetRef} className="relative bg-gray-300 py-20 sm:py-24">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto grid max-w-2xl grid-cols-1 items-center gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-12">
           {/* Left Column: Image */}
@@ -39,7 +40,7 @@ export function LoyaltyProgramSection() {
           <div className="hidden lg:flex lg:col-span-1 lg:justify-center">
             <div className="relative h-full w-1 bg-gray-200 rounded-full">
               <motion.div
-                className="absolute top-0 left-0 w-full bg-emerald-500 rounded-full"
+                className="absolute top-0 left-0 w-full bg-orange-500 rounded-full"
                 style={{ height: lineHeight }}
               />
             </div>
@@ -48,7 +49,7 @@ export function LoyaltyProgramSection() {
           {/* Right Column: Content */}
           <div className="lg:col-span-6">
             <div className="text-left">
-              <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              <h2 className="text-3xl font-bold tracking-tight text-black sm:text-4xl">
                 Forge Lasting Connections with a Premier Loyalty Program
               </h2>
               <p className="mt-6 text-lg leading-8 text-gray-600">
@@ -57,10 +58,10 @@ export function LoyaltyProgramSection() {
                 customer relationships by acknowledging and rewarding their
                 continued patronage in meaningful ways.
               </p>
-              <dl className="mt-10 max-w-xl space-y-8 text-base leading-7 text-gray-600 lg:max-w-none">
+              <dl className="mt-10 max-w-xl space-y-8 text-base leading-7 text-black lg:max-w-none">
                 <div className="relative pl-9">
                   <dt className="inline font-semibold text-gray-900">
-                    <Gift className="absolute left-1 top-1 h-5 w-5 text-emerald-600" />
+                    <Gift className="absolute left-1 top-1 h-5 w-5 text-orange-600" />
                     Tiered Rewards System.
                   </dt>
                   <dd className="inline">
@@ -72,7 +73,7 @@ export function LoyaltyProgramSection() {
                 </div>
                 <div className="relative pl-9">
                   <dt className="inline font-semibold text-gray-900">
-                    <Star className="absolute left-1 top-1 h-5 w-5 text-emerald-600" />
+                    <Star className="absolute left-1 top-1 h-5 w-5 text-orange-600" />
                     Personalized Offers.
                   </dt>
                   <dd className="inline">
@@ -84,16 +85,19 @@ export function LoyaltyProgramSection() {
                 </div>
                 <div className="relative pl-9">
                   <dt className="inline font-semibold text-gray-900">
-                    <Users className="absolute left-1 top-1 h-5 w-5 text-emerald-600" />
+                    <Users className="absolute left-1 top-1 h-5 w-5 text-orange-600" />
                     Seamless Integration.
                   </dt>
                   <dd className="inline">
-                    {' '}
                     Our program integrates smoothly with your existing
                     point-of-sale and e-commerce platforms for a frictionless
                     customer experience.
                   </dd>
                 </div>
+                <Button className="bg-orange-600 text-white hover:bg-orange-700 md:text-2xl md:h-[3rem] md:w-[14rem] rounded-none cursor-pointer flex justify-center items-center ">
+                  Learn More
+                  <ArrowRight size={300} />
+                </Button>
               </dl>
             </div>
           </div>

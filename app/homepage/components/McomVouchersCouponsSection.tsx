@@ -3,6 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { Ticket, Percent, ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export function McomVouchersCouponsSection() {
   return (
@@ -47,13 +48,13 @@ export function McomVouchersCouponsSection() {
                 <span className="text-green-500">+20%</span> with enticing
                 voucher offers.
               </p>
-              <a
-                href="#"
-                className="group mt-6 inline-flex items-center text-orange-800 font-semibold"
+              <Button
+                className="group mt-6 flex justify-center items-center bg-orange-600 hover:bg-orange-700 cursor-pointer text-white text-xl font-semibold"
+                size={'lg'}
               >
-                See how it works{' '}
+                See how it works
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
-              </a>
+              </Button>
             </div>
           </div>
 
@@ -84,24 +85,15 @@ export function McomVouchersCouponsSection() {
                 Achieve a <span className="text-blue-500">+18%</span> conversion
                 rate with well-targeted coupon strategies.
               </p>
-              <a
-                href="#"
-                className="group mt-6 inline-flex items-center text-orange-800 font-semibold"
+              <Button
+                className="group mt-6 flex justify-center items-center bg-orange-600 hover:bg-orange-700 cursor-pointer text-white text-xl font-semibold"
+                size={'lg'}
               >
                 Explore targeting options{' '}
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
-              </a>
+              </Button>
             </div>
           </div>
-        </div>
-        <div className="mt-12 text-center">
-          <a
-            href="#"
-            className="inline-flex items-center text-orange-700 font-semibold hover:text-gray-900"
-          >
-            Discover the power of MCOMVOUCHERS & MCOMCOUPONS{' '}
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </a>
         </div>
       </div>
     </div>

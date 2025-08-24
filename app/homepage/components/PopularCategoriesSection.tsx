@@ -89,12 +89,12 @@ export function PopularCategoriesSection() {
           {/* Scrollable Container */}
           <div
             ref={scrollContainerRef}
-            className="flex space-x-6 overflow-x-auto pb-6 scrollbar-hide"
+            className="flex space-x-6 overflow-x-auto pb-6 hide-scrollbar"
           >
             {categories.map((category, index) => (
               <motion.div
                 key={index}
-                className="flex-shrink-0 w-48 h-48 bg-gray-50 border border-gray-200 rounded-lg flex flex-col items-center justify-center text-center p-4 cursor-pointer"
+                className="flex-shrink-0 w-48 h-48 bg-gray-50 border border-gray-200 rounded-lg flex flex-col items-center justify-center text-center p-4 cursor-pointer hover:bg-orange-700 text-gray-800 hover:text-white"
                 variants={cardVariants}
                 whileHover="hover"
               >
@@ -104,7 +104,7 @@ export function PopularCategoriesSection() {
                     strokeWidth: 1.5,
                   })}
                 </div>
-                <p className="font-semibold text-gray-800">{category.name}</p>
+                <p className="font-semibold ">{category.name}</p>
                 <span className="mt-2 text-sm text-white bg-gray-600 rounded-full w-8 h-8 flex items-center justify-center">
                   {category.count}
                 </span>

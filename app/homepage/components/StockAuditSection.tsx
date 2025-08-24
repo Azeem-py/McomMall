@@ -3,7 +3,13 @@
 import React, { useRef } from 'react';
 import Image from 'next/image';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { ClipboardCheck, BarChart, CalendarClock } from 'lucide-react';
+import {
+  ClipboardCheck,
+  BarChart,
+  CalendarClock,
+  ArrowRight,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export function StockAuditSection() {
   const targetRef = useRef<HTMLDivElement | null>(null);
@@ -20,28 +26,6 @@ export function StockAuditSection() {
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto grid max-w-2xl grid-cols-1 items-center gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-12">
           {/* Left Column: Image */}
-          <div className="lg:col-span-5">
-            <div className="relative h-[500px] w-full overflow-hidden rounded-3xl">
-              <Image
-                src="https://images.unsplash.com/photo-1578575437130-5278e69142ae?q=80&w=2070&auto=format&fit=crop"
-                alt="Warehouse inventory being audited"
-                fill
-                className="object-cover"
-              />
-            </div>
-          </div>
-
-          {/* Middle Column: Animated Line */}
-          <div className="hidden lg:flex lg:col-span-1 lg:justify-center">
-            <div className="relative h-full w-1 bg-gray-200 rounded-full">
-              <motion.div
-                className="absolute top-0 left-0 w-full bg-blue-600 rounded-full"
-                style={{ height: lineHeight }}
-              />
-            </div>
-          </div>
-
-          {/* Right Column: Content */}
           <div className="lg:col-span-6">
             <div className="text-left">
               <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
@@ -91,7 +75,34 @@ export function StockAuditSection() {
                     utilization.
                   </dd>
                 </div>
+                <Button className="bg-orange-600 text-white hover:bg-orange-700 md:text-2xl md:h-[3rem] md:w-[14rem] rounded-none cursor-pointer flex justify-center items-center ">
+                  Learn More
+                  <ArrowRight size={300} />
+                </Button>
               </dl>
+            </div>
+          </div>
+
+          {/* Middle Column: Animated Line */}
+          <div className="hidden lg:flex lg:col-span-1 lg:justify-center">
+            <div className="relative h-full w-1 bg-gray-200 rounded-full">
+              <motion.div
+                className="absolute top-0 left-0 w-full bg-blue-600 rounded-full"
+                style={{ height: lineHeight }}
+              />
+            </div>
+          </div>
+
+          {/* Right Column: Content */}
+
+          <div className="lg:col-span-5">
+            <div className="relative h-[500px] w-full overflow-hidden rounded-3xl">
+              <Image
+                src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                alt="Warehouse inventory being audited"
+                fill
+                className="object-cover"
+              />
             </div>
           </div>
         </div>

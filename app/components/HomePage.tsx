@@ -4,38 +4,29 @@ import {
   MapPin,
   ArrowRight,
   Heart,
-  Star,
-  ChevronLeft,
-  ChevronRight,
   Phone,
   Mail,
   Facebook,
   Twitter,
   Instagram,
   Linkedin,
-  Utensils,
-  Home,
-  Sofa,
-  Mountain,
-  GraduationCap,
-  Car,
-  BedDouble,
-  ShoppingBag,
-  Dumbbell,
-  Sparkles as LucideSparkles,
   ArrowUp,
 } from 'lucide-react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { McomFeatureSection } from '../homepage/components/McomFeatureSection';
 import { SeasonalMarketingSection } from '../homepage/components/SeasonalMarketingSection';
-import { BusinessTrustSection } from '../homepage/components/BusinessTrustSection';
 import { LoyaltyProgramSection } from '../homepage/components/LoyaltyProgramSection';
 import { StockAuditSection } from '../homepage/components/StockAuditSection';
 import { McomVCardEGiftCardsSection } from '../homepage/components/McomVCardEGiftCardsSection';
 import { McomVouchersCouponsSection } from '../homepage/components/McomVouchersCouponsSection';
 import { McomMallBrandsSection } from '../homepage/components/McomMallBrandsSection';
 import { PopularCategoriesSection } from '../homepage/components/PopularCategoriesSection';
+import Winter from '@/public/homepage/WinterSale.png';
+import Summer from '@/public/homepage/SummerBanner.png';
+import Spring from '@/public/homepage/SpringBanner.png';
+import Autumn from '@/public/homepage/AutumnBanner.png';
+import Image from 'next/image';
 
 // --- Helper Components ---
 const ScrollAnimatedSection = ({ children }: { children: React.ReactNode }) => {
@@ -54,48 +45,7 @@ const ScrollAnimatedSection = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-// --- Mock Data ---
-const backgroundImages = [
-  'https://images.unsplash.com/photo-1558002038-1055907df827?q=80&w=1920&auto-format&fit=crop',
-  'https://images.unsplash.com/photo-1626081062126-d3b192c1fcb0?q=80&w=1176&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?q=80&w=1920&auto-format&fit=crop',
-  'https://images.unsplash.com/photo-1676630444903-163fe485c5d1?q=80&w=1126&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-];
-
-const categories = [
-  { name: 'Restaurant', listings: 2, icon: <Utensils size={40} /> },
-  { name: 'Real Estate', listings: 2, icon: <Home size={40} /> },
-  { name: 'Rent', listings: 3, icon: <Sofa size={40} /> },
-  { name: 'Place', listings: 1, icon: <Mountain size={40} /> },
-  { name: 'Education', listings: 3, icon: <GraduationCap size={40} /> },
-  { name: 'Car', listings: 2, icon: <Car size={40} /> },
-  { name: 'Hotel', listings: 5, icon: <BedDouble size={40} /> },
-  { name: 'Shopping', listings: 8, icon: <ShoppingBag size={40} /> },
-  { name: 'Fitness', listings: 4, icon: <Dumbbell size={40} /> },
-  { name: 'Beauty', listings: 6, icon: <LucideSparkles size={40} /> },
-];
-
 const allFeaturedAds = [
-  {
-    title: 'Fashionable Sunglass',
-    location: 'California, Cape May',
-    date: 'January 21, 2024',
-    seller: 'adlinet',
-    category: 'Others',
-    price: '$150.00',
-    image:
-      'https://images.unsplash.com/photo-1577803645773-f144005fb2d6?q=80&w=300&auto-format&fit=crop',
-  },
-  {
-    title: 'The Bungalow',
-    location: 'California, Cape May',
-    date: 'August 21, 2024',
-    seller: 'adlinet',
-    category: 'Restaurant',
-    price: '$2,525.00',
-    image:
-      'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?q=80&w=300&auto-format&fit=crop',
-  },
   {
     title: 'Albuquerque NM',
     location: 'California, Cape May',
@@ -135,77 +85,6 @@ const allFeaturedAds = [
     price: '$500.00',
     image:
       'https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=300&auto-format&fit=crop',
-  },
-  {
-    title: 'Lakeside Cabin',
-    location: 'Lake Tahoe, CA',
-    date: 'September 05, 2024',
-    seller: 'getaways',
-    category: 'Place',
-    price: '$450,000.00',
-    image:
-      'https://images.unsplash.com/photo-1559708937-56a01c883a80?q=80&w=300&auto-format&fit=crop',
-  },
-  {
-    title: 'Vintage Leather Jacket',
-    location: 'Brooklyn, NY',
-    date: 'August 10, 2024',
-    seller: 'retrofinds',
-    category: 'Others',
-    price: '$250.00',
-    image:
-      'https://images.unsplash.com/photo-1591047139829-d916b02ea942?q=80&w=300&auto-format&fit=crop',
-  },
-];
-
-const popularLocations = [
-  {
-    name: 'Retro Room',
-    location: 'New York Upper West Side',
-    rating: 4,
-    image:
-      'https://images.unsplash.com/photo-1567016376408-0226e4d0c1ea?w=100&h=100&fit=crop',
-    bgColor: 'bg-orange-100',
-  },
-  {
-    name: 'The Old Tavern',
-    location: 'Little Italy, New York',
-    rating: 3,
-    image:
-      'https://images.unsplash.com/photo-1574966771232-a7cc4c913745?w=100&h=100&fit=crop',
-    bgColor: 'bg-green-100',
-  },
-  {
-    name: 'Old Masters Art',
-    location: 'New York Upper East Side',
-    rating: 3,
-    image:
-      'https://images.unsplash.com/photo-1531904773987-09d31976a446?w=100&h=100&fit=crop',
-    bgColor: 'bg-blue-100',
-  },
-  {
-    name: 'Chez Michel',
-    location: 'New York SoHo',
-    rating: 4,
-    image:
-      'https://images.unsplash.com/photo-1533090481720-856c6e3c1fdc?w=100&h=100&fit=crop',
-    bgColor: 'bg-red-100',
-  },
-  {
-    name: 'Bloom Field',
-    location: 'New York Upper West Side',
-    rating: 4,
-    image:
-      'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=100&h=100&fit=crop',
-    bgColor: 'bg-pink-100',
-  },
-  {
-    name: 'Nature Getaway',
-    location: 'Chelsea New York',
-    rating: 5,
-    image:
-      'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=100&h=100&fit=crop',
-    bgColor: 'bg-purple-100',
   },
 ];
 
@@ -297,71 +176,6 @@ const McomMallLogo = ({ className = '' }) => (
   </svg>
 );
 
-const HowItWorksGraphic = ({ step }: { step: number }) => {
-  const content = () => {
-    switch (step) {
-      case 1:
-        return <Star className="text-yellow-400" fill="yellow" size={60} />;
-      case 2:
-        return (
-          <div className="flex gap-2 items-center">
-            <span className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold">
-              F
-            </span>
-            <span className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
-              C
-            </span>
-            <span className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center text-white font-bold">
-              .
-            </span>
-            <span className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-white font-bold">
-              M
-            </span>
-          </div>
-        );
-      case 3:
-        return (
-          <div className="bg-red-500 text-white px-4 py-2 rounded-full font-semibold">
-            hey there
-          </div>
-        );
-      default:
-        return null;
-    }
-  };
-  return (
-    <div className="relative w-48 h-48 flex items-center justify-center">
-      <svg viewBox="0 0 200 200" className="absolute inset-0 w-full h-full">
-        <path
-          d="M189.3,99.9c0,44.2-39.7,80-88.7,80S11.9,144.1,11.9,99.9S51.6,20,100.6,20S189.3,55.7,189.3,99.9Z"
-          transform="matrix(0.95, 0.3, -0.3, 0.95, 10, -25)"
-          fill="#111827"
-        />
-      </svg>
-      <div className="relative z-10">{content()}</div>
-    </div>
-  );
-};
-
-const DashedArrow = () => (
-  <svg
-    width="100"
-    height="30"
-    viewBox="0 0 119 32"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    className="hidden lg:block"
-  >
-    <path
-      d="M1 29.5C22.8333 17.6667 61.4 -9.5 118 10"
-      stroke="#4F46E5"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeDasharray="5 5"
-    />
-  </svg>
-);
-
 // --- Main App Component ---
 export default function HomePage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -372,21 +186,16 @@ export default function HomePage() {
   const [location, setLocation] = useState('');
   const router = useRouter();
 
-  const backgroundImages = [
-    'https://images.unsplash.com/photo-1558002038-1055907df827?q=80&w=1920&auto-format&fit=crop',
-    'https://images.unsplash.com/photo-1626081062126-d3b192c1fcb0?q=80&w=1176&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?q=80&w=1920&auto-format&fit=crop',
-    'https://images.unsplash.com/photo-1676630444903-163fe485c5d1?q=80&w=1126&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  ];
+  const backgroundImages = [Autumn, Summer, Spring, Winter];
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentImageIndex(
         prevIndex => (prevIndex + 1) % backgroundImages.length
       );
-    }, 2000); // Change image every 5 seconds
+    }, 5000); // Change image every 5 seconds
     return () => clearInterval(timer);
-  }, []);
+  }, [backgroundImages.length]);
 
   // Effect for back to top button visibility
   useEffect(() => {
@@ -407,16 +216,6 @@ export default function HomePage() {
     activeAdFilter === 'All'
       ? allFeaturedAds
       : allFeaturedAds.filter(ad => ad.category === activeAdFilter);
-
-  // Carousel scroll functions
-  const handleScroll = (scrollOffset: number) => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({
-        left: scrollOffset,
-        behavior: 'smooth',
-      });
-    }
-  };
 
   const handleSearch = () => {
     let query = searchQuery;
@@ -449,7 +248,7 @@ export default function HomePage() {
               key={currentImageIndex}
               className="absolute inset-0 w-full h-full bg-cover bg-center"
               style={{
-                backgroundImage: `url(${backgroundImages[currentImageIndex]})`,
+                backgroundImage: `url(${backgroundImages[currentImageIndex].src})`,
               }}
               initial={{ opacity: 0, scale: 1.05 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -603,111 +402,17 @@ export default function HomePage() {
           </div>
         </ScrollAnimatedSection>
 
-        {/* --- Most Popular Location Section --- */}
-        <ScrollAnimatedSection>
-          <div className="py-20 px-4 md:px-8 lg:px-16">
-            <h2 className="text-4xl font-bold text-center mb-12">
-              Most Popular Location
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-              {popularLocations.map((loc, index) => (
-                <div
-                  key={index}
-                  className={`${loc.bgColor} p-6 rounded-2xl flex items-center gap-6 hover:scale-105 hover:shadow-lg transition-transform`}
-                >
-                  <img
-                    src={loc.image}
-                    alt={loc.name}
-                    className="w-24 h-24 rounded-full object-cover border-4 border-white"
-                  />
-                  <div>
-                    <h3 className="font-bold text-xl">{loc.name}</h3>
-                    <p className="text-gray-700">{loc.location}</p>
-                    <div className="flex mt-2">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          size={20}
-                          className={
-                            i < loc.rating
-                              ? 'text-yellow-400 fill-current'
-                              : 'text-gray-300'
-                          }
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="text-center mt-12">
-              <a
-                href="#"
-                className="text-gray-600 font-semibold hover:underline"
-              >
-                Browse All Different{' '}
-                <span className="text-red-500">45+ Categories</span>
-              </a>
-            </div>
-          </div>
-        </ScrollAnimatedSection>
-
-        {/* --- How It Works Section --- */}
-        {/* <ScrollAnimatedSection>
-          <div className="py-20 px-4 md:px-8 lg:px-16">
-            <h2 className="text-4xl font-bold text-center mb-16">
-              How McomMall Works For You
-            </h2>
-            <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-4 max-w-6xl mx-auto">
-              <div className="flex flex-col items-center text-center">
-                <HowItWorksGraphic step={1} />
-                <h3 className="text-2xl font-bold mt-6 mb-2">
-                  1. Choose A Category
-                </h3>
-                <p className="max-w-xs text-gray-600">
-                  Select a category that best suits your interest. Use filters
-                  to customize your search and to find exactly what you want.
-                </p>
-              </div>
-              <DashedArrow />
-              <div className="flex flex-col items-center text-center">
-                <HowItWorksGraphic step={2} />
-                <h3 className="text-2xl font-bold mt-6 mb-2">
-                  2. Find What You Want
-                </h3>
-                <p className="max-w-xs text-gray-600">
-                  Once you&apos;ve settled on a business, learn more about it,
-                  read reviews and find its location so that you can reach it in
-                  no time!
-                </p>
-              </div>
-              <DashedArrow />
-              <div className="flex flex-col items-center text-center">
-                <HowItWorksGraphic step={3} />
-                <h3 className="text-2xl font-bold mt-6 mb-2">
-                  3. Go Out & Explore
-                </h3>
-                <p className="max-w-xs text-gray-600">
-                  The only thing left to do now is to go out, explore and have
-                  fun! Meet new friends and experience the city like a true
-                  local!
-                </p>
-              </div>
-            </div>
-          </div>
-        </ScrollAnimatedSection> */}
+        {/* NEW SECTION */}
+        <McomFeatureSection />
+        <SeasonalMarketingSection />
+        {/* <BusinessTrustSection /> */}
+        <LoyaltyProgramSection />
+        <StockAuditSection />
+        <McomVCardEGiftCardsSection />
+        <McomVouchersCouponsSection />
+        <McomMallBrandsSection />
+        {/* NEW SECTION ENDS */}
       </main>
-
-      {/* NEW SECTION */}
-      <McomFeatureSection />
-      <SeasonalMarketingSection />
-      {/* <BusinessTrustSection /> */}
-      <LoyaltyProgramSection />
-      <StockAuditSection />
-      <McomVCardEGiftCardsSection />
-      <McomVouchersCouponsSection />
-      <McomMallBrandsSection />
-      {/* NEW SECTION ENDS */}
 
       {/* --- Our Latest Blog Post Section --- */}
       <ScrollAnimatedSection>
@@ -722,9 +427,11 @@ export default function HomePage() {
                 className="bg-white rounded-2xl shadow-md overflow-hidden group"
               >
                 <div className="relative">
-                  <img
+                  <Image
                     src={post.image}
                     alt={post.title}
+                    width={100}
+                    height={100}
                     className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
                   />
                   <div className="absolute top-4 right-4 bg-gray-800 text-white text-xs px-3 py-1 rounded-full">

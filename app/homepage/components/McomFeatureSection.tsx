@@ -107,8 +107,8 @@ export function McomFeatureSection() {
             bgColor="bg-lime-600/80"
           />
           <InfoCard
-            title="What is Mcom Customer?"
-            description="As an Mcom Customer, you gain access to a trusted directory of local businesses. Find exactly what you need, read authentic reviews from your community, and make informed decisions. Your next favorite local spot is just a click away."
+            title="What is Mcom Consumer?"
+            description="As an Mcom Consumer, you gain access to a trusted directory of local businesses. Find exactly what you need, read authentic reviews from your community, and make informed decisions. Your next favorite local spot is just a click away."
             imageUrl="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
             bgColor="bg-fuchsia-600/80"
           />
