@@ -5,6 +5,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export function McomVCardEGiftCardsSection() {
   return (
@@ -47,13 +48,16 @@ export function McomVCardEGiftCardsSection() {
                 Boost revenue by <span className="text-blue-700">+15%</span>{' '}
                 within the first quarter.
               </p>
-              <a
-                href="#"
-                className="group mt-6 inline-flex items-center text-orange-800 font-semibold"
+              <Button
+                className="group mt-6 flex justify-center items-center bg-orange-600 hover:bg-orange-700 cursor-pointer text-white text-xl font-semibold"
+                size={'lg'}
               >
-                Learn how{' '}
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
-              </a>
+                Learn how
+                <ArrowRight
+                  className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200"
+                  fontSize={30}
+                />
+              </Button>
             </div>
           </div>
 
@@ -84,24 +88,15 @@ export function McomVCardEGiftCardsSection() {
                 See a <span className="text-blue-700">+25%</span> increase in
                 repeat customers through e-gift card usage.
               </p>
-              <a
-                href="#"
-                className="group mt-6 inline-flex items-center text-orange-800 font-semibold"
+              <Button
+                className="group mt-6 flex justify-center items-center bg-orange-600 hover:bg-orange-700 cursor-pointer text-white text-xl font-semibold"
+                size={'lg'}
               >
-                Explore growth strategies{' '}
+                Explore
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
-              </a>
+              </Button>
             </div>
           </div>
-        </div>
-        <div className="mt-12 text-center">
-          <a
-            href="#"
-            className="inline-flex items-center text-orange-700 font-semibold hover:text-gray-900"
-          >
-            Learn more about MCOMVCARD EGift Cards{' '}
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </a>
         </div>
       </div>
     </div>
