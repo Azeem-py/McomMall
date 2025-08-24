@@ -5,6 +5,7 @@ import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { ChevronDown, Menu as MenuIcon, X as XIcon } from 'lucide-react';
+import { businessCategories } from '../lib/business-categories';
 
 // --- Reusable ListItem Component ---
 const ListItem = ({
@@ -61,60 +62,38 @@ const menuItems = [
   {
     title: 'Business Category',
     content: (
-      <div className="grid w-screen max-w-lg grid-cols-2 gap-x-6 gap-y-4 p-4">
-        <div>
-          <h3 className="mb-2.5 text-lg font-semibold text-white">Services</h3>
-          <ul>
-            <li>
-              <ListItem href="/categories/automotive" title="Automotive" />
-            </li>
-            <li>
-              <ListItem href="/categories/financial" title="Financial" />
-            </li>
-            <li>
-              <ListItem href="/categories/legal" title="Legal" />
-            </li>
-          </ul>
-        </div>
-        <div>
-          <h3 className="mb-2.5 text-lg font-semibold text-white">Shopping</h3>
-          <ul>
-            <li>
-              <ListItem href="/categories/clothing" title="Clothing" />
-            </li>
-            <li>
-              <ListItem href="/categories/electronics" title="Electronics" />
-            </li>
-            <li>
-              <ListItem href="/categories/home-goods" title="Home Goods" />
-            </li>
-          </ul>
-        </div>
-        <div>
-          <h3 className="mb-2.5 text-lg font-semibold text-white">
-            Food & Drink
-          </h3>
-          <ul>
-            <li>
-              <ListItem href="/categories/restaurants" title="Restaurants" />
-            </li>
-            <li>
-              <ListItem href="/categories/cafes" title="Cafes" />
-            </li>
-          </ul>
-        </div>
-        <div>
-          <h3 className="mb-2.5 text-lg font-semibold text-white">
-            Health & Beauty
-          </h3>
-          <ul>
-            <li>
-              <ListItem href="/categories/gyms" title="Gyms" />
-            </li>
-            <li>
-              <ListItem href="/categories/salons" title="Salons" />
-            </li>
-          </ul>
+      <div className="w-screen max-w-full p-6 sm:p-8">
+        <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          {businessCategories.map(category => (
+            <div key={category.category}>
+              <h3 className="mb-4 text-lg font-bold text-white">
+                {category.category}
+              </h3>
+              <ul className="space-y-3">
+                {category.subCategories.map(subCategory => (
+                  <li key={subCategory.name}>
+                    <p className="font-semibold text-slate-200">
+                      {subCategory.name}
+                    </p>
+                    <ul className="mt-1.5 space-y-1.5 pl-2">
+                      {subCategory.items.map(item => (
+                        <li key={item}>
+                          <Link
+                            href={`/categories/${item
+                              .toLowerCase()
+                              .replace(/ /g, '-')}`}
+                            className="text-sm text-slate-400 hover:text-white"
+                          >
+                            {item}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </div>
     ),
@@ -300,7 +279,13 @@ export function NavMenu() {
                 animate="visible"
                 exit="hidden"
                 className={`absolute top-full z-20 mt-2 rounded-lg bg-slate-700 text-white shadow-lg 
-                  ${index === menuItems.length - 1 ? 'right-0' : 'left-0'}`}
+                  ${
+                    item.title === 'Business Category'
+                      ? 'left-1/2 -translate-x-1/2'
+                      : index === menuItems.length - 1
+                      ? 'right-0'
+                      : 'left-0'
+                  }`}
               >
                 {item.content}
               </motion.div>
