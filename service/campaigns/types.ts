@@ -9,6 +9,8 @@ export enum AdPlacement {
   SIDE_BAR = 'side_bar',
 }
 
+import { UserListing } from '../listings/types';
+
 export interface CreateCampaignDto {
   businessId: string;
   type: CampaignType;
@@ -18,4 +20,18 @@ export interface CreateCampaignDto {
   displayOnlyIfRegion?: string;
   enabledForLoggedInUser?: boolean;
   adPlacement: AdPlacement[];
+}
+
+export interface Campaign {
+  id: string;
+  business: UserListing;
+  type: CampaignType;
+  startDate: string;
+  budget: number;
+  displayOnlyIfCategory?: string;
+  displayOnlyIfRegion?: string;
+  enabledForLoggedInUser: boolean;
+  adPlacement: AdPlacement[];
+  createdAt: string;
+  updatedAt: string;
 }

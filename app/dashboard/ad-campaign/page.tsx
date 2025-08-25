@@ -4,12 +4,18 @@ import { DateRange } from 'react-day-picker';
 import { CampaignFilters } from './components/CampaignFilters';
 import { CampaignsTable } from './components/CampaignsTable';
 import { PageHeader } from './components/PageHeader';
-import { mockCampaigns } from './data';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
+import { useGetMyCampaigns } from '@/service/campaigns/hook';
+import { Campaign as ServiceCampaign } from '@/service/campaigns/types';
+import { Campaign as TableCampaign } from './types';
 
 const CampaignsPage = () => {
-  const [allCampaigns] = useState(mockCampaigns);
+  const {
+    data: campaignsData,
+    isLoading,
+    isError,
+  } = useGetMyCampaigns();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -27,6 +33,20 @@ const CampaignsPage = () => {
   const goToAddPage = () => {
     router.push('/dashboard/add-campaign');
   };
+
+  const allCampaigns: TableCampaign[] = useMemo(() => {
+    if (!campaignsData) return [];
+    return campaignsData.map((c: ServiceCampaign) => ({
+      id: c.id,
+      listingName: c.business.businessName,
+      status: 'active', // TODO: Implement status from backend
+      type: c.type,
+      startDate: new Date(c.startDate),
+      budget: c.budget,
+      spent: 0, // TODO: Implement spent from backend
+      placements: c.adPlacement,
+    }));
+  }, [campaignsData]);
 
   const filteredCampaigns = useMemo(() => {
     return allCampaigns.filter(campaign => {
@@ -68,7 +88,11 @@ const CampaignsPage = () => {
           resetFilters={resetFilters}
         />
 
-        <CampaignsTable campaigns={filteredCampaigns} />
+        <CampaignsTable
+          campaigns={filteredCampaigns}
+          isLoading={isLoading}
+          isError={isError}
+        />
         <Button
           className="mt-3 py-6 px-5 bg-orange-600 hover:bg-orange-700 rounded-2xl"
           onClick={goToAddPage}
