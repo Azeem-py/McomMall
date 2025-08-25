@@ -1,6 +1,11 @@
 'use client';
 
-import { useForm, useFieldArray, FieldErrors, FieldError } from 'react-hook-form';
+import {
+  useForm,
+  useFieldArray,
+  FieldErrors,
+  FieldError,
+} from 'react-hook-form';
 import { useGetUserListings } from '@/service/listings/hook';
 import {
   UploadCloud,
@@ -48,6 +53,7 @@ import {
 } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { cn } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
 
 interface Listing {
   id: string;
@@ -87,13 +93,6 @@ interface ProductFormValues {
   productImage: FileList | null;
   businessId?: string;
 }
-
-// NOTE: You will need to install the following dependencies:
-// npm install zod @hookform/resolvers react-hook-form lucide-react
-//
-// Also, ensure you have set up shadcn/ui correctly in your project.
-// You'll need to add the following components from shadcn/ui:
-// npx shadcn-ui@latest add button form input checkbox select textarea card radio-group
 
 const customResolver = (data: ProductFormValues) => {
   const errors: FieldErrors<ProductFormValues> = {};
@@ -238,6 +237,7 @@ const customResolver = (data: ProductFormValues) => {
 };
 
 export default function AddProductPage() {
+  const router = useRouter();
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
   const form = useForm<ProductFormValues>({
     resolver: customResolver,
@@ -298,13 +298,21 @@ export default function AddProductPage() {
       imageUrl: `https://source.unsplash.com/random/800x600?sig=${Math.random()}`,
       productUrl: data.productUrl,
       fileUrls: [], // Note: file uploads not handled in this implementation
-      downloadLimit: data.downloadLimit ? Number(data.downloadLimit) : undefined,
-      downloadExpiry: data.downloadExpiry ? Number(data.downloadExpiry) : undefined,
+      downloadLimit: data.downloadLimit
+        ? Number(data.downloadLimit)
+        : undefined,
+      downloadExpiry: data.downloadExpiry
+        ? Number(data.downloadExpiry)
+        : undefined,
       enableStockManagement: data.enableStockManagement,
       weight: data.weight ? Number(data.weight) : undefined,
-      length: data.dimensions?.length ? Number(data.dimensions.length) : undefined,
+      length: data.dimensions?.length
+        ? Number(data.dimensions.length)
+        : undefined,
       width: data.dimensions?.width ? Number(data.dimensions.width) : undefined,
-      height: data.dimensions?.height ? Number(data.dimensions.height) : undefined,
+      height: data.dimensions?.height
+        ? Number(data.dimensions.height)
+        : undefined,
       productStatus: data.productStatus,
       visibility: data.visibility,
       purchaseNote: data.purchaseNote,
@@ -319,15 +327,18 @@ export default function AddProductPage() {
       },
       onError: (error: Error) => {
         console.error('Failed to save product:', error);
-        toast.error(error.message || 'Failed to save product. Please try again.', {
-          style: {
-            minWidth: '300px',
-            minHeight: '60px',
-            fontSize: '1.25rem',
-            backgroundColor: 'hsl(var(--destructive))',
-            color: 'hsl(var(--destructive-foreground))',
-          },
-        });
+        toast.error(
+          error.message || 'Failed to save product. Please try again.',
+          {
+            style: {
+              minWidth: '300px',
+              minHeight: '60px',
+              fontSize: '1.25rem',
+              backgroundColor: 'hsl(var(--destructive))',
+              color: 'hsl(var(--destructive-foreground))',
+            },
+          }
+        );
       },
     });
   }
@@ -1020,10 +1031,16 @@ export default function AddProductPage() {
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="public" className="text-base">
+                                <SelectItem
+                                  value="public"
+                                  className="text-base"
+                                >
                                   Public
                                 </SelectItem>
-                                <SelectItem value="private" className="text-base">
+                                <SelectItem
+                                  value="private"
+                                  className="text-base"
+                                >
                                   Private
                                 </SelectItem>
                                 <SelectItem
