@@ -39,7 +39,7 @@ export const MenuContent = ({ onLinkClick }: MenuContentProps) => {
   };
 
   const renderMenuItems = (items: typeof mainMenuItems) => (
-    <ul className="space-y-1">
+    <ul className="space-y-1 ">
       {items.map((item, i) => (
         <li key={i}>
           <motion.div
