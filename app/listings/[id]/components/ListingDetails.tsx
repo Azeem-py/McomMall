@@ -26,17 +26,22 @@ export default function ClientListingDetail({
 
   if (isLoading) return <p>Loading...</p>;
 
-  let imgUrl;
+  let imageUrls: string[] = [];
   if (isSuccess && listing) {
-    if (listing.photos) {
-      const { photo_reference } = listing?.photos[0];
+    if (listing.photos && listing.photos.length > 0) {
       const API_URL =
         process.env.NEXT_PUBLIC_API_URL ||
         'https://mcom-mall-api.vercel.app/api/v1';
-      imgUrl = `${API_URL}/google/google-business/photo/${photo_reference}`;
+      imageUrls = listing.photos
+        .slice(0, 5)
+        .map(
+          (photo) =>
+            `${API_URL}/google/google-business/photo/${photo.photo_reference}`
+        );
     } else {
-      imgUrl =
-        'https://images.unsplash.com/photo-1543269865-cbf427effbad?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80';
+      imageUrls.push(
+        'https://images.unsplash.com/photo-1543269865-cbf427effbad?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80'
+      );
     }
 
     return (
@@ -90,7 +95,7 @@ export default function ClientListingDetail({
           </header>
 
           {/* Image Gallery */}
-          <ImageGallery images={[imgUrl]} />
+          <ImageGallery images={imageUrls} />
 
           {/* Main Content Layout */}
           <div className="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-12">
