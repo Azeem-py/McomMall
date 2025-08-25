@@ -12,6 +12,13 @@ import {
   mockRegions,
 } from './data';
 import { isAfter, startOfToday } from 'date-fns';
+import { useAddCampaign } from '@/service/campaigns/hook';
+import {
+  AdPlacement,
+  CampaignType,
+  CreateCampaignDto,
+} from '@/service/campaigns/types';
+import { SuccessCampaignDialog } from './components/SuccessCampaignDialog';
 
 const AddListingPage = () => {
   const [formData, setFormData] = useState<AdFormData>({
@@ -27,6 +34,9 @@ const AddListingPage = () => {
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
+  const [isSuccessDialogOpen, setSuccessDialogOpen] = useState(false);
+
+  const addCampaignMutation = useAddCampaign();
 
   const togglePlacement = (id: string) => {
     setFormData(prev => {
@@ -56,63 +66,84 @@ const AddListingPage = () => {
     }
 
     setErrors(newErrors);
-    // Return true if newErrors object is empty
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      console.log('Form submitted successfully:', formData);
-      // Here you would typically send the data to your API
-      alert('Ad submitted! Check the console for the form data.');
+      const campaignData: CreateCampaignDto = {
+        businessId: formData.listing,
+        type: formData.campaignType as CampaignType,
+        startDate: formData.startDate!,
+        budget: Number(formData.budget),
+        displayOnlyIfCategory: formData.category || undefined,
+        displayOnlyIfRegion: formData.region || undefined,
+        enabledForLoggedInUser: formData.forLoggedInUsers,
+        adPlacement: formData.placements as AdPlacement[],
+      };
+
+      addCampaignMutation.mutate(campaignData, {
+        onSuccess: () => {
+          setSuccessDialogOpen(true);
+        },
+      });
     } else {
       console.log('Form validation failed:', errors);
     }
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen p-4 sm:p-6 lg:p-8">
-      <div className="max-w-4xl mx-auto">
-        <header className="mb-8">
-          <p className="text-sm text-gray-500">Home &gt; Dashboard</p>
-          <h1 className="text-3xl font-bold text-gray-900 mt-1">Manage Ads</h1>
-        </header>
+    <>
+      <div className="bg-gray-50 min-h-screen p-4 sm:p-6 lg:p-8">
+        <div className="max-w-4xl mx-auto">
+          <header className="mb-8">
+            <p className="text-sm text-gray-500">Home &gt; Dashboard</p>
+            <h1 className="text-3xl font-bold text-gray-900 mt-1">
+              Manage Ads
+            </h1>
+          </header>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <GeneralAdSettings
-            formData={formData}
-            setFormData={setFormData}
-            errors={errors}
-            listings={mockListings}
-          />
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <GeneralAdSettings
+              formData={formData}
+              setFormData={setFormData}
+              errors={errors}
+              listings={mockListings}
+            />
 
-          <CampaignFilters
-            formData={formData}
-            setFormData={setFormData}
-            categories={mockCategories}
-            regions={mockRegions}
-          />
+            <CampaignFilters
+              formData={formData}
+              setFormData={setFormData}
+              categories={mockCategories}
+              regions={mockRegions}
+            />
 
-          <AdPlacementSelector
-            placementsData={adPlacements}
-            selectedPlacements={formData.placements}
-            togglePlacement={togglePlacement}
-            error={errors.placements}
-          />
+            <AdPlacementSelector
+              placementsData={adPlacements}
+              selectedPlacements={formData.placements}
+              togglePlacement={togglePlacement}
+              error={errors.placements}
+            />
 
-          <div className="flex justify-start">
-            <Button
-              type="submit"
-              size="lg"
-              className="bg-orange-600 hover:bg-orange-700 text-white font-bold"
-            >
-              Submit Ad
-            </Button>
-          </div>
-        </form>
+            <div className="flex justify-start">
+              <Button
+                type="submit"
+                size="lg"
+                className="bg-orange-600 hover:bg-orange-700 text-white font-bold"
+                disabled={addCampaignMutation.isPending}
+              >
+                {addCampaignMutation.isPending ? 'Submitting...' : 'Submit Ad'}
+              </Button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+      <SuccessCampaignDialog
+        open={isSuccessDialogOpen}
+        onOpenChange={setSuccessDialogOpen}
+      />
+    </>
   );
 };
 
