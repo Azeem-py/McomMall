@@ -1,16 +1,11 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { AdFormData, FormErrors } from './types';
 import { GeneralAdSettings } from './components/GeneralAdSettings';
 import { CampaignFilters } from './components/CampaignFilters';
 import { AdPlacementSelector } from './components/AdPlacementSelector';
 import { Button } from '@/components/ui/button';
-import {
-  adPlacements,
-  mockCategories,
-  mockListings,
-  mockRegions,
-} from './data';
+import { adPlacements, mockCategories, mockRegions } from './data';
 import { isAfter, startOfToday } from 'date-fns';
 import { useAddCampaign } from '@/service/campaigns/hook';
 import {
@@ -19,6 +14,8 @@ import {
   CreateCampaignDto,
 } from '@/service/campaigns/types';
 import { SuccessCampaignDialog } from './components/SuccessCampaignDialog';
+import { useGetUserListings } from '@/service/listings/hook';
+import { UserListing } from '@/service/listings/types';
 
 const AddListingPage = () => {
   const [formData, setFormData] = useState<AdFormData>({
@@ -37,6 +34,19 @@ const AddListingPage = () => {
   const [isSuccessDialogOpen, setSuccessDialogOpen] = useState(false);
 
   const addCampaignMutation = useAddCampaign();
+  const {
+    data: userListings,
+    isLoading: isLoadingListings,
+    isError: isErrorListings,
+  } = useGetUserListings();
+
+  const listingOptions = useMemo(() => {
+    if (!userListings) return [];
+    return userListings.map((listing: UserListing) => ({
+      value: listing.id,
+      label: listing.businessName,
+    }));
+  }, [userListings]);
 
   const togglePlacement = (id: string) => {
     setFormData(prev => {
@@ -109,7 +119,9 @@ const AddListingPage = () => {
               formData={formData}
               setFormData={setFormData}
               errors={errors}
-              listings={mockListings}
+              listings={listingOptions}
+              isLoading={isLoadingListings}
+              isError={isErrorListings}
             />
 
             <CampaignFilters
