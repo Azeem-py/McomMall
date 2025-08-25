@@ -1,12 +1,12 @@
 export enum CampaignType {
-  PPV = 'ppv',
-  PPC = 'ppc',
+  PAY_PER_VIEW = 'pay_per_view',
+  PAY_PER_CLICK = 'pay_per_click',
 }
 
 export enum AdPlacement {
   HOMEPAGE = 'homepage',
-  SEARCH_TOP = 'search_top',
-  SIDEBAR = 'sidebar',
+  TOP_OF_SEARCH_RESULT = 'top_of_search_result',
+  SIDE_BAR = 'side_bar',
 }
 
 export interface CreateCampaignDto {

@@ -82,15 +82,26 @@ const AddListingPage = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
+      const campaignTypeMapping: { [key: string]: CampaignType } = {
+        ppv: CampaignType.PAY_PER_VIEW,
+        ppc: CampaignType.PAY_PER_CLICK,
+      };
+
+      const adPlacementMapping: { [key: string]: AdPlacement } = {
+        homepage: AdPlacement.HOMEPAGE,
+        search_top: AdPlacement.TOP_OF_SEARCH_RESULT,
+        sidebar: AdPlacement.SIDE_BAR,
+      };
+
       const campaignData: CreateCampaignDto = {
         businessId: formData.listing,
-        type: formData.campaignType as CampaignType,
+        type: campaignTypeMapping[formData.campaignType],
         startDate: formData.startDate!,
         budget: Number(formData.budget),
         displayOnlyIfCategory: formData.category || undefined,
         displayOnlyIfRegion: formData.region || undefined,
         enabledForLoggedInUser: formData.forLoggedInUsers,
-        adPlacement: formData.placements as AdPlacement[],
+        adPlacement: formData.placements.map(p => adPlacementMapping[p]),
       };
 
       addCampaignMutation.mutate(campaignData, {
