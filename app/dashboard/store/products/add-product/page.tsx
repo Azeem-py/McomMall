@@ -12,8 +12,12 @@ import {
   Download,
 } from 'lucide-react';
 import Image from 'next/image';
-import React from 'react';
+import React, { useState } from 'react';
 import { toast } from 'sonner';
+
+import { useAddProduct } from '@/service/store/products/hook';
+import { SuccessDialog } from '../components/SuccessDialog';
+import { CreateProductDto } from '@/service/store/products/types';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -76,8 +80,8 @@ interface ProductFormValues {
   downloadLimit?: number;
   downloadExpiry?: number;
   productUrl?: string;
-  productStatus: 'pending' | 'published' | 'draft';
-  visibility: 'visible' | 'hidden';
+  productStatus: 'draft' | 'published' | 'archived';
+  visibility: 'public' | 'private' | 'password-protected';
   purchaseNote?: string;
   enableReviews: boolean;
   productImage: FileList | null;
@@ -234,6 +238,7 @@ const customResolver = (data: ProductFormValues) => {
 };
 
 export default function AddProductPage() {
+  const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
   const form = useForm<ProductFormValues>({
     resolver: customResolver,
     defaultValues: {
@@ -259,8 +264,8 @@ export default function AddProductPage() {
         height: undefined,
       },
       files: [],
-      productStatus: 'pending',
-      visibility: 'visible',
+      productStatus: 'draft',
+      visibility: 'public',
       purchaseNote: '',
       enableReviews: true,
       productImage: null,
@@ -276,24 +281,64 @@ export default function AddProductPage() {
   const { data: userListings, isLoading: isLoadingListings } =
     useGetUserListings();
 
+  const { mutate: addProduct, isPending } = useAddProduct();
+
   const productType = form.watch('productType');
 
   async function onSubmit(data: ProductFormValues) {
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      console.log('Form submitted successfully:', data);
-      toast.success('Product saved successfully!');
-      form.reset(); // Reset form after successful submission
-    } catch (error) {
-      console.error('Failed to save product:', error);
-      toast.error('Failed to save product. Please try again.');
-    }
+    const productData: CreateProductDto = {
+      bussinessId: data.businessId as string,
+      title: data.title,
+      category: data.category,
+      productType: data.productType,
+      price: data.price,
+      description: data.description,
+      sku: data.sku,
+      shortDescription: data.shortDescription,
+      imageUrl: `https://source.unsplash.com/random/800x600?sig=${Math.random()}`,
+      productUrl: data.productUrl,
+      fileUrls: [], // Note: file uploads not handled in this implementation
+      downloadLimit: data.downloadLimit,
+      downloadExpiry: data.downloadExpiry,
+      enableStockManagement: data.enableStockManagement,
+      weight: data.weight,
+      length: data.dimensions?.length,
+      width: data.dimensions?.width,
+      height: data.dimensions?.height,
+      productStatus: data.productStatus,
+      visibility: data.visibility,
+      purchaseNote: data.purchaseNote,
+      enableReviews: data.enableReviews,
+      tags: data.tags.split(',').map(tag => tag.trim()),
+    };
+
+    addProduct(productData, {
+      onSuccess: () => {
+        form.reset();
+        setIsSuccessDialogOpen(true);
+      },
+      onError: (error: Error) => {
+        console.error('Failed to save product:', error);
+        toast.error(error.message || 'Failed to save product. Please try again.', {
+          style: {
+            minWidth: '300px',
+            minHeight: '60px',
+            fontSize: '1.25rem',
+            backgroundColor: 'hsl(var(--destructive))',
+            color: 'hsl(var(--destructive-foreground))',
+          },
+        });
+      },
+    });
   }
 
   return (
     <div className="bg-gray-50 min-h-screen p-4 sm:p-6 lg:p-8 text-base">
       <div className="max-w-7xl mx-auto">
+        <SuccessDialog
+          open={isSuccessDialogOpen}
+          onOpenChange={setIsSuccessDialogOpen}
+        />
         <h1 className="text-4xl font-bold text-gray-800 mb-6">
           Add New Product
         </h1>
@@ -937,11 +982,8 @@ export default function AddProductPage() {
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem
-                                  value="pending"
-                                  className="text-base"
-                                >
-                                  Pending Review
+                                <SelectItem value="draft" className="text-base">
+                                  Draft
                                 </SelectItem>
                                 <SelectItem
                                   value="published"
@@ -949,8 +991,11 @@ export default function AddProductPage() {
                                 >
                                   Published
                                 </SelectItem>
-                                <SelectItem value="draft" className="text-base">
-                                  Draft
+                                <SelectItem
+                                  value="archived"
+                                  className="text-base"
+                                >
+                                  Archived
                                 </SelectItem>
                               </SelectContent>
                             </Select>
@@ -975,17 +1020,17 @@ export default function AddProductPage() {
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem
-                                  value="visible"
-                                  className="text-base"
-                                >
-                                  Visible
+                                <SelectItem value="public" className="text-base">
+                                  Public
+                                </SelectItem>
+                                <SelectItem value="private" className="text-base">
+                                  Private
                                 </SelectItem>
                                 <SelectItem
-                                  value="hidden"
+                                  value="password-protected"
                                   className="text-base"
                                 >
-                                  Hidden
+                                  Password Protected
                                 </SelectItem>
                               </SelectContent>
                             </Select>
@@ -1269,8 +1314,9 @@ export default function AddProductPage() {
                 type="submit"
                 size="lg"
                 className="bg-red-500 hover:bg-red-600 text-white text-lg py-7 px-8 flex items-center"
+                disabled={isPending}
               >
-                Save Product
+                {isPending ? 'Saving...' : 'Save Product'}
               </Button>
             </div>
           </form>
