@@ -78,7 +78,7 @@ export function SeasonalMarketingSection() {
       description:
         "Dominate the peak sales season. Craft compelling campaigns for Christmas, New Year's, and Valentine's Day. Emphasize gifting, celebration, and heartfelt messaging to drive conversions.",
       imageUrl:
-        'https://images.unsplash.com/photo-1489674267075-236b8de78299?q=80&w=1333&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1483664852095-d6cc6870702d?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
       bgColor: 'bg-green-700',
       textColor: 'text-white',
     },
