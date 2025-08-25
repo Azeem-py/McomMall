@@ -24,6 +24,8 @@ import { format } from 'date-fns';
 
 interface CampaignsTableProps {
   campaigns: Campaign[];
+  isLoading: boolean;
+  isError: boolean;
 }
 
 const StatusBadge = ({ status }: { status: Campaign['status'] }) => {
@@ -47,7 +49,11 @@ const StatusBadge = ({ status }: { status: Campaign['status'] }) => {
   );
 };
 
-export const CampaignsTable = ({ campaigns }: CampaignsTableProps) => {
+export const CampaignsTable = ({
+  campaigns,
+  isLoading,
+  isError,
+}: CampaignsTableProps) => {
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
       <Table>
@@ -63,7 +69,19 @@ export const CampaignsTable = ({ campaigns }: CampaignsTableProps) => {
           </TableRow>
         </TableHeader>
         <TableBody className="text-lg">
-          {campaigns.length > 0 ? (
+          {isLoading ? (
+            <TableRow>
+              <TableCell colSpan={7} className="h-24 text-center">
+                Loading campaigns...
+              </TableCell>
+            </TableRow>
+          ) : isError ? (
+            <TableRow>
+              <TableCell colSpan={7} className="h-24 text-center text-red-500">
+                Error fetching campaigns.
+              </TableCell>
+            </TableRow>
+          ) : campaigns.length > 0 ? (
             campaigns.map(campaign => (
               <TableRow key={campaign.id} className="p-2">
                 <TableCell className="font-medium">

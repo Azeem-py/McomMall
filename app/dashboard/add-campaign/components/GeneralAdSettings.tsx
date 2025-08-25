@@ -44,6 +44,8 @@ interface GeneralAdSettingsProps {
   setFormData: React.Dispatch<React.SetStateAction<AdFormData>>;
   errors: FormErrors;
   listings: SearchableSelectItem[];
+  isLoading: boolean;
+  isError: boolean;
 }
 
 // Reusable Tooltip Component
@@ -69,6 +71,8 @@ const SearchableSelect = ({
   items,
   placeholder,
   notFoundMessage,
+  isLoading,
+  isError,
 }: {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -77,6 +81,8 @@ const SearchableSelect = ({
   items: SearchableSelectItem[];
   placeholder: string;
   notFoundMessage: string;
+  isLoading?: boolean;
+  isError?: boolean;
 }) => (
   <Popover open={open} onOpenChange={setOpen}>
     <PopoverTrigger asChild>
@@ -85,8 +91,13 @@ const SearchableSelect = ({
         role="combobox"
         aria-expanded={open}
         className="w-full justify-between font-normal"
+        disabled={isLoading || isError}
       >
-        {value
+        {isLoading
+          ? 'Loading listings...'
+          : isError
+          ? 'Error fetching listings'
+          : value
           ? items.find((item: SearchableSelectItem) => item.value === value)
               ?.label
           : placeholder}
@@ -127,6 +138,8 @@ export const GeneralAdSettings = ({
   setFormData,
   errors,
   listings,
+  isLoading,
+  isError,
 }: GeneralAdSettingsProps) => {
   const [openListing, setOpenListing] = React.useState(false);
 
@@ -170,6 +183,8 @@ export const GeneralAdSettings = ({
             items={listings}
             placeholder="Search for a listing"
             notFoundMessage="No listing found."
+            isLoading={isLoading}
+            isError={isError}
           />
           {errors.listing && (
             <p className="text-red-500 text-xs mt-1">{errors.listing}</p>
