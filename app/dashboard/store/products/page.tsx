@@ -22,124 +22,8 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { ChevronRight, PlusCircle, Search, MoreHorizontal } from 'lucide-react';
+import { useGetMyProducts } from '@/service/store/products/hook';
 import { useRouter } from 'next/navigation';
-
-// --- MOCK DATA ---
-// Expanded mock data for better filtering examples
-const allProducts = [
-  {
-    id: 'prod_1',
-    name: 'Versace T-shirt',
-    image: '/placeholder-tshirt.svg',
-    status: 'Pending Review',
-    sku: 'SKU-VTS-01',
-    stock: 10,
-    price: 49.99,
-    salePrice: 44.99,
-    type: 'T-shirts',
-    brand: 'Versace',
-    views: 6,
-    date: '2025-07-28',
-  },
-  {
-    id: 'prod_2',
-    name: 'Gucci Handbag',
-    image: '/placeholder-handbag.svg',
-    status: 'Online',
-    sku: 'SKU-GUC-HB-12',
-    stock: 25,
-    price: 1250.0,
-    salePrice: 1199.99,
-    type: 'Accessories',
-    brand: 'Gucci',
-    views: 150,
-    date: '2025-07-27',
-  },
-  {
-    id: 'prod_3',
-    name: 'Nike Air Jordans',
-    image: '/placeholder-shoes.svg',
-    status: 'Draft',
-    sku: 'SKU-NIK-AJ-45',
-    stock: 50,
-    price: 180.0,
-    salePrice: 180.0,
-    type: 'Shoes',
-    brand: 'Nike',
-    views: 320,
-    date: '2025-07-26',
-  },
-  {
-    id: 'prod_4',
-    name: 'Rolex Watch',
-    image: '/placeholder-watch.svg',
-    status: 'In stock',
-    sku: 'SKU-RLX-W-88',
-    stock: 5,
-    price: 8500.0,
-    salePrice: 8500.0,
-    type: 'Watches',
-    brand: 'Rolex',
-    views: 85,
-    date: '2025-07-25',
-  },
-  {
-    id: 'prod_5',
-    name: 'Adidas Ultraboost',
-    image: '/placeholder-shoes.svg',
-    status: 'Online',
-    sku: 'SKU-ADI-UB-02',
-    stock: 150,
-    price: 160.0,
-    salePrice: 139.99,
-    type: 'Shoes',
-    brand: 'Adidas',
-    views: 550,
-    date: '2025-07-20',
-  },
-  {
-    id: 'prod_6',
-    name: "Levi's 501 Jeans",
-    image: '/placeholder-jeans.svg',
-    status: 'In stock',
-    sku: 'SKU-LVS-501-32',
-    stock: 80,
-    price: 98.0,
-    salePrice: 98.0,
-    type: 'Apparel',
-    brand: "Levi's",
-    views: 210,
-    date: '2025-07-15',
-  },
-  {
-    id: 'prod_7',
-    name: 'Prada Sunglasses',
-    image: '/placeholder-sunglasses.svg',
-    status: 'Pending Review',
-    sku: 'SKU-PRA-SG-07',
-    stock: 15,
-    price: 350.0,
-    salePrice: 320.0,
-    type: 'Accessories',
-    brand: 'Prada',
-    views: 45,
-    date: '2025-08-01',
-  },
-  {
-    id: 'prod_8',
-    name: 'Unpublished Nike T-Shirt',
-    image: '/placeholder-tshirt.svg',
-    status: 'Draft',
-    sku: 'SKU-NIK-TS-99',
-    stock: 0,
-    price: 35.0,
-    salePrice: 35.0,
-    type: 'T-shirts',
-    brand: 'Nike',
-    views: 0,
-    date: '2025-08-02',
-  },
-];
 
 // --- HELPER COMPONENTS & TYPES ---
 type ProductStatus = 'All' | 'Online' | 'Draft' | 'Pending Review' | 'In stock';
@@ -158,7 +42,11 @@ const PlaceholderImage = ({ className }: { className?: string }) => (
 );
 
 const formatDate = (dateString: string) => {
+  if (!dateString) return 'N/A';
   const date = new Date(dateString);
+  if (isNaN(date.getTime())) {
+    return 'Invalid Date';
+  }
   return new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
     month: 'long',
@@ -168,7 +56,8 @@ const formatDate = (dateString: string) => {
 
 // --- MAIN DASHBOARD COMPONENT ---
 export default function StoreDashboard() {
-  const [products, setProducts] = React.useState(allProducts);
+  // --- STATE MANAGEMENT ---
+  const { data: products = [], isLoading, isError, error } = useGetMyProducts();
   const [activeTab, setActiveTab] = React.useState<ProductStatus>('All');
   const [searchTerm, setSearchTerm] = React.useState('');
   const [selectedCategory, setSelectedCategory] = React.useState('all');
@@ -179,25 +68,26 @@ export default function StoreDashboard() {
 
   // --- FILTERING LOGIC ---
   const filteredProducts = React.useMemo(() => {
+    if (!products) return [];
     let tempProducts = [...products];
 
     // 1. Filter by active tab
     if (activeTab !== 'All') {
-      tempProducts = tempProducts.filter(p => p.status === activeTab);
+      tempProducts = tempProducts.filter(p => p.productStatus === activeTab);
     }
 
     // 2. Filter by search term (name or SKU)
     if (searchTerm) {
       tempProducts = tempProducts.filter(
         p =>
-          p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
           p.sku.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     // 3. Filter by category
     if (selectedCategory !== 'all') {
-      tempProducts = tempProducts.filter(p => p.type === selectedCategory);
+      tempProducts = tempProducts.filter(p => p.category === selectedCategory);
     }
 
     // 4. Filter by brand
@@ -236,7 +126,7 @@ export default function StoreDashboard() {
     if (action === 'delete') {
       // In a real app, you'd call an API here.
       console.log('Deleting products:', selectedRows);
-      setProducts(prev => prev.filter(p => !selectedRows.includes(p.id)));
+      // setProducts(prev => prev.filter(p => !selectedRows.includes(p.id)));
       setSelectedRows([]);
     }
     // Add logic for other bulk actions like 'publish' or 'unpublish' here.
@@ -251,10 +141,14 @@ export default function StoreDashboard() {
     'Pending Review',
     'In stock',
   ];
-  const categories = [...new Set(allProducts.map(p => p.type))];
-  const brands = [...new Set(allProducts.map(p => p.brand))];
+  const categories = [...new Set((products || []).map(p => p.category))];
+  const brands = [...new Set((products || []).map(p => p.brand))].filter(
+    (b): b is string => b !== undefined
+  );
   const isAllSelected =
-    selectedRows.length > 0 && selectedRows.length === filteredProducts.length;
+    selectedRows.length > 0 &&
+    filteredProducts &&
+    selectedRows.length === filteredProducts.length;
 
   return (
     <>
@@ -319,8 +213,9 @@ export default function StoreDashboard() {
                   >
                     {tab} (
                     {tab === 'All'
-                      ? products.length
-                      : products.filter(p => p.status === tab).length}
+                      ? products?.length || 0
+                      : products?.filter(p => p.productStatus === tab).length ||
+                        0}
                     )
                   </button>
                 ))}
@@ -447,12 +342,29 @@ export default function StoreDashboard() {
                   </TableRow>
                 </TableHeader>
                 <TableBody className="block md:table-row-group">
-                  {filteredProducts.length > 0 ? (
+                  {isLoading ? (
+                    <TableRow>
+                      <TableCell colSpan={11} className="h-24 text-center">
+                        Loading products...
+                      </TableCell>
+                    </TableRow>
+                  ) : isError ? (
+                    <TableRow>
+                      <TableCell
+                        colSpan={11}
+                        className="h-24 text-center text-red-500"
+                      >
+                        Error loading products: {error.message}
+                      </TableCell>
+                    </TableRow>
+                  ) : filteredProducts.length > 0 ? (
                     filteredProducts.map(product => (
                       <TableRow
                         key={product.id}
                         className={`mobile-table-card md:table-row ${
-                          product.status === 'Pending Review' ? 'bg-red-50' : ''
+                          product.productStatus === 'Pending Review'
+                            ? 'bg-red-50'
+                            : ''
                         }`}
                         data-state={
                           selectedRows.includes(product.id) ? 'selected' : ''
@@ -464,7 +376,7 @@ export default function StoreDashboard() {
                             onCheckedChange={checked =>
                               handleSelectRow(product.id, !!checked)
                             }
-                            aria-label={`Select row for ${product.name}`}
+                            aria-label={`Select row for ${product.title}`}
                           />
                         </TableCell>
                         <TableCell
@@ -472,14 +384,22 @@ export default function StoreDashboard() {
                           className="mobile-table-cell md:table-cell"
                         >
                           <div className="w-10 h-10 bg-gray-200 rounded-md flex items-center justify-center">
-                            <PlaceholderImage className="w-8 h-8 text-gray-400" />
+                            {product.imageUrl ? (
+                              <img
+                                src={product.imageUrl}
+                                alt={product.title}
+                                className="w-full h-full object-cover rounded-md"
+                              />
+                            ) : (
+                              <PlaceholderImage className="w-8 h-8 text-gray-400" />
+                            )}
                           </div>
                         </TableCell>
                         <TableCell
                           data-label="Name"
                           className="mobile-table-cell md:table-cell font-medium text-gray-800"
                         >
-                          {product.name}
+                          {product.title}
                         </TableCell>
                         <TableCell
                           data-label="Status"
@@ -487,21 +407,21 @@ export default function StoreDashboard() {
                         >
                           <Badge
                             variant={
-                              product.status === 'Pending Review'
+                              product.productStatus === 'Pending Review'
                                 ? 'destructive'
-                                : product.status === 'Online' ||
-                                  product.status === 'In stock'
+                                : product.productStatus === 'Online' ||
+                                  product.productStatus === 'In stock'
                                 ? 'default'
                                 : 'secondary'
                             }
                             className={
-                              product.status === 'Online' ||
-                              product.status === 'In stock'
+                              product.productStatus === 'Online' ||
+                              product.productStatus === 'In stock'
                                 ? 'bg-green-100 text-green-800'
                                 : ''
                             }
                           >
-                            {product.status}
+                            {product.productStatus}
                           </Badge>
                         </TableCell>
                         <TableCell
@@ -514,7 +434,7 @@ export default function StoreDashboard() {
                           data-label="Stock"
                           className="mobile-table-cell md:table-cell text-gray-600"
                         >
-                          {product.stock > 0 ? (
+                          {product.stock && product.stock > 0 ? (
                             <span className="text-green-600 font-semibold">
                               In stock
                             </span>
@@ -523,39 +443,46 @@ export default function StoreDashboard() {
                               Out of stock
                             </span>
                           )}
-                          {` (${product.stock})`}
+                          {` (${product.stock || 0})`}
                         </TableCell>
                         <TableCell
                           data-label="Price"
                           className="mobile-table-cell md:table-cell text-gray-600"
                         >
                           <div className="flex flex-col items-end md:items-start">
-                            {product.price !== product.salePrice && (
-                              <span className="line-through text-gray-400">
-                                ${product.price.toFixed(2)}
-                              </span>
-                            )}
-                            <span>${product.salePrice.toFixed(2)}</span>
+                            {product.price !== product.salePrice &&
+                              product.salePrice && (
+                                <span className="line-through text-gray-400">
+                                  ${product.price.toFixed(2)}
+                                </span>
+                              )}
+                            <span>
+                              ${(product.salePrice || product.price).toFixed(2)}
+                            </span>
                           </div>
                         </TableCell>
                         <TableCell
                           data-label="Type"
                           className="mobile-table-cell md:table-cell lg:table-cell hidden text-gray-600"
                         >
-                          {product.type}
+                          {product.category}
                         </TableCell>
                         <TableCell
                           data-label="Views"
                           className="mobile-table-cell md:table-cell lg:table-cell hidden text-gray-600"
                         >
-                          {product.views}
+                          {product.views || 0}
                         </TableCell>
                         <TableCell
                           data-label="Date"
                           className="mobile-table-cell md:table-cell text-gray-600"
                         >
                           <div className="flex flex-col text-xs items-end md:items-start">
-                            <span>{formatDate(product.date)}</span>
+                            <span>
+                              {formatDate(
+                                product.updatedAt || product.createdAt || ''
+                              )}
+                            </span>
                             <span className="text-gray-400">Last Modified</span>
                           </div>
                         </TableCell>
