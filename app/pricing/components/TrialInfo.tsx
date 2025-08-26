@@ -19,7 +19,7 @@ export default function TrialInfo() {
         </CardHeader>
         <CardContent>
           <p className="text-gray-700">
-            Try any selected plan with a 30-day free trial requiring only a £1
+            Try any selected plan with a 30-day trial requiring only a £1
             verification fee. The full subscription payment will be deferred
             until the end of the trial period.
           </p>
