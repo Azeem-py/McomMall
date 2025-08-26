@@ -2,6 +2,7 @@
 'use client';
 import Image from 'next/image';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import LocationSection from './locationSection';
 import {
   GooglePlaceResult,
@@ -160,24 +161,33 @@ function OverviewSection({
           <h3 className="text-xl font-bold border-t pt-6">Products</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
             {listing.products.map(product => (
-              <div key={product.id} className="border rounded-lg p-4">
-                {product.imageUrl && (
-                  <div className="relative w-full h-32 mb-2">
-                    <Image
-                      src={product.imageUrl}
-                      alt={product.title}
-                      layout="fill"
-                      className="object-cover rounded-md"
-                    />
-                  </div>
-                )}
-                <h4 className="font-semibold">{product.title}</h4>
-                <p className="text-gray-600">£{product.price.toFixed(2)}</p>
-                {product.shortDescription && (
-                  <p className="text-sm text-gray-500 mt-1">
-                    {product.shortDescription}
-                  </p>
-                )}
+              <div
+                key={product.id}
+                className="border rounded-lg p-4 flex flex-col"
+              >
+                <div className="relative w-full h-32 mb-2">
+                  <Image
+                    src={
+                      product.imageUrl ||
+                      'https://plus.unsplash.com/premium_photo-1664392147011-2a720f214e01?q=80&w=878&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
+                    }
+                    alt={product.title}
+                    layout="fill"
+                    className="object-cover rounded-md"
+                  />
+                </div>
+                <div className="flex-grow">
+                  <h4 className="font-semibold">{product.title}</h4>
+                  <p className="text-gray-600">£{product.price.toFixed(2)}</p>
+                  {product.shortDescription && (
+                    <p className="text-sm text-gray-500 mt-1">
+                      {product.shortDescription}
+                    </p>
+                  )}
+                </div>
+                <Button className="w-full mt-2 bg-red-500 hover:bg-red-600 text-white">
+                  Order Now
+                </Button>
               </div>
             ))}
           </div>
