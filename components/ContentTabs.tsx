@@ -21,6 +21,17 @@ function OverviewSection({
   listing: GooglePlaceResult | InHouseBusiness;
 }) {
   const isGoogle = isGoogleResult(listing);
+
+  const formatTime = (timeString: string) => {
+    if (!timeString) return '';
+    const [hours, minutes] = timeString.split(':');
+    let h = parseInt(hours, 10);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12;
+    h = h ? h : 12; // the hour '0' should be '12'
+    return `${h}:${minutes} ${ampm}`;
+  };
+
   const daysOfWeek = [
     'Sunday',
     'Monday',
@@ -80,7 +91,9 @@ function OverviewSection({
                   <span>
                     {hour.is24h
                       ? '24 Hours'
-                      : `${hour.openTime} - ${hour.closeTime}`}
+                      : `${formatTime(hour.openTime)} - ${formatTime(
+                          hour.closeTime
+                        )}`}
                   </span>
                 </li>
               ))}
