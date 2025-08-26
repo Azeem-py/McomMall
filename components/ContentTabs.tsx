@@ -1,5 +1,6 @@
 // app/components/listing-detail/ContentTabs.tsx
 'use client';
+import Image from 'next/image';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import LocationSection from './locationSection';
 import {
@@ -150,6 +151,35 @@ function OverviewSection({
                 </a>
               </p>
             )}
+          </div>
+        </div>
+      )}
+
+      {listing.products && listing.products.length > 0 && (
+        <div>
+          <h3 className="text-xl font-bold border-t pt-6">Products</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
+            {listing.products.map(product => (
+              <div key={product.id} className="border rounded-lg p-4">
+                {product.imageUrl && (
+                  <div className="relative w-full h-32 mb-2">
+                    <Image
+                      src={product.imageUrl}
+                      alt={product.title}
+                      layout="fill"
+                      className="object-cover rounded-md"
+                    />
+                  </div>
+                )}
+                <h4 className="font-semibold">{product.title}</h4>
+                <p className="text-gray-600">£{product.price.toFixed(2)}</p>
+                {product.shortDescription && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    {product.shortDescription}
+                  </p>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       )}
