@@ -232,8 +232,20 @@ export default function PayAsYouGoContent({
       <h1 className="text-3xl md:text-4xl font-bold mb-8 text-blue-900">
         Pay As You Go Pricing
       </h1>
-      <section className="flex flex-col items-center">
-        <TrialInfo />
+      <section className="w-full flex flex-col lg:flex-row items-center justify-center mb-12 gap-8">
+        <div className="lg:w-1/2">
+          <TrialInfo />
+        </div>
+        <div className="w-full lg:w-1/2 aspect-video">
+          <iframe
+            className="w-full h-full rounded-lg shadow-md"
+            src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+            title="Demo Video"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          ></iframe>
+        </div>
       </section>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 h-fit">
         {paygTiers.map((tier, index) => (
