@@ -21,6 +21,15 @@ function OverviewSection({
   listing: GooglePlaceResult | InHouseBusiness;
 }) {
   const isGoogle = isGoogleResult(listing);
+  const daysOfWeek = [
+    'Sunday',
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+  ];
 
   if (isGoogle) {
     return (
@@ -56,6 +65,82 @@ function OverviewSection({
           {listing.about || listing.shortDescription}
         </p>
       </div>
+
+      {listing.businessHours && listing.businessHours.length > 0 && (
+        <div>
+          <h3 className="text-xl font-bold border-t pt-6">
+            Opening Hours
+          </h3>
+          <ul className="text-gray-700 mt-2 space-y-1">
+            {listing.businessHours
+              .sort((a, b) => a.dayOfWeek - b.dayOfWeek)
+              .map(hour => (
+                <li key={hour.id} className="flex justify-between">
+                  <span>{daysOfWeek[hour.dayOfWeek]}</span>
+                  <span>
+                    {hour.is24h
+                      ? '24 Hours'
+                      : `${hour.openTime} - ${hour.closeTime}`}
+                  </span>
+                </li>
+              ))}
+          </ul>
+        </div>
+      )}
+
+      {listing.productSellerProfile && (
+        <div>
+          <h3 className="text-xl font-bold border-t pt-6">
+            Seller Information
+          </h3>
+          <div className="text-gray-700 mt-2 space-y-2">
+            <p>
+              <strong>Selling Modes:</strong>{' '}
+              {listing.productSellerProfile.sellingModes.join(', ')}
+            </p>
+            {listing.productSellerProfile.returnsPolicy && (
+              <p>
+                <strong>Returns Policy:</strong>{' '}
+                {listing.productSellerProfile.returnsPolicy}
+              </p>
+            )}
+            {listing.productSellerProfile.fulfilmentNotes && (
+              <p>
+                <strong>Fulfilment Notes:</strong>{' '}
+                {listing.productSellerProfile.fulfilmentNotes}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {listing.serviceProviderProfile && (
+        <div>
+          <h3 className="text-xl font-bold border-t pt-6">
+            Service Information
+          </h3>
+          <div className="text-gray-700 mt-2 space-y-2">
+            <p>
+              <strong>Booking Method:</strong>{' '}
+              {listing.serviceProviderProfile.bookingMethod}
+            </p>
+            {listing.serviceProviderProfile.bookingUrl && (
+              <p>
+                <strong>Book Online:</strong>{' '}
+                <a
+                  href={listing.serviceProviderProfile.bookingUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-red-500 hover:underline"
+                >
+                  {listing.serviceProviderProfile.bookingUrl}
+                </a>
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
       {(listing.website || listing.businessEmail) && (
         <div>
           <h3 className="text-xl font-bold border-t pt-6">
