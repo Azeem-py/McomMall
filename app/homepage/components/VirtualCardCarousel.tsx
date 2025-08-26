@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardFooter } from '../../../components/ui/card';
 import { Button } from '../../../components/ui/button';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import Image from 'next/image';
 import { Mail, Phone, MapPin, Calendar, Share2, Download } from 'lucide-react';
 
@@ -74,9 +74,9 @@ const shineAnim = {
   initial: { x: -200 },
   animate: { x: 600 },
   transition: { repeat: Infinity, duration: 3.6, ease: 'easeInOut' },
-};
+} as const;
 
-const cardTilt = {
+const cardTilt: Variants = {
   rest: { rotateX: 0, rotateY: 0, scale: 1 },
   hover: {
     rotateX: -3,
@@ -176,7 +176,9 @@ export default function McomEgiftCard() {
                 {/* SHINE SWEEP */}
                 <motion.div
                   className="pointer-events-none absolute -top-10 -left-40 h-[140%] w-24 rotate-12 bg-white/25 blur-xl"
-                  {...shineAnim}
+                  initial={shineAnim.initial}
+                  animate={shineAnim.animate}
+                  transition={shineAnim.transition}
                 />
 
                 {/* HEADER */}

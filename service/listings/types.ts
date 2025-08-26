@@ -100,7 +100,7 @@ interface Category {
   description: string | null;
 }
 
-interface Location {
+export interface Location {
   id: string;
   created_at: string;
   updated_at: string;
