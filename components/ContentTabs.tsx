@@ -1,9 +1,6 @@
 // app/components/listing-detail/ContentTabs.tsx
 'use client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ParkingCircle, Briefcase, PawPrint } from 'lucide-react';
-import type { DetailedListing } from '@/lib/listing-data';
-import ReviewsSection from './ReviewSection';
 import LocationSection from './locationSection';
 import {
   GooglePlaceResult,
@@ -18,27 +15,66 @@ function isGoogleResult(
 }
 
 // You would create more detailed components for each tab
-function OverviewSection({ listing }: { listing: DetailedListing }) {
+function OverviewSection({
+  listing,
+}: {
+  listing: GooglePlaceResult | InHouseBusiness;
+}) {
+  const isGoogle = isGoogleResult(listing);
+
+  if (isGoogle) {
+    return (
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-lg font-semibold">Business Status</h3>
+          <p className="text-gray-600">{listing.business_status}</p>
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold">Types</h3>
+          <p className="text-gray-600">{listing.types?.join(', ')}</p>
+        </div>
+        {listing.opening_hours && (
+          <div>
+            <h3 className="text-lg font-semibold">Availability</h3>
+            <p className="text-gray-600">
+              {listing.opening_hours.open_now ? 'Open Now' : 'Closed'}
+            </p>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // InHouseBusiness
   return (
     <div className="space-y-6">
-      <p className="text-gray-700 leading-relaxed">{listing.description}</p>
-      <h3 className="text-xl font-bold border-t pt-6">Features</h3>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        {listing.features.map(feature => (
-          <div key={feature.name} className="flex items-center space-x-2">
-            {feature.icon === 'Parking' && (
-              <ParkingCircle className="h-5 w-5 text-red-500" />
-            )}
-            {feature.icon === 'Workspace' && (
-              <Briefcase className="h-5 w-5 text-red-500" />
-            )}
-            {feature.icon === 'Pet' && (
-              <PawPrint className="h-5 w-5 text-red-500" />
-            )}
-            <span className="text-gray-600">{feature.name}</span>
-          </div>
-        ))}
+      <div>
+        <h3 className="text-xl font-bold">
+          About {listing.businessName}
+        </h3>
+        <p className="text-gray-700 leading-relaxed mt-2">
+          {listing.about || listing.shortDescription}
+        </p>
       </div>
+      {(listing.website || listing.businessEmail) && (
+        <div>
+          <h3 className="text-xl font-bold border-t pt-6">
+            Contact Information
+          </h3>
+          <div className="flex flex-col space-y-2 mt-2">
+            {listing.website && (
+              <a
+                href={listing.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-red-500 hover:underline"
+              >
+                {listing.website}
+              </a>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -66,7 +102,7 @@ export default function ContentTabs({
         <TabsTrigger value="reviews">Reviews</TabsTrigger>
       </TabsList>
       <TabsContent value="overview">
-        {/* <OverviewSection listing={listing} /> */}
+        <OverviewSection listing={listing} />
       </TabsContent>
       <TabsContent value="location">
         <LocationSection listing={location} address={address} />
