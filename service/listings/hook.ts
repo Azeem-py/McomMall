@@ -52,6 +52,28 @@ export const useGetGoogleListings = ({
   return query;
 };
 
+export const useGetBusinessData = ({ id }: { id: string }) => {
+  const fetcher = async () => {
+    try {
+      const response = await api.get(`listings/${id}`);
+      return response.data;
+    } catch (error: unknown) {
+      const err = error as ErrorResponse;
+      throw new Error(
+        err.response?.data?.message || err.message || 'Failed to fetch business'
+      );
+    }
+  };
+
+  const query = useQuery({
+    queryFn: fetcher,
+    queryKey: ['FETCH_BUSINESS_DATA', id],
+    enabled: !!id,
+  });
+
+  return query;
+};
+
 export const useGetInHouseBusiness = ({
   queryText,
 }: {

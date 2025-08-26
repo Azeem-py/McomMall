@@ -92,8 +92,13 @@ export default function ListingCard({
     ? listing.name
     : listing.logoAltText || listing.businessName;
 
+  const listingId = isGoogle ? place_id : listing.id;
+  const href = isGoogle
+    ? `/listings/${listingId}`
+    : `/listings/${listingId}?source=in-house`;
+
   return (
-    <Link href={`/listings/${place_id}`} className="block">
+    <Link href={href} className="block">
       <Card className="w-full overflow-hidden shadow-md border rounded-xl hover:shadow-xl transition-shadow duration-300">
         <div className="relative">
           {/* Category Tag */}
