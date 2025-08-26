@@ -139,7 +139,7 @@ export default function ClientListingDetail({
                   phoneNumber={
                     isGoogle
                       ? listing.formatted_phone_number || ''
-                      : listing.businessPhoneNumber
+                      : listing.businessPhone
                   }
                   priceDisplay={String(listing?.price_level ?? '')}
                   author={{
