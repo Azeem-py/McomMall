@@ -29,6 +29,7 @@ import Autumn from '@/public/homepage/AutumnBanner.png';
 import Image from 'next/image';
 import { McomEgiftCard } from '../homepage/components/McomEgiftCard';
 import VirtualCardCarousel from '../homepage/components/VirtualCardCarousel';
+import HowItWorks from '../homepage/components/HowItWorks';
 
 // --- Helper Components ---
 const ScrollAnimatedSection = ({ children }: { children: React.ReactNode }) => {
@@ -324,6 +325,8 @@ export default function HomePage() {
             </motion.div>
           </div>
         </section>
+
+        <HowItWorks />
 
         {/* --- Categories Section --- */}
 
