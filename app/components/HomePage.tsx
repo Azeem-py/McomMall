@@ -417,7 +417,7 @@ export default function HomePage() {
         <StockAuditSection />
         <McomEgiftCard />
         <VirtualCardCarousel />
-        <McomVCardEGiftCardsSection />
+        {/* <McomVCardEGiftCardsSection /> */}
         <McomVouchersCouponsSection />
         <McomMallBrandsSection />
         {/* NEW SECTION ENDS */}
