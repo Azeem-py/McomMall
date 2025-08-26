@@ -1,7 +1,7 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { Star, Bookmark, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Star, Bookmark, CheckCircle } from 'lucide-react';
 
 import {
   useGetBusinessData,
