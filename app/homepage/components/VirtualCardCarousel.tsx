@@ -5,14 +5,6 @@ import { motion, Variants } from 'framer-motion';
 import Image from 'next/image';
 import { Mail, Phone, MapPin, Calendar, Share2, Download } from 'lucide-react';
 
-// ————————————————————————————————————————————
-// HYPER VIRTUAL CARD REDESIGN
-// - Bigger, unified dimensions
-// - Animated gradients, glass layers, SVG patterns
-// - Playful accents, chips, and glow rings
-// - Equal heights across all cards
-// ————————————————————————————————————————————
-
 const people = [
   {
     name: 'Ezra Miller',
