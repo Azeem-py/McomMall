@@ -6,6 +6,7 @@ import {
   CreateBusinessPayload,
   GooglePlaceResult,
   GooglePlaceResults,
+  InHouseBusinessResults,
 } from './types';
 
 export interface ErrorResponse {
@@ -46,6 +47,58 @@ export const useGetGoogleListings = ({
     queryFn: fetch,
     queryKey: ['FETCH_GOOGLE_BUSINESSES', lat, lng, queryText],
     enabled: lat && lng ? true : false,
+    refetchOnMount: false,
+  });
+  return query;
+};
+
+export const useGetBusinessData = ({ id }: { id: string }) => {
+  const fetcher = async () => {
+    try {
+      const response = await api.get(`listings/${id}`);
+      return response.data;
+    } catch (error: unknown) {
+      const err = error as ErrorResponse;
+      throw new Error(
+        err.response?.data?.message || err.message || 'Failed to fetch business'
+      );
+    }
+  };
+
+  const query = useQuery({
+    queryFn: fetcher,
+    queryKey: ['FETCH_BUSINESS_DATA', id],
+    enabled: !!id,
+  });
+
+  return query;
+};
+
+export const useGetInHouseBusiness = ({
+  queryText,
+}: {
+  queryText: string | null;
+}) => {
+  const fetcher = async () => {
+    try {
+      const response = await api.get('listings/search', {
+        params: { queryText },
+      });
+      return response.data as InHouseBusinessResults;
+    } catch (error: unknown) {
+      const err = error as ErrorResponse;
+      throw new Error(
+        err.response?.data?.message ||
+          err.message ||
+          'Failed to fetch in-house businesses'
+      );
+    }
+  };
+
+  const query = useQuery({
+    queryFn: fetcher,
+    queryKey: ['FETCH_IN_HOUSE_BUSINESSES', queryText],
+    enabled: !!queryText,
     refetchOnMount: false,
   });
   return query;

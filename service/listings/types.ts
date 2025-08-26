@@ -15,7 +15,7 @@ export interface Geometry {
   };
 }
 
-interface Photo {
+export interface Photo {
   height: number;
   width: number;
   html_attributions: string[];
@@ -100,7 +100,7 @@ interface Category {
   description: string | null;
 }
 
-interface Location {
+export interface Location {
   id: string;
   created_at: string;
   updated_at: string;
@@ -108,6 +108,8 @@ interface Location {
   addressLine1: string;
   addressLine2: string | null;
   city: string;
+  lat: number;
+  lng: number;
   showPublicly: boolean;
   deliveryRadiusKm: number | null;
   servicePostcodes: string[];
@@ -239,3 +241,139 @@ export interface CreateBusinessPayload {
   productSellerProfile?: ProductSellerProfilePayload;
   serviceProviderProfile?: ServiceProviderProfilePayload;
 }
+
+export type BusinessStatus = 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
+
+// --- Detailed In-House Business Types ---
+
+export interface SocialLink {
+  id: string;
+  platform: string;
+  url: string;
+}
+
+export interface BusinessHour {
+  id: string;
+  dayOfWeek: DayOfWeek;
+  openTime: string;
+  closeTime: string;
+  is24h: boolean;
+}
+
+export interface SpecialDay {
+  id: string;
+  date: string;
+  description: string;
+  isOpen: boolean;
+  openTime?: string;
+  closeTime?: string;
+}
+
+export interface StorefrontLink {
+  id: string;
+  platform: StorefrontPlatform;
+  url: string;
+}
+
+export interface ProductSellerProfile {
+  id: string;
+  sellingModes: SellingMode[];
+  fulfilmentNotes?: string;
+  returnsPolicy?: string;
+  hasAgeRestrictedItems: boolean;
+  storefrontLinks: StorefrontLink[];
+}
+
+export interface Certification {
+  id: string;
+  name: string;
+  fileUrl: string;
+}
+
+export interface ServiceProviderProfile {
+  id: string;
+  bookingMethod: BookingMethod;
+  bookingUrl?: string;
+  fixedPriceFrom?: number;
+  hourlyRateFrom?: number;
+  quoteOnly: boolean;
+  hasPublicLiabilityInsurance: boolean;
+  insuranceProvider?: string;
+  insuranceExpiryDate?: string;
+  certifications: Certification[];
+}
+
+export interface Product {
+  id: string;
+  title: string;
+  productType: string;
+  price: number;
+  shortDescription?: string;
+  description: string;
+  imageUrl?: string;
+  productUrl?: string;
+  fileUrls?: string[];
+  downloadLimit: number;
+  downloadExpiry: number;
+  sku?: string;
+  enableStockManagement: boolean;
+  weight: number;
+  length: number;
+  width: number;
+  height: number;
+  productStatus: string;
+  visibility: string;
+  purchaseNote?: string;
+  enableReviews: boolean;
+  tags?: string[];
+  category: string;
+}
+
+export type CampaignType = string;
+export type AdPlacement = string;
+
+export interface Campaign {
+  id: string;
+  type: CampaignType;
+  startDate: string;
+  budget: number;
+  displayOnlyIfCategory?: string;
+  displayOnlyIfRegion?: string;
+  enabledForLoggedInUser: boolean;
+  adPlacement: AdPlacement[];
+}
+
+export interface InHouseBusiness {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  listingType: ListingType[];
+  businessName: string;
+  legalName?: string;
+  companyRegistrationNumber?: string;
+  vatNumber?: string;
+  shortDescription: string;
+  about?: string;
+  website?: string;
+  businessPhone: string;
+  businessEmail?: string;
+  logoUrl?: string;
+  bannerUrl?: string;
+  logoAltText?: string;
+  bannerAltText?: string;
+  status: BusinessStatus;
+  googlePlaceId?: string;
+  isGoogleVerified: boolean;
+  location: Location;
+  categories: Category[];
+  socialLinks: SocialLink[];
+  businessHours: BusinessHour[];
+  specialDays: SpecialDay[];
+  productSellerProfile?: ProductSellerProfile;
+  serviceProviderProfile?: ServiceProviderProfile;
+  products: Product[];
+  campaigns: Campaign[];
+  user: User;
+}
+
+export type InHouseBusinessResults = InHouseBusiness[];

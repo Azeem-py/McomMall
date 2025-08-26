@@ -27,6 +27,8 @@ import Summer from '@/public/homepage/SummerBanner.png';
 import Spring from '@/public/homepage/SpringBanner.png';
 import Autumn from '@/public/homepage/AutumnBanner.png';
 import Image from 'next/image';
+import { McomEgiftCard } from '../homepage/components/McomEgiftCard';
+import VirtualCardCarousel from '../homepage/components/VirtualCardCarousel';
 
 // --- Helper Components ---
 const ScrollAnimatedSection = ({ children }: { children: React.ReactNode }) => {
@@ -355,7 +357,7 @@ export default function HomePage() {
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 max-w-6xl mx-auto"
             >
               <AnimatePresence>
-                {filteredAds.map((ad, index) => (
+                {filteredAds.map(ad => (
                   <motion.div
                     key={ad.title}
                     layout
@@ -365,9 +367,11 @@ export default function HomePage() {
                     transition={{ duration: 0.3 }}
                     className="bg-white rounded-2xl shadow-md overflow-hidden flex flex-col sm:flex-row gap-4 p-4 hover:shadow-xl transition-shadow"
                   >
-                    <img
+                    <Image
                       src={ad.image}
                       alt={ad.title}
+                      width={100}
+                      height={100}
                       className="w-full sm:w-1/3 h-48 sm:h-full object-cover rounded-lg"
                     />
                     <div className="flex flex-col justify-between w-full">
@@ -408,6 +412,8 @@ export default function HomePage() {
         {/* <BusinessTrustSection /> */}
         <LoyaltyProgramSection />
         <StockAuditSection />
+        <McomEgiftCard />
+        <VirtualCardCarousel />
         <McomVCardEGiftCardsSection />
         <McomVouchersCouponsSection />
         <McomMallBrandsSection />

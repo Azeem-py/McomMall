@@ -21,7 +21,17 @@ import { categories, listings } from '@/lib/listing-data';
 import FilterSidebar, { type FilterState } from '@/components/FilterSidebar';
 import CategoryFilter from '@/components/CategoryFilter';
 import ListingCard from '@/components/listingCard';
-import { useGetGoogleListings } from '@/service/listings/hook';
+import {
+  useGetGoogleListings,
+  useGetInHouseBusiness,
+} from '@/service/listings/hook';
+import { InHouseBusiness, GooglePlaceResult } from '@/service/listings/types';
+
+function isGoogleResult(
+  listing: GooglePlaceResult | InHouseBusiness
+): listing is GooglePlaceResult {
+  return 'place_id' in listing;
+}
 
 const initialFilters: FilterState = {
   searchTerm: '',
@@ -76,11 +86,32 @@ function ListingsPageContent() {
   const [activeFilters, setActiveFilters] =
     useState<FilterState>(initialFilters);
 
-  const { isLoading, isSuccess, data } = useGetGoogleListings({
+  const {
+    isLoading: isInHouseLoading,
+    isSuccess: isInHouseSuccess,
+    data: inHouseData,
+  } = useGetInHouseBusiness({
+    queryText: activeFilters.searchTerm || queryText,
+  });
+
+  const {
+    isLoading: isGoogleLoading,
+    isSuccess: isGoogleSuccess,
+    data: googleData,
+  } = useGetGoogleListings({
     queryText: activeFilters.searchTerm || queryText,
     lat: coords.lat,
     lng: coords.lng,
   });
+
+  const combinedListings = useMemo(() => {
+    const inHouseResults = inHouseData || [];
+    const googleResults = googleData || [];
+    return [...inHouseResults, ...googleResults];
+  }, [inHouseData, googleData]);
+
+  const isLoading = isInHouseLoading || isGoogleLoading;
+  const isSuccess = isInHouseSuccess || isGoogleSuccess;
 
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -99,6 +130,28 @@ function ListingsPageContent() {
     []
   );
 
+  const listingsForMap = useMemo(
+    () =>
+      combinedListings.filter(l => {
+        if (isGoogleResult(l)) {
+          return l.geometry?.location?.lat && l.geometry?.location?.lng;
+        }
+        return l.location?.lat != null && l.location?.lng != null;
+      }),
+    [combinedListings]
+  );
+
+  const mapCenter: [number, number] = useMemo(() => {
+    if (listingsForMap.length > 0) {
+      const first = listingsForMap[0];
+      if (isGoogleResult(first)) {
+        return [first.geometry.location.lat, first.geometry.location.lng];
+      }
+      return [first.location.lat, first.location.lng];
+    }
+    return [coords.lat, coords.lng];
+  }, [listingsForMap, coords]);
+
   const handleFilterChange = (newFilters: FilterState) => {
     setActiveFilters(newFilters);
     setCurrentPage(1);
@@ -109,7 +162,7 @@ function ListingsPageContent() {
     window.history.pushState(null, '', `?${params.toString()}`);
   };
 
-  const totalPages = Math.ceil((data?.length || 0) / listingsPerPage);
+  const totalPages = Math.ceil((combinedListings?.length || 0) / listingsPerPage);
 
   if (isLoading) return <p>Loading...</p>;
 
@@ -175,7 +228,7 @@ function ListingsPageContent() {
 
           <div className="flex-1 flex overflow-hidden">
             <div className="flex-1 p-4 overflow-y-auto">
-              {data && data.length === 0 ? (
+              {combinedListings && combinedListings.length === 0 ? (
                 <div className="text-center">
                   <h2 className="text-2xl font-semibold mb-4">
                     No listings found
@@ -193,10 +246,14 @@ function ListingsPageContent() {
               ) : (
                 <>
                   <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                    {data &&
-                      data.map(listing => (
+                    {combinedListings &&
+                      combinedListings.map(listing => (
                         <ListingCard
-                          key={listing.place_id}
+                          key={
+                            isGoogleResult(listing)
+                              ? listing.place_id
+                              : listing.id
+                          }
                           listing={listing}
                         />
                       ))}
@@ -223,17 +280,7 @@ function ListingsPageContent() {
               )}
             </div>
             <div className="w-1/3 h-full flex-shrink-0 hidden lg:block">
-              <MapComponent
-                listings={data ?? []}
-                center={
-                  data && data.length > 0
-                    ? [
-                        data[0].geometry.location.lat,
-                        data[0].geometry.location.lng,
-                      ]
-                    : [coords.lat, coords.lng]
-                }
-              />
+              <MapComponent listings={listingsForMap} center={mapCenter} />
             </div>
           </div>
         </main>
