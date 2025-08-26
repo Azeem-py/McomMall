@@ -130,6 +130,28 @@ function ListingsPageContent() {
     []
   );
 
+  const listingsForMap = useMemo(
+    () =>
+      combinedListings.filter(l => {
+        if (isGoogleResult(l)) {
+          return l.geometry?.location?.lat && l.geometry?.location?.lng;
+        }
+        return l.location?.lat != null && l.location?.lng != null;
+      }),
+    [combinedListings]
+  );
+
+  const mapCenter: [number, number] = useMemo(() => {
+    if (listingsForMap.length > 0) {
+      const first = listingsForMap[0];
+      if (isGoogleResult(first)) {
+        return [first.geometry.location.lat, first.geometry.location.lng];
+      }
+      return [first.location.lat, first.location.lng];
+    }
+    return [coords.lat, coords.lng];
+  }, [listingsForMap, coords]);
+
   const handleFilterChange = (newFilters: FilterState) => {
     setActiveFilters(newFilters);
     setCurrentPage(1);
@@ -258,22 +280,7 @@ function ListingsPageContent() {
               )}
             </div>
             <div className="w-1/3 h-full flex-shrink-0 hidden lg:block">
-              <MapComponent
-                listings={combinedListings ?? []}
-                center={
-                  combinedListings && combinedListings.length > 0
-                    ? isGoogleResult(combinedListings[0])
-                      ? [
-                          combinedListings[0].geometry.location.lat,
-                          combinedListings[0].geometry.location.lng,
-                        ]
-                      : [
-                          combinedListings[0].location.lat,
-                          combinedListings[0].location.lng,
-                        ]
-                    : [coords.lat, coords.lng]
-                }
-              />
+              <MapComponent listings={listingsForMap} center={mapCenter} />
             </div>
           </div>
         </main>
