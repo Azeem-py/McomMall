@@ -15,7 +15,7 @@ export interface Geometry {
   };
 }
 
-export interface Photo {
+interface Photo {
   height: number;
   width: number;
   html_attributions: string[];

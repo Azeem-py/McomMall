@@ -5,8 +5,17 @@ import { ParkingCircle, Briefcase, PawPrint } from 'lucide-react';
 import type { DetailedListing } from '@/lib/listing-data';
 import ReviewsSection from './ReviewSection';
 import LocationSection from './locationSection';
-import { GooglePlaceResult } from '@/service/listings/types';
+import {
+  GooglePlaceResult,
+  InHouseBusiness,
+} from '@/service/listings/types';
 import { ReviewsTabContent } from '@/app/listings/[id]/components/ReviewsTabContent';
+
+function isGoogleResult(
+  listing: GooglePlaceResult | InHouseBusiness
+): listing is GooglePlaceResult {
+  return 'place_id' in listing;
+}
 
 // You would create more detailed components for each tab
 function OverviewSection({ listing }: { listing: DetailedListing }) {
@@ -38,14 +47,20 @@ export default function ContentTabs({
   listing,
   isLoading,
 }: {
-  listing: GooglePlaceResult;
+  listing: GooglePlaceResult | InHouseBusiness;
   isLoading: boolean;
 }) {
+  const isGoogle = isGoogleResult(listing);
+  const location = isGoogle ? listing.geometry : listing.location;
+  const address = isGoogle
+    ? listing.formatted_address || listing.vicinity
+    : `${listing.location.addressLine1}, ${listing.location.city}`;
+  const reviews = isGoogle ? listing.reviews : []; // In-house doesn't have reviews yet
+
   return (
     <Tabs defaultValue="overview" className="w-full">
       <TabsList className="grid w-full grid-cols-3 md:grid-cols-5 mb-6">
         <TabsTrigger value="overview">Overview</TabsTrigger>
-
         <TabsTrigger value="location">Location</TabsTrigger>
         <TabsTrigger value="faq">FAQ</TabsTrigger>
         <TabsTrigger value="reviews">Reviews</TabsTrigger>
@@ -54,13 +69,10 @@ export default function ContentTabs({
         {/* <OverviewSection listing={listing} /> */}
       </TabsContent>
       <TabsContent value="location">
-        <LocationSection
-          listing={listing.geometry}
-          address={listing.formatted_address || listing.vicinity}
-        />
+        <LocationSection listing={location} address={address} />
       </TabsContent>
       <TabsContent value="reviews">
-        <ReviewsTabContent reviews={listing.reviews} isLoading={isLoading} />
+        <ReviewsTabContent reviews={reviews} isLoading={isLoading} />
       </TabsContent>
     </Tabs>
   );
