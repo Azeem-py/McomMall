@@ -108,6 +108,8 @@ interface Location {
   addressLine1: string;
   addressLine2: string | null;
   city: string;
+  lat: number;
+  lng: number;
   showPublicly: boolean;
   deliveryRadiusKm: number | null;
   servicePostcodes: string[];
@@ -239,3 +241,41 @@ export interface CreateBusinessPayload {
   productSellerProfile?: ProductSellerProfilePayload;
   serviceProviderProfile?: ServiceProviderProfilePayload;
 }
+
+export type BusinessStatus = 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
+
+export interface InHouseBusiness {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  listingType: ListingType[];
+  businessName: string;
+  legalName?: string;
+  companyRegistrationNumber?: string;
+  vatNumber?: string;
+  shortDescription: string;
+  about?: string;
+  website?: string;
+  businessPhone: string;
+  businessEmail?: string;
+  logoUrl?: string;
+  bannerUrl?: string;
+  logoAltText?: string;
+  bannerAltText?: string;
+  status: BusinessStatus;
+  googlePlaceId?: string;
+  isGoogleVerified: boolean;
+  location: Location;
+  categories: Category[];
+  // simplified for now
+  socialLinks: any[];
+  businessHours: any[];
+  specialDays: any[];
+  productSellerProfile?: any;
+  serviceProviderProfile?: any;
+  products: any[];
+  campaigns: any[];
+  user: User;
+}
+
+export type InHouseBusinessResults = InHouseBusiness[];
