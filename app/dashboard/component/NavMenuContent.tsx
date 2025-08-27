@@ -33,7 +33,7 @@ export function NavMenuContent({ onLinkClick }: NavMenuContentProps) {
         Claim Listing
       </Link>
       <Link
-        href="/create-listing"
+        href="/dashboard/add-listing"
         onClick={onLinkClick}
         className="p-3 hover:bg-gray-100 rounded-md"
       >

@@ -22,7 +22,9 @@ export default function PricingNav({
       >
         <Button
           variant={activeView === 'payg' ? 'default' : 'ghost'}
-          className={`w-full justify-start text-left  `}
+          className={`w-full justify-start text-left ${
+            activeView === 'payg' && 'bg-orange-600 hover:bg-orange-700'
+          }`}
           onClick={() => setActiveView('payg')}
         >
           <CreditCard className="mr-2 h-4 w-4" />
@@ -36,7 +38,9 @@ export default function PricingNav({
       >
         <Button
           variant={activeView === 'cobranded' ? 'default' : 'ghost'}
-          className={`w-full justify-start text-left`}
+          className={`w-full justify-start text-left ${
+            activeView === 'cobranded' && 'bg-orange-600 hover:bg-orange-700'
+          }`}
           onClick={() => setActiveView('cobranded')}
         >
           <Building2 className="mr-2 h-4 w-4" />
