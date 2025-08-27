@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence, Variants, Transition } from 'framer-motion';
 import BusinessTypeSelector from './components/BusinessTypeSelector';
+import CheckboxIcon from './components/CheckboxIcon';
 import MultiStepListingForm from './components/MultiStepListingForm';
 import {
   Card,
@@ -54,7 +55,8 @@ const AddListingPage = () => {
             variants={pageVariants}
             transition={pageTransition}
           >
-            <Card>
+            <Card className="relative">
+              <CheckboxIcon />
               <CardHeader className="text-center">
                 <CardTitle className="text-3xl font-bold">
                   Create a New Listing
@@ -94,10 +96,13 @@ const AddListingPage = () => {
             variants={pageVariants}
             transition={pageTransition}
           >
-            <MultiStepListingForm
-              businessTypes={selectedTypes}
-              onBack={handleBack}
-            />
+            <div className="relative">
+              <CheckboxIcon />
+              <MultiStepListingForm
+                businessTypes={selectedTypes}
+                onBack={handleBack}
+              />
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
