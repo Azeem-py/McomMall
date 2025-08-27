@@ -185,6 +185,13 @@ const sellingModesSchema = z
               path: ['sellingModes'],
             }
           ),
+        storefrontLinks: z
+          .object({
+            amazon: urlValidation,
+            ebay: urlValidation,
+            etsy: urlValidation,
+          })
+          .optional(),
       }),
   })
   .passthrough();
@@ -506,11 +513,15 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
       const storefrontLinks: StorefrontLinkPayload[] = Object.entries(
         data.productData.storefrontLinks || {}
       )
-        .map(([platform, url]) =>
-          url
-            ? { platform: platform as StorefrontLinkPayload['platform'], url }
-            : null
-        )
+        .map(([platform, url]) => {
+          const formattedUrl = formatUrl(url);
+          return formattedUrl
+            ? {
+                platform: platform as StorefrontLinkPayload['platform'],
+                url: formattedUrl,
+              }
+            : null;
+        })
         .filter((link): link is StorefrontLinkPayload => link !== null);
 
       productSellerProfile = {
