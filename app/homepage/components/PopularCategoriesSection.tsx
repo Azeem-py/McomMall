@@ -3,29 +3,96 @@
 import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
-  Home,
+  UtensilsCrossed,
+  Wrench,
+  Sparkles,
+  Stethoscope,
+  BookOpen,
+  Dumbbell,
+  Ticket,
   Car,
+  Building2,
   Megaphone,
+  Dog,
+  Plane,
+  Factory,
   Users,
-  Map,
-  Mic,
-  Briefcase,
-  Heart,
-  ShoppingCart,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
 
+// New, updated list of categories
 const categories = [
-  { name: 'Apartments', count: 12, icon: <Home /> },
-  { name: 'Cars', count: 8, icon: <Car /> },
-  { name: 'Classifieds', count: 25, icon: <Megaphone /> },
-  { name: 'Coaching', count: 5, icon: <Users /> },
-  { name: 'Eat & Drink', count: 32, icon: <Map /> },
-  { name: 'Events', count: 18, icon: <Mic /> },
-  { name: 'Jobs', count: 45, icon: <Briefcase /> },
-  { name: 'Health', count: 22, icon: <Heart /> },
-  { name: 'Shopping', count: 50, icon: <ShoppingCart /> },
+  {
+    name: 'Food & Drink',
+    count: 42,
+    icon: <UtensilsCrossed />,
+  },
+  {
+    name: 'Trades & Home',
+    count: 58,
+    icon: <Wrench />,
+  },
+  {
+    name: 'Beauty & Wellness',
+    count: 35,
+    icon: <Sparkles />,
+  },
+  {
+    name: 'Health & Medical',
+    count: 28,
+    icon: <Stethoscope />,
+  },
+  {
+    name: 'Education & Training',
+    count: 15,
+    icon: <BookOpen />,
+  },
+  {
+    name: 'Fitness & Sports',
+    count: 22,
+    icon: <Dumbbell />,
+  },
+  {
+    name: 'Arts & Events',
+    count: 19,
+    icon: <Ticket />,
+  },
+  {
+    name: 'Automotive',
+    count: 31,
+    icon: <Car />,
+  },
+  {
+    name: 'Property & Real Estate',
+    count: 45,
+    icon: <Building2 />,
+  },
+  {
+    name: 'Professional Services',
+    count: 62,
+    icon: <Megaphone />,
+  },
+  {
+    name: 'Pets & Animals',
+    count: 12,
+    icon: <Dog />,
+  },
+  {
+    name: 'Accommodation & Travel',
+    count: 27,
+    icon: <Plane />,
+  },
+  {
+    name: 'Manufacturing',
+    count: 14,
+    icon: <Factory />,
+  },
+  {
+    name: 'Non-Profit & Community',
+    count: 9,
+    icon: <Users />,
+  },
 ];
 
 export function PopularCategoriesSection() {
@@ -51,35 +118,35 @@ export function PopularCategoriesSection() {
         damping: 10,
       },
     },
-  } as const; // FIX: Added 'as const' to solve the error
+  } as const;
 
   return (
-    <div className="bg-white py-20">
+    <div className="bg-white py-20 sm:py-24">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="relative">
-          <div className="text-center mb-12">
+          <div className="mb-12 text-center">
             <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
               Popular Categories
             </h2>
             <div className="mt-4 flex justify-center">
-              <div className="w-24 h-1 bg-orange-500 rounded-full" />
+              <div className="h-1 w-24 rounded-full bg-orange-500" />
             </div>
           </div>
 
           {/* Scroll Buttons */}
-          <div className="absolute inset-y-0 left-0 hidden md:flex items-center z-10">
+          <div className="absolute inset-y-0 left-0 z-10 hidden items-center md:flex">
             <button
               onClick={() => scroll('left')}
-              className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition"
+              className="rounded-full bg-white p-2 shadow-md transition hover:bg-gray-100"
               aria-label="Scroll left"
             >
               <ChevronLeft className="h-6 w-6 text-gray-700" />
             </button>
           </div>
-          <div className="absolute inset-y-0 right-0 hidden md:flex items-center z-10">
+          <div className="absolute inset-y-0 right-0 z-10 hidden items-center md:flex">
             <button
               onClick={() => scroll('right')}
-              className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition"
+              className="rounded-full bg-white p-2 shadow-md transition hover:bg-gray-100"
               aria-label="Scroll right"
             >
               <ChevronRight className="h-6 w-6 text-gray-700" />
@@ -89,23 +156,26 @@ export function PopularCategoriesSection() {
           {/* Scrollable Container */}
           <div
             ref={scrollContainerRef}
-            className="flex space-x-6 overflow-x-auto pb-6 hide-scrollbar"
+            className="hide-scrollbar flex space-x-6 overflow-x-auto pb-6"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {categories.map((category, index) => (
               <motion.div
                 key={index}
-                className="flex-shrink-0 w-48 h-48 bg-gray-50 border border-gray-200 rounded-lg flex flex-col items-center justify-center text-center p-4 cursor-pointer hover:bg-orange-500 text-orange-600 hover:text-white"
+                className="group flex h-48 w-48 flex-shrink-0 cursor-pointer flex-col items-center justify-center rounded-lg border border-gray-200 bg-gray-50 p-4 text-center text-orange-600 transition-colors hover:bg-orange-500 hover:text-white"
                 variants={cardVariants}
                 whileHover="hover"
               >
-                <div className=" mb-3">
+                <div className="mb-3">
                   {React.cloneElement(category.icon, {
                     size: 40,
                     strokeWidth: 1.5,
                   })}
                 </div>
-                <p className="font-semibold text-gray-800 ">{category.name}</p>
-                <span className="mt-2 text-sm text-white bg-gray-600 rounded-full w-8 h-8 flex items-center justify-center">
+                <p className="font-semibold text-gray-800 transition-colors group-hover:text-white">
+                  {category.name}
+                </p>
+                <span className="mt-2 flex h-8 w-8 items-center justify-center rounded-full bg-gray-600 text-sm text-white transition-colors group-hover:bg-white group-hover:text-orange-500">
                   {category.count}
                 </span>
               </motion.div>
