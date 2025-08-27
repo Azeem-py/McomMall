@@ -47,9 +47,7 @@ const BusinessTypeSelector: React.FC<BusinessTypeSelectorProps> = ({
 
   const handleSelect = (typeId: string) => {
     setSelectedTypes(prev =>
-      prev.includes(typeId)
-        ? prev.filter(t => t !== typeId)
-        : [...prev, typeId]
+      prev.includes(typeId) ? prev.filter(t => t !== typeId) : [...prev, typeId]
     );
   };
 
@@ -76,9 +74,7 @@ const BusinessTypeSelector: React.FC<BusinessTypeSelectorProps> = ({
             >
               <Card
                 className={`relative h-full transition-all duration-300 ${
-                  isSelected
-                    ? 'border-orange-700 shadow-lg'
-                    : 'border-border'
+                  isSelected ? 'border-orange-700 shadow-lg' : 'border-border'
                 }`}
               >
                 {isSelected && (
@@ -100,21 +96,7 @@ const BusinessTypeSelector: React.FC<BusinessTypeSelectorProps> = ({
           );
         })}
       </div>
-      <div className="text-center mb-8">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <p className="text-sm text-muted-foreground">
-                Select one or both depending on your business. You can always
-                update later.
-              </p>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>This choice determines the next steps in the form.</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
+
       <div className="flex justify-end">
         <Button
           onClick={() => onNext(selectedTypes)}
