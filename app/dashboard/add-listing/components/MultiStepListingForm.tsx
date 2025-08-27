@@ -65,6 +65,22 @@ const profanityCheck = (value: string) =>
   !badWords.some(word => value.toLowerCase().includes(word));
 
 // Zod Schemas for validation
+const urlValidation = z
+  .string()
+  .refine(
+    value => {
+      if (!value) return true; // Optional fields are handled by .optional()
+      // Allow URLs with or without a protocol
+      const urlWithProtocol = /^(https?:\/\/)/.test(value)
+        ? value
+        : `https://${value}`;
+      return z.string().url().safeParse(urlWithProtocol).success;
+    },
+    { message: 'Invalid URL.' }
+  )
+  .optional()
+  .or(z.literal(''));
+
 const businessInfoSchema = z
   .object({
     businessName: z
@@ -86,44 +102,24 @@ const businessInfoSchema = z
     longDesc: z.string().optional(),
     phone: z
       .string()
-      .regex(/^\+44\d{10}$/, { message: 'Invalid UK phone. Use +44 format.' }),
+      .min(1, { message: 'Phone number is required.' })
+      .regex(/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/, {
+        message: 'Invalid phone number.',
+      }),
     email: z
       .string()
       .email({ message: 'Invalid email.' })
-      .optional()
-      .or(z.literal('')),
+      .min(1, { message: 'Email is required.' }),
     socials: z
       .object({
-        website: z
-          .string()
-          .url({ message: 'Invalid URL.' })
-          .optional()
-          .or(z.literal('')),
-        facebook: z
-          .string()
-          .url({ message: 'Invalid URL.' })
-          .optional()
-          .or(z.literal('')),
-        instagram: z
-          .string()
-          .url({ message: 'Invalid URL.' })
-          .optional()
-          .or(z.literal('')),
-        twitter: z
-          .string()
-          .url({ message: 'Invalid URL.' })
-          .optional()
-          .or(z.literal('')),
-        youtube: z
-          .string()
-          .url({ message: 'Invalid URL.' })
-          .optional()
-          .or(z.literal('')),
-        linkedin: z
-          .string()
-          .url({ message: 'Invalid URL.' })
-          .optional()
-          .or(z.literal('')),
+        website: urlValidation.refine(val => val && val.length > 0, {
+          message: 'A valid website URL is required.',
+        }),
+        facebook: urlValidation,
+        instagram: urlValidation,
+        twitter: urlValidation,
+        youtube: urlValidation,
+        linkedin: urlValidation,
       })
       .optional(),
   })
@@ -418,6 +414,14 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
       t => t.toLowerCase() as ListingType
     );
 
+    const formatUrl = (url?: string): string | undefined => {
+      if (!url) return undefined;
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        return url;
+      }
+      return `https://${url}`;
+    };
+
     // --- Location and Service Area ---
     const location: CreateBusinessPayload['location'] = {
       addressLine1: data.address || '',
@@ -447,7 +451,10 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
 
     // --- Social Links ---
     const socialLinks: SocialLinkPayload[] = Object.entries(data.socials)
-      .map(([platform, url]) => (url ? { platform, url } : null))
+      .map(([platform, url]) => {
+        const formattedUrl = formatUrl(url);
+        return formattedUrl ? { platform, url: formattedUrl } : null;
+      })
       .filter((link): link is SocialLinkPayload => link !== null);
 
     // --- Business Hours ---

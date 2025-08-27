@@ -209,7 +209,7 @@ const BusinessInfoStep: React.FC<StepProps> = ({
       <FormField
         id="phone"
         label="Phone Number"
-        tooltip="A valid UK phone number starting with +44."
+        tooltip="Enter a valid phone number for your business."
         error={errors.phone}
         isOptional={isFieldOptional(schema!, 'phone')}
       >
@@ -256,7 +256,7 @@ const BusinessInfoStep: React.FC<StepProps> = ({
         <FormField
           id="website"
           label="Website"
-          tooltip="Your business website. Must start with https://"
+          tooltip="Your business website. e.g. www.example.com"
           error={errors['socials.website']}
           isOptional={isFieldOptional(schema!, 'socials.website')}
         >
