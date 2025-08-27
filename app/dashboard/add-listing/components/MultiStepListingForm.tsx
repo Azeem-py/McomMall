@@ -65,21 +65,21 @@ const profanityCheck = (value: string) =>
   !badWords.some(word => value.toLowerCase().includes(word));
 
 // Zod Schemas for validation
-const urlValidation = z
-  .string()
-  .refine(
-    value => {
-      if (!value) return true; // Optional fields are handled by .optional()
-      // Allow URLs with or without a protocol
-      const urlWithProtocol = /^(https?:\/\/)/.test(value)
-        ? value
-        : `https://${value}`;
-      return z.string().url().safeParse(urlWithProtocol).success;
-    },
-    { message: 'Invalid URL.' }
-  )
-  .optional()
-  .or(z.literal(''));
+// Custom URL validator for optional fields
+const urlValidation = z.string().refine(
+  value => {
+    if (!value || value.trim() === '') {
+      return true;
+    }
+    const urlWithProtocol = /^(https?:\/\/)/.test(value)
+      ? value
+      : `https://${value}`;
+    return z.string().url().safeParse(urlWithProtocol).success;
+  },
+  {
+    message: 'Invalid URL.',
+  }
+);
 
 const businessInfoSchema = z
   .object({
@@ -112,14 +112,23 @@ const businessInfoSchema = z
       .min(1, { message: 'Email is required.' }),
     socials: z
       .object({
-        website: urlValidation.refine(val => val && val.length > 0, {
-          message: 'A valid website URL is required.',
-        }),
-        facebook: urlValidation,
-        instagram: urlValidation,
-        twitter: urlValidation,
-        youtube: urlValidation,
-        linkedin: urlValidation,
+        website: z
+          .string()
+          .min(1, { message: 'A valid website URL is required.' })
+          .refine(
+            value => {
+              const urlWithProtocol = /^(https?:\/\/)/.test(value)
+                ? value
+                : `https://${value}`;
+              return z.string().url().safeParse(urlWithProtocol).success;
+            },
+            { message: 'A valid website URL is required.' }
+          ),
+        facebook: urlValidation.optional(),
+        instagram: urlValidation.optional(),
+        twitter: urlValidation.optional(),
+        youtube: urlValidation.optional(),
+        linkedin: urlValidation.optional(),
       })
       .optional(),
   })
