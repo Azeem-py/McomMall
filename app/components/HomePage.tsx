@@ -30,6 +30,7 @@ import Image from 'next/image';
 import { McomEgiftCard } from '../homepage/components/McomEgiftCard';
 import VirtualCardCarousel from '../homepage/components/VirtualCardCarousel';
 import HowItWorks from '../homepage/components/HowItWorks';
+import { AuditSection } from '../homepage/components/AuditSection';
 
 // --- Helper Components ---
 const ScrollAnimatedSection = ({ children }: { children: React.ReactNode }) => {
@@ -412,12 +413,13 @@ export default function HomePage() {
         {/* NEW SECTION */}
         <McomFeatureSection />
         <SeasonalMarketingSection />
+        <AuditSection />
         {/* <BusinessTrustSection /> */}
         <LoyaltyProgramSection />
         <StockAuditSection />
         <McomEgiftCard />
         <VirtualCardCarousel />
-        <McomVCardEGiftCardsSection />
+        {/* <McomVCardEGiftCardsSection /> */}
         <McomVouchersCouponsSection />
         <McomMallBrandsSection />
         {/* NEW SECTION ENDS */}

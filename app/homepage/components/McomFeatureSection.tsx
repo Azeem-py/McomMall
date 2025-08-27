@@ -2,95 +2,124 @@
 
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
-import Image from 'next/image';
+import React, { useState } from 'react';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
+import { Building, ShoppingBag, Users } from 'lucide-react';
 
-interface InfoCardProps {
-  title: string;
-  description: string;
-  imageUrl: string;
-  bgColor: string;
-}
+// --- Reusable Video Player Component ---
+const VideoPlayer = ({ videoId }: { videoId: string }) => (
+  <div className="aspect-video w-full overflow-hidden rounded-lg border border-slate-700 bg-black shadow-2xl">
+    <iframe
+      src={`https://www.youtube.com/embed/${videoId}`}
+      title="YouTube video player"
+      frameBorder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowFullScreen
+      className="h-full w-full"
+    ></iframe>
+  </div>
+);
 
-const InfoCard: React.FC<InfoCardProps> = ({
-  title,
-  description,
-  imageUrl,
-  bgColor,
-}) => {
-  const overlayVariants = {
-    rest: {
-      height: 'auto',
-      transition: { duration: 0.5, ease: 'easeInOut' },
-    },
-    hover: {
-      height: '100%',
-      transition: { duration: 0.4, ease: 'easeInOut', staggerChildren: 0.1 },
-    },
-  } as const;
-
-  const textVariants = {
-    rest: {
-      opacity: 0,
-      y: 20,
-      transition: { duration: 0.3, ease: 'easeOut' },
-    },
-    hover: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.4, ease: 'easeIn', delay: 0.2 },
-    },
-  } as const;
-
-  const arrowVariants = {
-    rest: { rotate: 0 },
-    hover: { rotate: -45 },
-  } as const;
-
-  return (
-    <motion.div
-      initial="rest"
-      whileHover="hover"
-      animate="rest"
-      className="relative h-96 w-full cursor-pointer overflow-hidden rounded-lg shadow-2xl"
-    >
-      <Image
-        src={imageUrl}
-        alt={title}
-        fill
-        className="object-cover transition-transform duration-500"
-      />
-
-      <motion.div
-        variants={overlayVariants}
-        className={`absolute bottom-0 left-0 right-0 p-6 text-white backdrop-blur-sm ${bgColor}`}
-      >
-        <div className="flex items-center justify-between">
-          <h3 className="text-2xl font-bold">{title}</h3>
-          <motion.div variants={arrowVariants}>
-            <ArrowRight className="h-7 w-7 transition-transform" />
-          </motion.div>
+// --- Business Content Component ---
+const BusinessContent = () => (
+  <motion.div
+    key="business"
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -20 }}
+    transition={{ duration: 0.5, ease: 'easeInOut' }}
+    className="mt-16 space-y-16"
+  >
+    {/* Product Seller Section */}
+    <div className="grid items-center gap-12 md:grid-cols-2">
+      <div className="order-2 md:order-1">
+        <div className="mb-4 flex items-center gap-3">
+          <ShoppingBag className="h-8 w-8 text-lime-400" />
+          <h3 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            Are you a Product Seller?
+          </h3>
         </div>
-        <motion.p variants={textVariants} className="mt-4 text-base font-light">
-          {description}
-        </motion.p>
-      </motion.div>
-    </motion.div>
-  );
-};
+        <p className="text-lg leading-relaxed text-gray-300">
+          Showcase your products to a ready-to-buy audience. With Mcom Business,
+          you get a virtual storefront to list your entire catalog, manage
+          inventory, and process orders seamlessly. Reach more customers and
+          watch your sales grow.
+        </p>
+      </div>
+      <div className="order-1 md:order-2">
+        <VideoPlayer videoId="wT345_g7g3I" />
+      </div>
+    </div>
 
+    {/* Service Provider Section */}
+    <div className="grid items-center gap-12 md:grid-cols-2">
+      <div>
+        <VideoPlayer videoId="bK_3d1eAgHM" />
+      </div>
+      <div>
+        <div className="mb-4 flex items-center gap-3">
+          <Building className="h-8 w-8 text-lime-400" />
+          <h3 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            Are you a Service Provider?
+          </h3>
+        </div>
+        <p className="text-lg leading-relaxed text-gray-300">
+          From consulting to craftsmanship, Mcom Business is your platform to
+          shine. List your services, manage bookings with our intuitive tools,
+          and build a stellar reputation with customer reviews. We connect you
+          with clients seeking your expertise.
+        </p>
+      </div>
+    </div>
+  </motion.div>
+);
+
+// --- Consumer Content Component ---
+const ConsumerContent = () => (
+  <motion.div
+    key="consumer"
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -20 }}
+    transition={{ duration: 0.5, ease: 'easeInOut' }}
+    className="mt-16"
+  >
+    <div className="grid items-center gap-12 md:grid-cols-2">
+      <div>
+        <div className="mb-4 flex items-center gap-3">
+          <Users className="h-8 w-8 text-fuchsia-400" />
+          <h3 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            {" What's in it for You?"}
+          </h3>
+        </div>
+        <p className="text-lg leading-relaxed text-gray-300">
+          As an Mcom Consumer, you unlock a universe of local possibilities.
+          Effortlessly find trusted product sellers and service providers in
+          your area. Read authentic reviews, compare options, and connect with
+          the best businesses around. Your next favorite local gem is just a
+          click away!
+        </p>
+      </div>
+      <div>
+        <VideoPlayer videoId="Yq_xWpXF2AY" />
+      </div>
+    </div>
+  </motion.div>
+);
+
+// --- Main Feature Section Component ---
 export function McomFeatureSection() {
+  const [activeTab, setActiveTab] = useState('business');
+
+  const tabs = [
+    { id: 'business', label: 'MCOM BUSINESS' },
+    { id: 'consumer', label: 'MCOM CONSUMER' },
+  ];
+
   return (
     <div className="bg-slate-900 py-20 text-white sm:py-24">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-            MCOM BUSINESS{' '}
-            <span className="mx-2 font-light text-gray-500">|</span> MCOM
-            CONSUMER
-          </h2>
           <p className="mt-6 text-lg leading-8 text-gray-300">
             McomMall is a premier business listing website designed to connect
             local businesses with a vibrant community of consumers. Discover,
@@ -99,19 +128,42 @@ export function McomFeatureSection() {
           </p>
         </div>
 
-        <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-8 lg:mx-0 lg:max-w-none lg:grid-cols-2">
-          <InfoCard
-            title="What is Mcom Business?"
-            description="Mcom Business provides a powerful suite of tools for companies to list their services, manage their online presence, and connect directly with customers. Boost your visibility, gather reviews, and grow your brand with our intuitive platform."
-            imageUrl="https://images.unsplash.com/photo-1665686308827-eb62e4f6604d?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            bgColor="bg-lime-600/80"
-          />
-          <InfoCard
-            title="What is Mcom Consumer?"
-            description="As an Mcom Consumer, you gain access to a trusted directory of local businesses. Find exactly what you need, read authentic reviews from your community, and make informed decisions. Your next favorite local spot is just a click away."
-            imageUrl="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            bgColor="bg-fuchsia-600/80"
-          />
+        {/* Tab Navigation */}
+        <div className="mt-12 flex justify-center border-b border-slate-700">
+          <div className="flex space-x-4">
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`relative rounded-t-md px-4 py-3 text-sm md:text-2xl font-bold transition-colors duration-300 sm:px-6 sm:text-base ${
+                  activeTab === tab.id
+                    ? 'text-white'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                {activeTab === tab.id && (
+                  <motion.div
+                    layoutId="active-tab-indicator"
+                    className={`absolute inset-x-0 bottom-0 h-1 ${
+                      tab.id === 'business' ? 'bg-lime-500' : 'bg-fuchsia-500'
+                    }`}
+                  />
+                )}
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Tab Content */}
+        <div className="mx-auto max-w-5xl">
+          <AnimatePresence mode="wait">
+            {activeTab === 'business' ? (
+              <BusinessContent />
+            ) : (
+              <ConsumerContent />
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </div>
