@@ -96,7 +96,7 @@ interface ProductFormValues {
 const customResolver = (data: ProductFormValues) => {
   const errors: FieldErrors<ProductFormValues> = {};
 
-  if (!data.title.trim()) {
+  if (!data.title?.trim()) {
     errors.title = { type: 'required', message: 'Product title is required.' };
   }
   if (!data.productType) {
@@ -105,7 +105,7 @@ const customResolver = (data: ProductFormValues) => {
       message: 'You must select a product type.',
     };
   }
-  if (!data.category.trim()) {
+  if (!data.category?.trim()) {
     errors.category = {
       type: 'required',
       message: 'Please select a category.',
@@ -117,25 +117,25 @@ const customResolver = (data: ProductFormValues) => {
       message: 'Price must be a positive number.',
     };
   }
-  if (!data.brand.trim()) {
+  if (!data.brand?.trim()) {
     errors.brand = { type: 'required', message: 'Brand is required.' };
   }
-  if (!data.tags.trim()) {
+  if (!data.tags?.trim()) {
     errors.tags = { type: 'required', message: 'Tags are required.' };
   }
-  if (!data.shortDescription.trim()) {
+  if (!data.shortDescription?.trim()) {
     errors.shortDescription = {
       type: 'required',
       message: 'Short description is required.',
     };
   }
-  if (!data.description.trim()) {
+  if (!data.description?.trim()) {
     errors.description = {
       type: 'required',
       message: 'Description is required.',
     };
   }
-  if (!data.sku.trim()) {
+  if (!data.sku?.trim()) {
     errors.sku = { type: 'required', message: 'SKU is required.' };
   }
   if (data.enableStockManagement && data.stockQuantity === undefined) {
@@ -246,7 +246,36 @@ export default function EditProductPage() {
 
   const form = useForm<ProductFormValues>({
     resolver: customResolver,
-    defaultValues: {},
+    defaultValues: {
+      title: '',
+      productType: 'physical',
+      category: '',
+      price: 0,
+      discountedPrice: undefined,
+      brand: '',
+      tags: '',
+      shortDescription: '',
+      description: '',
+      sku: '',
+      enableStockManagement: false,
+      stockQuantity: undefined,
+      lowStockThreshold: undefined,
+      allowBackorders: 'no',
+      allowSingleOrder: false,
+      weight: undefined,
+      dimensions: {
+        length: undefined,
+        width: undefined,
+        height: undefined,
+      },
+      files: [],
+      productStatus: 'draft',
+      visibility: 'public',
+      purchaseNote: '',
+      enableReviews: true,
+      productImage: null,
+      businessId: '',
+    },
   });
 
   useEffect(() => {
