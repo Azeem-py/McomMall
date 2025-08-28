@@ -11,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { ProductSellerData } from '../../../types';
 
 interface StepProps {
   formData: ListingFormData;
@@ -43,17 +44,27 @@ const SellingModesStep: React.FC<StepProps> = ({
   };
   const storefrontLinks = productData.storefrontLinks || {};
 
-  const handleSellingModeChange = (id: keyof typeof sellingModes, checked: boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      productData: {
-        ...prev.productData,
-        sellingModes: {
-          ...sellingModes,
-          [id]: checked,
+  const handleSellingModeChange = (
+    id: keyof ProductSellerData['sellingModes'],
+    checked: boolean
+  ) => {
+    setFormData(prev => {
+      const currentModes = prev.productData?.sellingModes || {
+        inStorePickup: false,
+        localDelivery: false,
+        ukWideShipping: false,
+      };
+      return {
+        ...prev,
+        productData: {
+          ...prev.productData,
+          sellingModes: {
+            ...currentModes,
+            [id]: checked,
+          },
         },
-      },
-    }));
+      };
+    });
   };
 
   const handleProductDataChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -67,19 +78,21 @@ const SellingModesStep: React.FC<StepProps> = ({
       }))
   }
 
-  const handleStorefrontLinkChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const { id, value } = e.target;
-      setFormData(prev => ({
-          ...prev,
-          productData: {
-              ...prev.productData,
-              storefrontLinks: {
-                  ...storefrontLinks,
-                  [id]: value,
-              }
-          }
-      }))
-  }
+  const handleStorefrontLinkChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      productData: {
+        ...prev.productData,
+        storefrontLinks: {
+          ...(prev.productData?.storefrontLinks || {}),
+          [id]: value,
+        },
+      },
+    }));
+  };
 
   return (
     <div className="space-y-6">
