@@ -586,7 +586,9 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
 
   const validateAllSteps = () => {
     const newErrors: Record<string, string> = {};
-    steps.forEach(step => {
+    let firstErrorStep: number | null = null;
+
+    steps.forEach((step, index) => {
       const rules = step.validationRules as Record<
         string,
         {
@@ -596,14 +598,15 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
         }
       >;
       for (const fieldName in rules) {
+        // Stop checking if we already have an error for this field from a previous step's rules
+        if (newErrors[fieldName]) continue;
+
         const rule = rules[fieldName];
         const value = get(formData, fieldName);
 
-        // Conditional validation for logo/banner alt text
         if (fieldName === 'logo.altText' && !formData.logo?.file) continue;
         if (fieldName === 'banner.altText' && !formData.banner?.file) continue;
 
-        // Conditional validation for booking URL
         if (
           fieldName === 'serviceData.bookingURL' &&
           formData.serviceData?.bookingMethod !== 'online'
@@ -619,18 +622,26 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
 
         if (!rule.validate(value)) {
           newErrors[fieldName] = rule.message;
+          if (firstErrorStep === null) {
+            firstErrorStep = index + 1;
+          }
         }
       }
     });
+
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    const isValid = Object.keys(newErrors).length === 0;
+    return { isValid, firstErrorStep };
   };
 
   const handleSubmit = () => {
-    if (validateAllSteps()) {
+    const { isValid, firstErrorStep } = validateAllSteps();
+    if (isValid) {
       const payload = transformFormDataToPayload(formData);
       console.log('Submitting Payload:', JSON.stringify(payload, null, 2));
       addListing(payload);
+    } else if (firstErrorStep !== null) {
+      setCurrentStep(firstErrorStep);
     }
   };
 
