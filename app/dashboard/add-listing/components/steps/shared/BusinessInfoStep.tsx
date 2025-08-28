@@ -10,49 +10,23 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { Info } from 'lucide-react';
-import { z } from 'zod';
 
 interface StepProps {
   formData: ListingFormData;
   setFormData: React.Dispatch<React.SetStateAction<ListingFormData>>;
   errors: Record<string, string>;
-  schema?: z.ZodSchema<unknown>;
+  validationRules?: Record<string, { optional?: boolean }>;
 }
 
-const isFieldOptional = (schema: z.ZodSchema<unknown>, fieldName: string) => {
-  if (!schema || !('shape' in schema)) {
-    return true; // Default to optional if schema is not as expected
-  }
-
-  const shape = (schema as z.ZodObject<z.ZodRawShape>).shape;
-
-  if (fieldName.includes('.')) {
-    const [objectName, propertyName] = fieldName.split('.');
-    let objectSchema = shape[objectName];
-    if (!objectSchema) return true;
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if ((objectSchema as any)._def.typeName === 'ZodOptional') {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      objectSchema = (objectSchema as any)._def.innerType;
-    }
-
-    if (objectSchema && 'shape' in objectSchema) {
-      const nestedFieldSchema = (objectSchema as z.ZodObject<z.ZodRawShape>)
-        .shape[propertyName];
-      if (!nestedFieldSchema) return true;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return (nestedFieldSchema as any)._def.typeName === 'ZodOptional';
-    }
+const isFieldOptional = (
+  rules: StepProps['validationRules'],
+  fieldName: string
+) => {
+  if (!rules || !rules[fieldName]) {
+    // Fields not in rules are considered optional (e.g. legalName, etc)
     return true;
   }
-
-  const fieldSchema = shape[fieldName];
-  if (!fieldSchema) {
-    return true;
-  }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (fieldSchema as any)._def.typeName === 'ZodOptional';
+  return rules[fieldName]?.optional === true;
 };
 
 const FormField = ({
@@ -101,7 +75,7 @@ const BusinessInfoStep: React.FC<StepProps> = ({
   formData,
   setFormData,
   errors,
-  schema,
+  validationRules,
 }) => {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -128,7 +102,7 @@ const BusinessInfoStep: React.FC<StepProps> = ({
           label="Business Name"
           tooltip="The name your customers will see. Make it catchy!"
           error={errors.businessName}
-          isOptional={isFieldOptional(schema!, 'businessName')}
+          isOptional={isFieldOptional(validationRules, 'businessName')}
         >
           <Input
             id="businessName"
@@ -144,7 +118,7 @@ const BusinessInfoStep: React.FC<StepProps> = ({
         label="Legal Name"
         tooltip="Your official business name, if different from your trading name."
         error={errors.legalName}
-        isOptional={isFieldOptional(schema!, 'legalName')}
+          isOptional={isFieldOptional(validationRules, 'legalName')}
       >
         <Input
           id="legalName"
@@ -159,7 +133,7 @@ const BusinessInfoStep: React.FC<StepProps> = ({
         label="Company Reg. No."
         tooltip="Your official company registration number."
         error={errors.companyRegNo}
-        isOptional={isFieldOptional(schema!, 'companyRegNo')}
+          isOptional={isFieldOptional(validationRules, 'companyRegNo')}
       >
         <Input
           id="companyRegNo"
@@ -174,7 +148,7 @@ const BusinessInfoStep: React.FC<StepProps> = ({
           label="Short Description"
           tooltip="A brief summary (20-180 characters) that appears in search results."
           error={errors.shortDesc}
-          isOptional={isFieldOptional(schema!, 'shortDesc')}
+          isOptional={isFieldOptional(validationRules, 'shortDesc')}
         >
           <Textarea
             id="shortDesc"
@@ -195,7 +169,7 @@ const BusinessInfoStep: React.FC<StepProps> = ({
           label="Long Description"
           tooltip="A detailed description of your business, its history, and what makes it special."
           error={errors.longDesc}
-          isOptional={isFieldOptional(schema!, 'longDesc')}
+          isOptional={isFieldOptional(validationRules, 'longDesc')}
         >
           <Textarea
             id="longDesc"
@@ -211,7 +185,7 @@ const BusinessInfoStep: React.FC<StepProps> = ({
         label="Phone Number"
         tooltip="Enter a valid phone number for your business."
         error={errors.phone}
-        isOptional={isFieldOptional(schema!, 'phone')}
+          isOptional={isFieldOptional(validationRules, 'phone')}
       >
         <Input
           id="phone"
@@ -227,7 +201,7 @@ const BusinessInfoStep: React.FC<StepProps> = ({
         label="Public Email"
         tooltip="The email address customers can contact you on."
         error={errors.email}
-        isOptional={isFieldOptional(schema!, 'email')}
+          isOptional={isFieldOptional(validationRules, 'email')}
       >
         <Input
           id="email"
@@ -243,7 +217,7 @@ const BusinessInfoStep: React.FC<StepProps> = ({
         label="VAT No."
         tooltip="Your business VAT number, if applicable."
         error={errors.vatNo}
-        isOptional={isFieldOptional(schema!, 'vatNo')}
+          isOptional={isFieldOptional(validationRules, 'vatNo')}
       >
         <Input
           id="vatNo"
@@ -258,7 +232,7 @@ const BusinessInfoStep: React.FC<StepProps> = ({
           label="Website"
           tooltip="Your business website. e.g. www.example.com"
           error={errors['socials.website']}
-          isOptional={isFieldOptional(schema!, 'socials.website')}
+          isOptional={isFieldOptional(validationRules, 'socials.website')}
         >
           <Input
             id="website"
@@ -273,7 +247,7 @@ const BusinessInfoStep: React.FC<StepProps> = ({
           label="Facebook"
           tooltip="Your Facebook page URL."
           error={errors['socials.facebook']}
-          isOptional={isFieldOptional(schema!, 'socials.facebook')}
+          isOptional={isFieldOptional(validationRules, 'socials.facebook')}
         >
           <Input
             id="facebook"
@@ -288,7 +262,7 @@ const BusinessInfoStep: React.FC<StepProps> = ({
           label="Instagram"
           tooltip="Your Instagram profile URL."
           error={errors['socials.instagram']}
-          isOptional={isFieldOptional(schema!, 'socials.instagram')}
+          isOptional={isFieldOptional(validationRules, 'socials.instagram')}
         >
           <Input
             id="instagram"
@@ -303,7 +277,7 @@ const BusinessInfoStep: React.FC<StepProps> = ({
           label="Twitter"
           tooltip="Your Twitter profile URL."
           error={errors['socials.twitter']}
-          isOptional={isFieldOptional(schema!, 'socials.twitter')}
+          isOptional={isFieldOptional(validationRules, 'socials.twitter')}
         >
           <Input
             id="twitter"
@@ -318,7 +292,7 @@ const BusinessInfoStep: React.FC<StepProps> = ({
           label="YouTube"
           tooltip="Your YouTube channel URL."
           error={errors['socials.youtube']}
-          isOptional={isFieldOptional(schema!, 'socials.youtube')}
+          isOptional={isFieldOptional(validationRules, 'socials.youtube')}
         >
           <Input
             id="youtube"
@@ -333,7 +307,7 @@ const BusinessInfoStep: React.FC<StepProps> = ({
           label="LinkedIn"
           tooltip="Your LinkedIn profile URL."
           error={errors['socials.linkedin']}
-          isOptional={isFieldOptional(schema!, 'socials.linkedin')}
+          isOptional={isFieldOptional(validationRules, 'socials.linkedin')}
         >
           <Input
             id="linkedin"

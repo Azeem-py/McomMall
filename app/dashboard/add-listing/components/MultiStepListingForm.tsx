@@ -37,7 +37,13 @@ import {
 } from '@/service/listings/types';
 import { Separator } from '@/components/ui/separator';
 import { Check, Loader2 } from 'lucide-react';
-import { z } from 'zod';
+import {
+  isNotEmpty,
+  isLength,
+  isValidEmail,
+  isValidPhone,
+  isValidUrl,
+} from '@/lib/validation';
 import { ListingFormData } from '../types';
 
 // Import all step components
@@ -59,187 +65,115 @@ interface MultiStepListingFormProps {
   onBack: () => void;
 }
 
-// Profanity filter (simple version)
-const badWords = ['profanity', 'badword'];
-const profanityCheck = (value: string) =>
-  !badWords.some(word => value.toLowerCase().includes(word));
-
-// Zod Schemas for validation
-// Custom URL validator for optional fields
-const urlValidation = z.string().refine(
-  value => {
-    if (!value || value.trim() === '') {
-      return true;
-    }
-    const urlWithProtocol = /^(https?:\/\/)/.test(value)
-      ? value
-      : `https://${value}`;
-    return z.string().url().safeParse(urlWithProtocol).success;
+// Validation rules definition
+const validationRules = {
+  businessInfo: {
+    businessName: {
+      validate: isNotEmpty,
+      message: 'Business name is required.',
+    },
+    shortDesc: {
+      validate: (v: string) => isLength(v, { min: 20, max: 180 }),
+      message: 'Must be 20-180 characters.',
+    },
+    phone: {
+      validate: isValidPhone,
+      message: 'Invalid phone number.',
+    },
+    email: {
+      validate: isValidEmail,
+      message: 'Invalid email address.',
+    },
+    'socials.website': {
+      validate: isValidUrl,
+      message: 'A valid website URL is required.',
+    },
+    'socials.facebook': {
+      validate: isValidUrl,
+      message: 'Invalid URL.',
+      optional: true,
+    },
+    'socials.instagram': {
+      validate: isValidUrl,
+      message: 'Invalid URL.',
+      optional: true,
+    },
+    'socials.twitter': {
+      validate: isValidUrl,
+      message: 'Invalid URL.',
+      optional: true,
+    },
+    'socials.youtube': {
+      validate: isValidUrl,
+      message: 'Invalid URL.',
+      optional: true,
+    },
+    'socials.linkedin': {
+      validate: isValidUrl,
+      message: 'Invalid URL.',
+      optional: true,
+    },
   },
-  {
-    message: 'Invalid URL.',
-  }
-);
-
-const businessInfoSchema = z
-  .object({
-    businessName: z
-      .string()
-      .min(1, { message: 'Business name is required.' })
-      .refine(profanityCheck, {
-        message: 'Business name contains inappropriate language.',
-      }),
-    legalName: z.string().optional(),
-    companyRegNo: z.string().optional(),
-    vatNo: z.string().optional(),
-    shortDesc: z
-      .string()
-      .min(20, { message: 'Must be 20-180 characters.' })
-      .max(180, { message: 'Must be 20-180 characters.' })
-      .refine(profanityCheck, {
-        message: 'Description contains inappropriate language.',
-      }),
-    longDesc: z.string().optional(),
-    phone: z
-      .string()
-      .min(1, { message: 'Phone number is required.' })
-      .regex(/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/, {
-        message: 'Invalid phone number.',
-      }),
-    email: z
-      .string()
-      .email({ message: 'Invalid email.' })
-      .min(1, { message: 'Email is required.' }),
-    socials: z
-      .object({
-        website: z
-          .string()
-          .min(1, { message: 'A valid website URL is required.' })
-          .refine(
-            value => {
-              const urlWithProtocol = /^(https?:\/\/)/.test(value)
-                ? value
-                : `https://${value}`;
-              return z.string().url().safeParse(urlWithProtocol).success;
-            },
-            { message: 'A valid website URL is required.' }
-          ),
-        facebook: urlValidation.optional(),
-        instagram: urlValidation.optional(),
-        twitter: urlValidation.optional(),
-        youtube: urlValidation.optional(),
-        linkedin: urlValidation.optional(),
-      })
-      .optional(),
-  })
-  .passthrough();
-
-const mediaSchema = z
-  .object({
-    logo: z
-      .object({
-        file: z.instanceof(File).nullable(),
-        altText: z.string(),
-      })
-      .refine(data => (data.file ? data.altText.length > 0 : true), {
-        message: 'Logo alt text is required when an image is uploaded.',
-        path: ['altText'],
-      })
-      .nullable(),
-    banner: z
-      .object({
-        file: z.instanceof(File).nullable(),
-        altText: z.string(),
-      })
-      .refine(data => (data.file ? data.altText.length > 0 : true), {
-        message: 'Banner alt text is required when an image is uploaded.',
-        path: ['altText'],
-      })
-      .nullable(),
-  })
-  .passthrough();
-
-const productCategorySchema = z
-  .object({
-    productData: z
-      .object({
-        primaryCategory: z
-          .string()
-          .min(1, { message: 'Primary category is required.' }),
-      }),
-  })
-  .passthrough();
-
-const productLocationSchema = z
-  .object({
-    address: z.string().min(1, { message: 'Address is required.' }),
-  })
-  .passthrough();
-
-const sellingModesSchema = z
-  .object({
-    productData: z
-      .object({
-        sellingModes: z
-          .object({
-            inStorePickup: z.boolean(),
-            localDelivery: z.boolean(),
-            ukWideShipping: z.boolean(),
-          })
-          .refine(
-            data =>
-              data.inStorePickup || data.localDelivery || data.ukWideShipping,
-            {
-              message: 'At least one selling mode must be selected.',
-              path: ['sellingModes'],
-            }
-          ),
-        storefrontLinks: z
-          .object({
-            amazon: urlValidation,
-            ebay: urlValidation,
-            etsy: urlValidation,
-          })
-          .optional(),
-      }),
-  })
-  .passthrough();
-
-const serviceCategorySchema = z
-  .object({
-    serviceData: z
-      .object({
-        tradeCategory: z
-          .string()
-          .min(1, { message: 'Trade category is required.' }),
-      }),
-  })
-  .passthrough();
-
-const bookingSchema = z
-  .object({
-    serviceData: z
-      .object({
-        bookingMethod: z.string(),
-        bookingURL: z.string().optional(),
-      })
-      .refine(
-        data => {
-          if (data.bookingMethod === 'online') {
-            return (
-              data.bookingURL &&
-              z.string().url().safeParse(data.bookingURL).success
-            );
-          }
-          return true;
-        },
-        {
-          message: 'A valid booking URL is required for online booking.',
-          path: ['bookingURL'],
-        }
-      ),
-  })
-  .passthrough();
+  media: {
+    'logo.altText': {
+      validate: isNotEmpty,
+      message: 'Logo alt text is required when an image is uploaded.',
+      // This validation is conditional, handled in validateStep
+    },
+    'banner.altText': {
+      validate: isNotEmpty,
+      message: 'Banner alt text is required when an image is uploaded.',
+      // This validation is conditional, handled in validateStep
+    },
+  },
+  productCategory: {
+    'productData.primaryCategory': {
+      validate: isNotEmpty,
+      message: 'Primary category is required.',
+    },
+  },
+  productLocation: {
+    address: {
+      validate: isNotEmpty,
+      message: 'Address is required.',
+    },
+  },
+  sellingModes: {
+    'productData.sellingModes': {
+      validate: (modes: { [s: string]: boolean }) =>
+        Object.values(modes).some(v => v),
+      message: 'At least one selling mode must be selected.',
+    },
+    'productData.storefrontLinks.amazon': {
+      validate: isValidUrl,
+      message: 'Invalid URL.',
+      optional: true,
+    },
+    'productData.storefrontLinks.ebay': {
+      validate: isValidUrl,
+      message: 'Invalid URL.',
+      optional: true,
+    },
+    'productData.storefrontLinks.etsy': {
+      validate: isValidUrl,
+      message: 'Invalid URL.',
+      optional: true,
+    },
+  },
+  serviceCategory: {
+    'serviceData.tradeCategory': {
+      validate: isNotEmpty,
+      message: 'Trade category is required.',
+    },
+  },
+  booking: {
+    'serviceData.bookingURL': {
+      validate: isValidUrl,
+      message: 'A valid booking URL is required for online booking.',
+      // This validation is conditional, handled in validateStep
+    },
+  },
+};
 
 const StepIndicator = ({
   currentStep,
@@ -341,47 +275,71 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
       {
         title: 'Business Info',
         component: BusinessInfoStep,
-        schema: businessInfoSchema,
+        validationRules: validationRules.businessInfo,
       },
     ];
     const productSteps = [
       {
         title: 'Product Categories',
         component: ProductCategoryStep,
-        schema: productCategorySchema,
+        validationRules: validationRules.productCategory,
       },
       {
         title: 'Location',
         component: ProductLocationStep,
-        schema: productLocationSchema,
+        validationRules: validationRules.productLocation,
       },
-      { title: 'Hours', component: ProductHoursStep, schema: z.any() },
+      { title: 'Hours', component: ProductHoursStep, validationRules: {} },
       {
         title: 'Selling Modes',
         component: SellingModesStep,
-        schema: sellingModesSchema,
+        validationRules: validationRules.sellingModes,
       },
     ];
     const serviceSteps = [
       {
         title: 'Service Categories',
         component: ServiceCategoryStep,
-        schema: serviceCategorySchema,
+        validationRules: validationRules.serviceCategory,
       },
-      { title: 'Service Area', component: ServiceAreaStep, schema: z.any() },
-      { title: 'Availability', component: ServiceHoursStep, schema: z.any() },
-      { title: 'Booking', component: BookingStep, schema: bookingSchema },
-      { title: 'Credentials', component: CredentialsStep, schema: z.any() },
+      {
+        title: 'Service Area',
+        component: ServiceAreaStep,
+        validationRules: {},
+      },
+      {
+        title: 'Availability',
+        component: ServiceHoursStep,
+        validationRules: {},
+      },
+      {
+        title: 'Booking',
+        component: BookingStep,
+        validationRules: validationRules.booking,
+      },
+      {
+        title: 'Credentials',
+        component: CredentialsStep,
+        validationRules: {},
+      },
     ];
     const sharedFinal = [
-      { title: 'Media', component: MediaStep, schema: mediaSchema },
-      { title: 'Review & Publish', component: ReviewStep, schema: z.any() },
+      {
+        title: 'Media',
+        component: MediaStep,
+        validationRules: validationRules.media,
+      },
+      {
+        title: 'Review & Publish',
+        component: ReviewStep,
+        validationRules: {},
+      },
     ];
 
     let flowSteps: {
       title: string;
       component: React.ElementType;
-      schema: z.ZodSchema<unknown>;
+      validationRules: object;
     }[] = [];
 
     if (
@@ -398,21 +356,61 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
     return [...sharedInitial, ...flowSteps, ...sharedFinal];
   }, [businessTypes]);
 
-  const validateStep = () => {
-    const currentSchema = steps[currentStep - 1].schema;
-    const result = currentSchema.safeParse(formData);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const get = (obj: any, path: string) => {
+    const keys = path.split('.');
+    let result = obj;
+    for (const key of keys) {
+      if (result === null || result === undefined) {
+        return undefined;
+      }
+      result = result[key];
+    }
+    return result;
+  };
 
-    if (!result.success) {
-      const newErrors: Record<string, string> = {};
-      result.error.issues.forEach(err => {
-        newErrors[err.path.join('.')] = err.message;
-      });
-      setErrors(newErrors);
-      return false;
+  const validateStep = () => {
+    const currentRules = steps[currentStep - 1].validationRules as Record<
+      string,
+      {
+        validate: (value: unknown) => boolean;
+        message: string;
+        optional?: boolean;
+      }
+    >;
+    const newErrors: Record<string, string> = {};
+
+    for (const fieldName in currentRules) {
+      const rule = currentRules[fieldName];
+      const value = get(formData, fieldName);
+
+      // Conditional validation for logo/banner alt text
+      if (fieldName === 'logo.altText' && !formData.logo?.file) {
+        continue;
+      }
+      if (fieldName === 'banner.altText' && !formData.banner?.file) {
+        continue;
+      }
+
+      // Conditional validation for booking URL
+      if (
+        fieldName === 'serviceData.bookingURL' &&
+        formData.serviceData?.bookingMethod !== 'online'
+      ) {
+        continue;
+      }
+
+      if (rule.optional && (value === undefined || value === null || value === '')) {
+        continue;
+      }
+
+      if (!rule.validate(value)) {
+        newErrors[fieldName] = rule.message;
+      }
     }
 
-    setErrors({});
-    return true;
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const nextStep = () => {
@@ -586,12 +584,54 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
     return payload;
   };
 
+  const validateAllSteps = () => {
+    const newErrors: Record<string, string> = {};
+    steps.forEach(step => {
+      const rules = step.validationRules as Record<
+        string,
+        {
+          validate: (value: unknown) => boolean;
+          message: string;
+          optional?: boolean;
+        }
+      >;
+      for (const fieldName in rules) {
+        const rule = rules[fieldName];
+        const value = get(formData, fieldName);
+
+        // Conditional validation for logo/banner alt text
+        if (fieldName === 'logo.altText' && !formData.logo?.file) continue;
+        if (fieldName === 'banner.altText' && !formData.banner?.file) continue;
+
+        // Conditional validation for booking URL
+        if (
+          fieldName === 'serviceData.bookingURL' &&
+          formData.serviceData?.bookingMethod !== 'online'
+        )
+          continue;
+
+        if (
+          rule.optional &&
+          (value === undefined || value === null || value === '')
+        ) {
+          continue;
+        }
+
+        if (!rule.validate(value)) {
+          newErrors[fieldName] = rule.message;
+        }
+      }
+    });
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = () => {
-    // A more comprehensive final validation should be done here
-    // before attempting to submit.
-    const payload = transformFormDataToPayload(formData);
-    console.log('Submitting Payload:', JSON.stringify(payload, null, 2));
-    addListing(payload);
+    if (validateAllSteps()) {
+      const payload = transformFormDataToPayload(formData);
+      console.log('Submitting Payload:', JSON.stringify(payload, null, 2));
+      addListing(payload);
+    }
   };
 
   const CurrentStepComponent = steps[currentStep - 1].component;
@@ -641,7 +681,7 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
                 formData={formData}
                 setFormData={setFormData}
                 errors={errors}
-                schema={steps[currentStep - 1].schema}
+                validationRules={steps[currentStep - 1].validationRules}
               />
             </motion.div>
           </AnimatePresence>
