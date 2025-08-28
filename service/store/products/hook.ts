@@ -47,7 +47,7 @@ export const useUpdateProduct = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: updateProduct,
-    onSuccess: (data) => {
+    onSuccess: data => {
       queryClient.invalidateQueries({ queryKey: ['my-products'] });
       queryClient.invalidateQueries({ queryKey: ['product', data.id] });
     },
@@ -59,6 +59,7 @@ const deleteProduct = async (id: string) => {
   return data;
 };
 
+//delete hook
 export const useDeleteProduct = () => {
   const queryClient = useQueryClient();
   return useMutation({
