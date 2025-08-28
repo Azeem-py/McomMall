@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ShoppingCart, Wrench, CheckCircle } from 'lucide-react';
+import { ShoppingCart, Wrench, CheckCircle, Square } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -47,9 +47,7 @@ const BusinessTypeSelector: React.FC<BusinessTypeSelectorProps> = ({
 
   const handleSelect = (typeId: string) => {
     setSelectedTypes(prev =>
-      prev.includes(typeId)
-        ? prev.filter(t => t !== typeId)
-        : [...prev, typeId]
+      prev.includes(typeId) ? prev.filter(t => t !== typeId) : [...prev, typeId]
     );
   };
 
@@ -76,16 +74,16 @@ const BusinessTypeSelector: React.FC<BusinessTypeSelectorProps> = ({
             >
               <Card
                 className={`relative h-full transition-all duration-300 ${
-                  isSelected
-                    ? 'border-orange-700 shadow-lg'
-                    : 'border-border'
+                  isSelected ? 'border-orange-700 shadow-lg' : 'border-border'
                 }`}
               >
-                {isSelected && (
-                  <div className="absolute top-2 right-2 text-orange-700">
-                    <CheckCircle className="w-6 h-6" />
-                  </div>
-                )}
+                <div className="absolute top-2 right-2">
+                  {isSelected ? (
+                    <CheckCircle className="w-6 h-6 text-orange-700" />
+                  ) : (
+                    <Square className="w-6 h-6 text-muted-foreground" />
+                  )}
+                </div>
                 <CardHeader className="flex-row items-start gap-4">
                   <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-blue-600/10">
                     <type.icon className="w-6 h-6 text-blue-600" />
@@ -100,21 +98,7 @@ const BusinessTypeSelector: React.FC<BusinessTypeSelectorProps> = ({
           );
         })}
       </div>
-      <div className="text-center mb-8">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <p className="text-sm text-muted-foreground">
-                Select one or both depending on your business. You can always
-                update later.
-              </p>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>This choice determines the next steps in the form.</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
+
       <div className="flex justify-end">
         <Button
           onClick={() => onNext(selectedTypes)}

@@ -1,6 +1,6 @@
 export const businessCategories = [
   {
-    category: 'Food & Drink',
+    name: 'Food & Drink',
     subCategories: [
       {
         name: 'Restaurants',
@@ -48,7 +48,7 @@ export const businessCategories = [
     ],
   },
   {
-    category: 'Shopping & Retail',
+    name: 'Shopping & Retail',
     subCategories: [
       {
         name: 'Clothing & Fashion',
@@ -89,7 +89,7 @@ export const businessCategories = [
     ],
   },
   {
-    category: 'Trades & Home Services',
+    name: 'Trades & Home Services',
     subCategories: [
       {
         name: 'Plumbing & Heating',
@@ -132,7 +132,7 @@ export const businessCategories = [
     ],
   },
   {
-    category: 'Beauty & Wellness',
+    name: 'Beauty & Wellness',
     subCategories: [
       {
         name: 'Hairdressers & Barbers',
@@ -140,10 +140,7 @@ export const businessCategories = [
       },
       { name: 'Nail Salons', items: [] },
       { name: 'Beauty Salons', items: ['Waxing', 'Makeup Artists'] },
-      {
-        name: 'Spas & Wellness Centres',
-        items: ['Day Spas', 'Holistic Therapy'],
-      },
+      { name: 'Spas & Wellness Centres', items: ['Day Spas', 'Holistic Therapy'] },
       {
         name: 'Massage Therapists',
         items: ['Swedish, Deep Tissue, Hot Stone'],
@@ -154,7 +151,7 @@ export const businessCategories = [
     ],
   },
   {
-    category: 'Health & Medical',
+    name: 'Health & Medical',
     subCategories: [
       { name: 'General Practitioners (GP)', items: [] },
       { name: 'Dentists', items: ['Cosmetic Dentists', 'Orthodontists'] },
@@ -169,7 +166,7 @@ export const businessCategories = [
     ],
   },
   {
-    category: 'Education & Training',
+    name: 'Education & Training',
     subCategories: [
       { name: 'Schools (Primary, Secondary)', items: [] },
       { name: 'Colleges & Universities', items: [] },
@@ -184,7 +181,7 @@ export const businessCategories = [
     ],
   },
   {
-    category: 'Fitness & Sports',
+    name: 'Fitness & Sports',
     subCategories: [
       { name: 'Gyms & Fitness Centres', items: [] },
       { name: 'Yoga & Pilates Studios', items: [] },
@@ -200,7 +197,7 @@ export const businessCategories = [
     ],
   },
   {
-    category: 'Arts, Entertainment & Events',
+    name: 'Arts, Entertainment & Events',
     subCategories: [
       { name: 'Theatres & Live Venues', items: [] },
       { name: 'Cinemas', items: [] },
@@ -216,7 +213,7 @@ export const businessCategories = [
     ],
   },
   {
-    category: 'Automotive & Transport',
+    name: 'Automotive & Transport',
     subCategories: [
       { name: 'Car Dealers (New / Used)', items: [] },
       { name: 'Garages & MOT Centres', items: [] },
@@ -231,7 +228,7 @@ export const businessCategories = [
     ],
   },
   {
-    category: 'Property & Real Estate',
+    name: 'Property & Real Estate',
     subCategories: [
       { name: 'Estate Agents', items: [] },
       { name: 'Letting Agents', items: [] },
@@ -242,7 +239,7 @@ export const businessCategories = [
     ],
   },
   {
-    category: 'Media, Marketing & Professional Services',
+    name: 'Media, Marketing & Professional Services',
     subCategories: [
       { name: 'Web Design & Development', items: [] },
       { name: 'Graphic Design', items: [] },
@@ -258,7 +255,7 @@ export const businessCategories = [
     ],
   },
   {
-    category: 'Pets & Animal Services',
+    name: 'Pets & Animal Services',
     subCategories: [
       { name: 'Vets & Veterinary Clinics', items: [] },
       { name: 'Pet Groomers', items: [] },
@@ -269,7 +266,7 @@ export const businessCategories = [
     ],
   },
   {
-    category: 'Accommodation & Travel',
+    name: 'Accommodation & Travel',
     subCategories: [
       { name: 'Hotels (Boutique, Luxury)', items: [] },
       { name: 'Bed & Breakfasts / Guest Houses', items: [] },
@@ -281,7 +278,7 @@ export const businessCategories = [
     ],
   },
   {
-    category: 'Manufacturing & Industrial',
+    name: 'Manufacturing & Industrial',
     subCategories: [
       { name: 'Factories', items: [] },
       { name: 'Engineering Services', items: [] },
@@ -292,7 +289,7 @@ export const businessCategories = [
     ],
   },
   {
-    category: 'Non-Profit & Community',
+    name: 'Non-Profit & Community',
     subCategories: [
       { name: 'Charities', items: [] },
       { name: 'Religious Organizations', items: [] },

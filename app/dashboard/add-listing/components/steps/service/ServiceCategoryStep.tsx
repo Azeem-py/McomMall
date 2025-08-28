@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ListingFormData } from '../../../types';
 import { Label } from '@/components/ui/label';
 import {
@@ -8,7 +8,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+    Command,
+    CommandInput,
+    CommandItem,
+    CommandList,
+  } from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
 import { z } from 'zod';
+import { businessCategories } from '@/lib/business-categories';
 
 interface StepProps {
   formData: ListingFormData;
@@ -29,17 +38,6 @@ const isFieldOptional = (schema: z.ZodSchema<unknown>, fieldName: string) => {
     return (fieldSchema as any)._def.typeName === 'ZodOptional';
   };
 
-// Mock data
-const serviceCategories = [
-  'Plumbing',
-  'Electrical',
-  'Consulting',
-  'Cleaning',
-  'Landscaping',
-  'Hairdressing',
-  'Tutoring',
-];
-
 const ServiceCategoryStep: React.FC<StepProps> = ({
   formData,
   setFormData,
@@ -48,7 +46,18 @@ const ServiceCategoryStep: React.FC<StepProps> = ({
 }) => {
   const serviceData = formData.serviceData || {};
 
-  const handleCategoryChange = (value: string) => {
+  const handlePrimaryCategoryChange = (value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      serviceData: {
+        ...prev.serviceData,
+        primaryCategory: value,
+        tradeCategory: '', // Reset subcategory
+      },
+    }));
+  };
+
+  const handleSubCategoryChange = (value: string) => {
     setFormData(prev => ({
       ...prev,
       serviceData: {
@@ -58,8 +67,44 @@ const ServiceCategoryStep: React.FC<StepProps> = ({
     }));
   };
 
+  const availableSubCategories = useMemo(() => {
+    if (!serviceData.primaryCategory) return [];
+    const category = businessCategories.find(c => c.name === serviceData.primaryCategory);
+    return category ? category.subCategories : [];
+  }, [serviceData.primaryCategory]);
+
   return (
     <div className="space-y-6">
+      <div>
+        <Label htmlFor="primaryCategory">
+            Primary Category
+            {isFieldOptional(schema!, 'serviceData.primaryCategory') && (
+                <span className="text-muted-foreground font-normal text-sm">
+                    {' '}
+                    (optional)
+                </span>
+            )}
+        </Label>
+        <Select
+          value={serviceData.primaryCategory}
+          onValueChange={handlePrimaryCategoryChange}
+        >
+          <SelectTrigger id="primaryCategory">
+            <SelectValue placeholder="Select a primary category" />
+          </SelectTrigger>
+          <SelectContent>
+            {businessCategories.map(cat => (
+              <SelectItem key={cat.name} value={cat.name}>
+                {cat.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {errors['serviceData.primaryCategory'] && (
+          <p className="text-sm text-red-500">{errors['serviceData.primaryCategory']}</p>
+        )}
+      </div>
+
       <div>
         <Label htmlFor="tradeCategory">
             Trade/Industry Category
@@ -70,23 +115,35 @@ const ServiceCategoryStep: React.FC<StepProps> = ({
                 </span>
             )}
         </Label>
-        <Select
-          value={serviceData.tradeCategory}
-          onValueChange={handleCategoryChange}
-        >
-          <SelectTrigger id="tradeCategory">
-            <SelectValue placeholder="Select your trade or industry" />
-          </SelectTrigger>
-          <SelectContent>
-            {serviceCategories.map(cat => (
-              <SelectItem key={cat} value={cat}>
-                {cat}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <Popover>
+            <PopoverTrigger asChild>
+                <Button
+                    variant="outline"
+                    className="w-full justify-start text-left font-normal"
+                    disabled={!serviceData.primaryCategory}
+                >
+                    {serviceData.tradeCategory || "Select a trade or industry"}
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                <Command>
+                    <CommandInput placeholder="Search..." />
+                    <CommandList>
+                        {availableSubCategories.map(sub => (
+                            <CommandItem
+                                key={sub.name}
+                                onSelect={() => handleSubCategoryChange(sub.name)}
+                                className="cursor-pointer"
+                            >
+                                {sub.name}
+                            </CommandItem>
+                        ))}
+                    </CommandList>
+                </Command>
+            </PopoverContent>
+        </Popover>
         {errors['serviceData.tradeCategory'] && (
-          <p className="text-sm text-red-500">{errors['serviceData.tradeCategory']}</p>
+            <p className="text-sm text-red-500">{errors['serviceData.tradeCategory']}</p>
         )}
       </div>
     </div>

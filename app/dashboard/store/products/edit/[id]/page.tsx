@@ -17,11 +17,11 @@ import {
   Download,
 } from 'lucide-react';
 import Image from 'next/image';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 
-import { useAddProduct } from '@/service/store/products/hook';
-import { SuccessDialog } from '../components/SuccessDialog';
+import { useGetProductById, useUpdateProduct } from '@/service/store/products/hook';
+import { UpdateSuccessDialog } from '../../components/UpdateSuccessDialog';
 import { CreateProductDto } from '@/service/store/products/types';
 
 import { Button } from '@/components/ui/button';
@@ -43,15 +43,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-  } from '@/components/ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Textarea } from '@/components/ui/textarea';
 import {
   Card,
@@ -62,8 +53,6 @@ import {
 } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { cn } from '@/lib/utils';
-import { useRouter } from 'next/navigation';
-import { businessCategories } from '@/lib/business-categories';
 
 interface Listing {
   id: string;
@@ -79,7 +68,7 @@ interface ProductFormValues {
   brand: string;
   tags: string;
   shortDescription: string;
-  description: string;
+  description:string;
   sku: string;
   enableStockManagement: boolean;
   stockQuantity?: number;
@@ -180,12 +169,8 @@ const customResolver = (data: ProductFormValues) => {
       errors.dimensions = dimErrors;
     }
   }
-  if (!data.productImage) {
-    errors.productImage = {
-      type: 'required',
-      message: 'Product image is required.',
-    };
-  }
+  // On the edit page, we don't want to force the user to re-upload an image.
+  // The backend should handle keeping the old image if a new one isn't provided.
   if (!data.businessId) {
     errors.businessId = {
       type: 'required',
@@ -246,9 +231,15 @@ const customResolver = (data: ProductFormValues) => {
   };
 };
 
-export default function AddProductPage() {
-  const router = useRouter();
+import { useParams } from 'next/navigation';
+
+export default function EditProductPage() {
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
+  const params = useParams();
+  const id = params.id as string;
+
+  const { data: product, isLoading: isLoadingProduct } = useGetProductById(id);
+
   const form = useForm<ProductFormValues>({
     resolver: customResolver,
     defaultValues: {
@@ -283,6 +274,44 @@ export default function AddProductPage() {
     },
   });
 
+  useEffect(() => {
+    if (product) {
+      form.reset({
+        title: product.title,
+        productType: product.productType as 'physical' | 'downloadable' | 'virtual',
+        category: product.category,
+        price: product.price,
+        discountedPrice: product.salePrice,
+        brand: product.brand,
+        tags: product.tags?.join(', '),
+        shortDescription: product.shortDescription,
+        description: product.description,
+        sku: product.sku,
+        enableStockManagement: product.enableStockManagement,
+        stockQuantity: product.stock,
+        lowStockThreshold: product.stock, // Assuming this is the case
+        allowBackorders: 'no', // Assuming default
+        allowSingleOrder: false, // Assuming default
+        weight: product.weight,
+        dimensions: {
+          length: product.length,
+          width: product.width,
+          height: product.height,
+        },
+        files: [], // Not handled
+        downloadLimit: product.downloadLimit,
+        downloadExpiry: product.downloadExpiry,
+        productUrl: product.productUrl,
+        productStatus: product.productStatus as 'draft' | 'published' | 'archived',
+        visibility: product.visibility as 'public' | 'private' | 'password-protected',
+        purchaseNote: product.purchaseNote,
+        enableReviews: product.enableReviews,
+        businessId: product.bussinessId,
+        productImage: null, // Not handled
+      });
+    }
+  }, [product, form]);
+
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: 'files',
@@ -291,12 +320,12 @@ export default function AddProductPage() {
   const { data: userListings, isLoading: isLoadingListings } =
     useGetUserListings();
 
-  const { mutate: addProduct, isPending } = useAddProduct();
+  const { mutate: updateProduct, isPending } = useUpdateProduct();
 
   const productType = form.watch('productType');
 
   async function onSubmit(data: ProductFormValues) {
-    const productData: CreateProductDto = {
+    const productData: Partial<CreateProductDto> = {
       bussinessId: data.businessId as string,
       title: data.title,
       category: data.category,
@@ -330,38 +359,48 @@ export default function AddProductPage() {
       tags: data.tags.split(',').map(tag => tag.trim()),
     };
 
-    addProduct(productData, {
-      onSuccess: () => {
-        form.reset();
-        setIsSuccessDialogOpen(true);
-      },
-      onError: (error: Error) => {
-        console.error('Failed to save product:', error);
-        toast.error(
-          error.message || 'Failed to save product. Please try again.',
-          {
-            style: {
-              minWidth: '300px',
-              minHeight: '60px',
-              fontSize: '1.25rem',
-              backgroundColor: 'hsl(var(--destructive))',
-              color: 'hsl(var(--destructive-foreground))',
-            },
-          }
-        );
-      },
-    });
+    updateProduct(
+      { id, ...productData },
+      {
+        onSuccess: () => {
+          setIsSuccessDialogOpen(true);
+        },
+        onError: (error: Error) => {
+          console.error('Failed to save product:', error);
+          toast.error(
+            error.message || 'Failed to save product. Please try again.',
+            {
+              style: {
+                minWidth: '300px',
+                minHeight: '60px',
+                fontSize: '1.25rem',
+                backgroundColor: 'hsl(var(--destructive))',
+                color: 'hsl(var(--destructive-foreground))',
+              },
+            }
+          );
+        },
+      }
+    );
+  }
+
+  if (isLoadingProduct) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-2xl">Loading product data...</div>
+      </div>
+    );
   }
 
   return (
     <div className="bg-gray-50 min-h-screen p-4 sm:p-6 lg:p-8 text-base">
       <div className="max-w-7xl mx-auto">
-        <SuccessDialog
+        <UpdateSuccessDialog
           open={isSuccessDialogOpen}
           onOpenChange={setIsSuccessDialogOpen}
         />
         <h1 className="text-4xl font-bold text-gray-800 mb-6">
-          Add New Product
+          Edit Product
         </h1>
 
         <Form {...form}>
@@ -1213,7 +1252,7 @@ export default function AddProductPage() {
                       control={form.control}
                       name="category"
                       render={({ field, fieldState: { error } }) => (
-                        <FormItem className="flex flex-col">
+                        <FormItem>
                           <FormLabel
                             className={cn(
                               'text-2xl font-semibold',
@@ -1222,47 +1261,39 @@ export default function AddProductPage() {
                           >
                             Category
                           </FormLabel>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant="outline"
-                                  role="combobox"
-                                  className={cn(
-                                    'w-full justify-between text-base py-6',
-                                    !field.value && 'text-muted-foreground'
-                                  )}
-                                >
-                                  {field.value
-                                    ? businessCategories.find(
-                                        (cat) => cat.name === field.value
-                                      )?.name
-                                    : 'Select a category'}
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                              <Command>
-                                <CommandInput placeholder="Search category..." />
-                                <CommandList>
-                                  <CommandEmpty>No category found.</CommandEmpty>
-                                  <CommandGroup>
-                                    {businessCategories.map((cat) => (
-                                      <CommandItem
-                                        value={cat.name}
-                                        key={cat.name}
-                                        onSelect={() => {
-                                          form.setValue('category', cat.name);
-                                        }}
-                                      >
-                                        {cat.name}
-                                      </CommandItem>
-                                    ))}
-                                  </CommandGroup>
-                                </CommandList>
-                              </Command>
-                            </PopoverContent>
-                          </Popover>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger className="text-base py-6 w-full">
+                                <SelectValue placeholder="Select a category" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem
+                                value="uncategorized"
+                                className="text-base"
+                              >
+                                Uncategorized
+                              </SelectItem>
+                              <SelectItem
+                                value="electronics"
+                                className="text-base"
+                              >
+                                Electronics
+                              </SelectItem>
+                              <SelectItem
+                                value="clothing"
+                                className="text-base"
+                              >
+                                Clothing
+                              </SelectItem>
+                              <SelectItem value="books" className="text-base">
+                                Books
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
                           <FormMessage className="text-red-500 text-base font-medium" />
                         </FormItem>
                       )}
@@ -1350,7 +1381,7 @@ export default function AddProductPage() {
                 className="bg-red-500 hover:bg-red-600 text-white text-lg py-7 px-8 flex items-center"
                 disabled={isPending}
               >
-                {isPending ? 'Saving...' : 'Save Product'}
+                {isPending ? 'Saving...' : 'Save Changes'}
               </Button>
             </div>
           </form>

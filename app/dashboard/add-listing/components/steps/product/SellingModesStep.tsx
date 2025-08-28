@@ -4,33 +4,37 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { z } from 'zod';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { ProductSellerData } from '../../../types';
 
 interface StepProps {
   formData: ListingFormData;
   setFormData: React.Dispatch<React.SetStateAction<ListingFormData>>;
   errors: Record<string, string>;
-  schema?: z.ZodSchema<unknown>;
+  validationRules?: Record<string, { optional?: boolean }>;
 }
 
-const isFieldOptional = (schema: z.ZodSchema<unknown>, fieldName: string) => {
-    if (!schema || !('shape' in schema)) {
-      return true; // Default to optional if schema is not as expected
-    }
-    const fieldSchema = (schema as z.ZodObject<z.ZodRawShape>).shape[fieldName];
-    if (!fieldSchema) {
-        return true;
-    }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (fieldSchema as any)._def.typeName === 'ZodOptional';
-  };
+const isFieldOptional = (
+  rules: StepProps['validationRules'],
+  fieldName: string
+) => {
+  if (!rules || !rules[fieldName]) {
+    return true;
+  }
+  return rules[fieldName]?.optional === true;
+};
 
 const SellingModesStep: React.FC<StepProps> = ({
   formData,
   setFormData,
   errors,
-  schema,
+  validationRules,
 }) => {
   const productData = formData.productData || {};
   const sellingModes = productData.sellingModes || {
@@ -40,17 +44,27 @@ const SellingModesStep: React.FC<StepProps> = ({
   };
   const storefrontLinks = productData.storefrontLinks || {};
 
-  const handleSellingModeChange = (id: keyof typeof sellingModes, checked: boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      productData: {
-        ...prev.productData,
-        sellingModes: {
-          ...sellingModes,
-          [id]: checked,
+  const handleSellingModeChange = (
+    id: keyof ProductSellerData['sellingModes'],
+    checked: boolean
+  ) => {
+    setFormData(prev => {
+      const currentModes = prev.productData?.sellingModes || {
+        inStorePickup: false,
+        localDelivery: false,
+        ukWideShipping: false,
+      };
+      return {
+        ...prev,
+        productData: {
+          ...prev.productData,
+          sellingModes: {
+            ...currentModes,
+            [id]: checked,
+          },
         },
-      },
-    }));
+      };
+    });
   };
 
   const handleProductDataChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -64,19 +78,21 @@ const SellingModesStep: React.FC<StepProps> = ({
       }))
   }
 
-  const handleStorefrontLinkChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const { id, value } = e.target;
-      setFormData(prev => ({
-          ...prev,
-          productData: {
-              ...prev.productData,
-              storefrontLinks: {
-                  ...storefrontLinks,
-                  [id]: value,
-              }
-          }
-      }))
-  }
+  const handleStorefrontLinkChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      productData: {
+        ...prev.productData,
+        storefrontLinks: {
+          ...(prev.productData?.storefrontLinks || {}),
+          [id]: value,
+        },
+      },
+    }));
+  };
 
   return (
     <div className="space-y-6">
@@ -123,13 +139,16 @@ const SellingModesStep: React.FC<StepProps> = ({
         <CardContent className="space-y-4">
           <div>
             <Label htmlFor="fulfilmentNotes">
-                Fulfilment Notes
-                {isFieldOptional(schema!, 'productData.fulfilmentNotes') && (
-                    <span className="text-muted-foreground font-normal text-sm">
-                        {' '}
-                        (optional)
-                    </span>
-                )}
+              Fulfilment Notes
+              {isFieldOptional(
+                validationRules,
+                'productData.fulfilmentNotes'
+              ) && (
+                <span className="text-muted-foreground font-normal text-sm">
+                  {' '}
+                  (optional)
+                </span>
+              )}
             </Label>
             <Textarea
               id="fulfilmentNotes"
@@ -140,13 +159,13 @@ const SellingModesStep: React.FC<StepProps> = ({
           </div>
           <div>
             <Label htmlFor="returnsPolicy">
-                Returns Policy
-                {isFieldOptional(schema!, 'productData.returnsPolicy') && (
-                    <span className="text-muted-foreground font-normal text-sm">
-                        {' '}
-                        (optional)
-                    </span>
-                )}
+              Returns Policy
+              {isFieldOptional(validationRules, 'productData.returnsPolicy') && (
+                <span className="text-muted-foreground font-normal text-sm">
+                  {' '}
+                  (optional)
+                </span>
+              )}
             </Label>
             <Textarea
               id="returnsPolicy"
@@ -160,30 +179,63 @@ const SellingModesStep: React.FC<StepProps> = ({
 
       <Card>
         <CardHeader>
-            <CardTitle>External Storefronts</CardTitle>
-            <CardDescription>
-                Link to your stores on other platforms.
-                {isFieldOptional(schema!, 'productData.storefrontLinks') && (
-                    <span className="text-muted-foreground font-normal text-sm">
-                        {' '}
-                        (optional)
-                    </span>
-                )}
-            </CardDescription>
+          <CardTitle>External Storefronts</CardTitle>
+          <CardDescription>
+            Link to your stores on other platforms.
+            {isFieldOptional(
+              validationRules,
+              'productData.storefrontLinks'
+            ) && (
+              <span className="text-muted-foreground font-normal text-sm">
+                {' '}
+                (optional)
+              </span>
+            )}
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-            <div>
-                <Label htmlFor="amazon">Amazon Store</Label>
-                <Input id="amazon" placeholder="https://amazon.co.uk/your-store" value={storefrontLinks.amazon || ''} onChange={handleStorefrontLinkChange} />
-            </div>
-            <div>
-                <Label htmlFor="ebay">eBay Store</Label>
-                <Input id="ebay" placeholder="https://ebay.co.uk/usr/your-store" value={storefrontLinks.ebay || ''} onChange={handleStorefrontLinkChange} />
-            </div>
-            <div>
-                <Label htmlFor="etsy">Etsy Shop</Label>
-                <Input id="etsy" placeholder="https://etsy.com/shop/your-shop" value={storefrontLinks.etsy || ''} onChange={handleStorefrontLinkChange} />
-            </div>
+          <div>
+            <Label htmlFor="amazon">Amazon Store</Label>
+            <Input
+              id="amazon"
+              placeholder="https://amazon.co.uk/your-store"
+              value={storefrontLinks.amazon || ''}
+              onChange={handleStorefrontLinkChange}
+            />
+            {errors['productData.storefrontLinks.amazon'] && (
+              <p className="text-sm text-red-500">
+                {errors['productData.storefrontLinks.amazon']}
+              </p>
+            )}
+          </div>
+          <div>
+            <Label htmlFor="ebay">eBay Store</Label>
+            <Input
+              id="ebay"
+              placeholder="https://ebay.co.uk/usr/your-store"
+              value={storefrontLinks.ebay || ''}
+              onChange={handleStorefrontLinkChange}
+            />
+            {errors['productData.storefrontLinks.ebay'] && (
+              <p className="text-sm text-red-500">
+                {errors['productData.storefrontLinks.ebay']}
+              </p>
+            )}
+          </div>
+          <div>
+            <Label htmlFor="etsy">Etsy Shop</Label>
+            <Input
+              id="etsy"
+              placeholder="https://etsy.com/shop/your-shop"
+              value={storefrontLinks.etsy || ''}
+              onChange={handleStorefrontLinkChange}
+            />
+            {errors['productData.storefrontLinks.etsy'] && (
+              <p className="text-sm text-red-500">
+                {errors['productData.storefrontLinks.etsy']}
+              </p>
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>

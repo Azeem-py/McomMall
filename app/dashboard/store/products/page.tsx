@@ -21,9 +21,34 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
-import { ChevronRight, PlusCircle, Search, MoreHorizontal } from 'lucide-react';
-import { useGetMyProducts } from '@/service/store/products/hook';
+import {
+  ChevronRight,
+  PlusCircle,
+  Search,
+  MoreHorizontal,
+  Trash2,
+  Edit,
+} from 'lucide-react';
+import { useGetMyProducts, useDeleteProduct } from '@/service/store/products/hook';
 import { useRouter } from 'next/navigation';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 // --- HELPER COMPONENTS & TYPES ---
 type ProductStatus = 'All' | 'Online' | 'Draft' | 'Pending Review' | 'In stock';
@@ -63,8 +88,25 @@ export default function StoreDashboard() {
   const [selectedCategory, setSelectedCategory] = React.useState('all');
   const [selectedBrand, setSelectedBrand] = React.useState('all');
   const [selectedRows, setSelectedRows] = React.useState<string[]>([]);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] =
+    React.useState(false);
+  const [selectedProduct, setSelectedProduct] = React.useState<string | null>(
+    null
+  );
 
   const router = useRouter();
+  const { mutate: deleteProduct, isPending: isDeleting } = useDeleteProduct();
+
+  const handleDelete = () => {
+    if (selectedProduct) {
+      deleteProduct(selectedProduct, {
+        onSuccess: () => {
+          setShowDeleteConfirmation(false);
+          setSelectedProduct(null);
+        },
+      });
+    }
+  };
 
   // --- FILTERING LOGIC ---
   const filteredProducts = React.useMemo(() => {
@@ -183,6 +225,26 @@ export default function StoreDashboard() {
         }
       `}</style>
       <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8 font-sans">
+        <AlertDialog
+          open={showDeleteConfirmation}
+          onOpenChange={setShowDeleteConfirmation}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete the
+                product.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDelete} disabled={isDeleting}>
+                {isDeleting ? 'Deleting...' : 'Delete'}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
         <div className="max-w-7xl mx-auto">
           {/* Header Section */}
           <header className="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
@@ -487,9 +549,37 @@ export default function StoreDashboard() {
                           </div>
                         </TableCell>
                         <TableCell className="mobile-table-cell md:table-cell">
-                          <Button variant="ghost" size="icon">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onSelect={() =>
+                                  router.push(
+                                    `/dashboard/store/products/edit/${product.id}`
+                                  )
+                                }
+                              >
+                                <Edit className="mr-2 h-4 w-4" />
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onSelect={() => {
+                                  setSelectedProduct(product.id);
+                                  setShowDeleteConfirmation(true);
+                                }}
+                                className="text-red-600"
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </TableCell>
                       </TableRow>
                     ))

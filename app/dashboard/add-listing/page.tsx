@@ -11,6 +11,12 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 const AddListingPage = () => {
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
@@ -55,6 +61,23 @@ const AddListingPage = () => {
                 </CardTitle>
                 <CardDescription className="text-lg">
                   First, tell us what kind of business you operate.
+                  <div className="text-center mb-8">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <p className="text-sm md:text-lg text-black font-medium">
+                            Select one or both depending on your business. You
+                            can always update later.
+                          </p>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>
+                            This choice determines the next steps in the form.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
                 </CardDescription>
               </CardHeader>
               <CardContent>

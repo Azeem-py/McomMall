@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import api from '../api';
@@ -50,6 +50,64 @@ export const useGetGoogleListings = ({
     refetchOnMount: false,
   });
   return query;
+};
+
+export const useEditListing = () => {
+  const router = useRouter();
+  const edit = async ({
+    listingId,
+    payload,
+  }: {
+    listingId: string;
+    payload: CreateBusinessPayload;
+  }) => {
+    try {
+      const response = await api.patch(`listings/${listingId}`, { ...payload });
+      return response.data;
+    } catch (error: unknown) {
+      const err = error as ErrorResponse;
+      throw new Error(
+        err.response?.data?.message || err.message || 'Failed to edit listing'
+      );
+    }
+  };
+
+  const mutation = useMutation({
+    mutationFn: edit,
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
+
+  return mutation;
+};
+
+export const useDeleteListing = () => {
+  const queryClient = useQueryClient();
+  const remove = async (listingId: string) => {
+    try {
+      const response = await api.delete(`listings/${listingId}`);
+      return response.data;
+    } catch (error: unknown) {
+      const err = error as ErrorResponse;
+      throw new Error(
+        err.response?.data?.message || err.message || 'Failed to delete listing'
+      );
+    }
+  };
+
+  const mutation = useMutation({
+    mutationFn: remove,
+    onSuccess: data => {
+      toast.success(data.message || 'Listing deleted successfully!');
+      queryClient.invalidateQueries({ queryKey: ['FETCH_USER_LISTINGS'] });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
+
+  return mutation;
 };
 
 export const useGetBusinessData = ({ id }: { id: string }) => {

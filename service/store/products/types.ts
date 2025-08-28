@@ -24,6 +24,10 @@ export interface CreateProductDto {
   tags?: string[];
 }
 
+export interface UpdateProductDto extends Partial<CreateProductDto> {
+  id: string;
+}
+
 export interface Product {
   id: string;
   bussinessId: string;
