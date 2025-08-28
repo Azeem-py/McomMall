@@ -169,12 +169,8 @@ const customResolver = (data: ProductFormValues) => {
       errors.dimensions = dimErrors;
     }
   }
-  if (!data.productImage) {
-    errors.productImage = {
-      type: 'required',
-      message: 'Product image is required.',
-    };
-  }
+  // On the edit page, we don't want to force the user to re-upload an image.
+  // The backend should handle keeping the old image if a new one isn't provided.
   if (!data.businessId) {
     errors.businessId = {
       type: 'required',
