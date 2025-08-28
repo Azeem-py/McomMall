@@ -37,6 +37,7 @@ export interface SpecialDay {
 // Flow-specific data structures
 export interface ProductSellerData {
   primaryCategory: string;
+  subCategory: string;
   subCategories: string[];
   showAddressPublicly: boolean;
   deliveryArea: {
@@ -61,6 +62,7 @@ export interface ProductSellerData {
 }
 
 export interface ServiceProviderData {
+  primaryCategory: string;
   tradeCategory: string;
   serviceLocation: {
     atBusinessLocation: boolean;

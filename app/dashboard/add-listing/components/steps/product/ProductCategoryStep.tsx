@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { ListingFormData } from '../../../types';
 import { Label } from '@/components/ui/label';
 import {
@@ -10,7 +10,6 @@ import {
 } from '@/components/ui/select';
 import {
   Command,
-  CommandGroup,
   CommandInput,
   CommandItem,
   CommandList,
@@ -20,6 +19,7 @@ import { X } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { z } from 'zod';
+import { businessCategories } from '@/lib/business-categories';
 
 interface StepProps {
   formData: ListingFormData;
@@ -40,24 +40,16 @@ const isFieldOptional = (schema: z.ZodSchema<unknown>, fieldName: string) => {
   return (fieldSchema as any)._def.typeName === 'ZodOptional';
 };
 
-// Mock data - in a real app, this would come from an API
-const categories = {
-  'Electronics': ['Smartphones', 'Laptops', 'Cameras', 'Headphones'],
-  'Fashion': ['T-shirts', 'Jeans', 'Dresses', 'Shoes'],
-  'Home & Garden': ['Furniture', 'Lighting', 'Gardening Tools'],
-  'Books': ['Fiction', 'Non-fiction', 'Sci-Fi', 'Biographies'],
-};
-
 const ProductCategoryStep: React.FC<StepProps> = ({
   formData,
   setFormData,
   errors,
   schema,
 }) => {
-  const [availableSubcategories, setAvailableSubcategories] = useState<string[]>([]);
+  const [selectedSubCategory, setSelectedSubCategory] = useState(formData.productData?.subCategory || '');
 
   const productData = formData.productData || {};
-  const selectedSubcategories = productData.subCategories || [];
+  const selectedItems = productData.subCategories || [];
 
   const handlePrimaryCategoryChange = (value: string) => {
     setFormData(prev => ({
@@ -65,47 +57,72 @@ const ProductCategoryStep: React.FC<StepProps> = ({
       productData: {
         ...prev.productData,
         primaryCategory: value,
-        subCategories: [], // Reset subcategories when primary changes
+        subCategory: '', // Reset subcategory
+        subCategories: [], // Reset items
       },
     }));
-    setAvailableSubcategories(categories[value as keyof typeof categories] || []);
+    setSelectedSubCategory('');
   };
 
-  const handleSubcategorySelect = (subcategory: string) => {
-    if (selectedSubcategories.length < 3 && !selectedSubcategories.includes(subcategory)) {
-      const newSubcategories = [...selectedSubcategories, subcategory];
+  const handleSubCategoryChange = (value: string) => {
+    setSelectedSubCategory(value);
+    setFormData(prev => ({
+      ...prev,
+      productData: {
+        ...prev.productData,
+        subCategory: value,
+        subCategories: [], // Reset items
+      },
+    }));
+  };
+
+  const handleItemSelect = (item: string) => {
+    if (selectedItems.length < 5 && !selectedItems.includes(item)) {
+      const newItems = [...selectedItems, item];
       setFormData(prev => ({
         ...prev,
         productData: {
           ...prev.productData,
-          subCategories: newSubcategories,
+          subCategories: newItems,
         },
       }));
     }
   };
 
-  const handleSubcategoryRemove = (subcategory: string) => {
-    const newSubcategories = selectedSubcategories.filter(s => s !== subcategory);
+  const handleItemRemove = (item: string) => {
+    const newItems = selectedItems.filter(s => s !== item);
     setFormData(prev => ({
       ...prev,
       productData: {
         ...prev.productData,
-        subCategories: newSubcategories,
+        subCategories: newItems,
       },
     }));
   };
+
+  const availableSubCategories = useMemo(() => {
+    if (!productData.primaryCategory) return [];
+    const category = businessCategories.find(c => c.name === productData.primaryCategory);
+    return category ? category.subCategories : [];
+  }, [productData.primaryCategory]);
+
+  const availableItems = useMemo(() => {
+    if (!selectedSubCategory) return [];
+    const subCategory = availableSubCategories.find(s => s.name === selectedSubCategory);
+    return subCategory ? subCategory.items || [] : [];
+  }, [selectedSubCategory, availableSubCategories]);
 
   return (
     <div className="space-y-6">
       <div>
         <Label htmlFor="primaryCategory">
-            Primary Category
-            {isFieldOptional(schema!, 'productData.primaryCategory') && (
-                <span className="text-muted-foreground font-normal text-sm">
-                    {' '}
-                    (optional)
-                </span>
-            )}
+          Primary Category
+          {isFieldOptional(schema!, 'productData.primaryCategory') && (
+            <span className="text-muted-foreground font-normal text-sm">
+              {' '}
+              (optional)
+            </span>
+          )}
         </Label>
         <Select
           value={productData.primaryCategory}
@@ -115,9 +132,9 @@ const ProductCategoryStep: React.FC<StepProps> = ({
             <SelectValue placeholder="Select a primary category" />
           </SelectTrigger>
           <SelectContent>
-            {Object.keys(categories).map(cat => (
-              <SelectItem key={cat} value={cat}>
-                {cat}
+            {businessCategories.map(cat => (
+              <SelectItem key={cat.name} value={cat.name}>
+                {cat.name}
               </SelectItem>
             ))}
           </SelectContent>
@@ -128,37 +145,57 @@ const ProductCategoryStep: React.FC<StepProps> = ({
       </div>
 
       <div>
+        <Label htmlFor="subCategory">
+          Sub-Category
+        </Label>
+        <Select
+          value={selectedSubCategory}
+          onValueChange={handleSubCategoryChange}
+          disabled={!productData.primaryCategory}
+        >
+          <SelectTrigger id="subCategory">
+            <SelectValue placeholder="Select a sub-category" />
+          </SelectTrigger>
+          <SelectContent>
+            {availableSubCategories.map(sub => (
+              <SelectItem key={sub.name} value={sub.name}>
+                {sub.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
         <Label>
-            Subcategories
-            {isFieldOptional(schema!, 'productData.subCategories') && (
-                <span className="text-muted-foreground font-normal text-sm">
-                    {' '}
-                    (optional, up to 3)
-                </span>
-            )}
+          Services / Specialisms
+          <span className="text-muted-foreground font-normal text-sm">
+            {' '}
+            (optional, up to 5)
+          </span>
         </Label>
         <Popover>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
               className="w-full justify-start text-left font-normal"
-              disabled={!productData.primaryCategory}
+              disabled={!selectedSubCategory || availableItems.length === 0}
             >
-              Select subcategories...
+              Select services or specialisms...
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
             <Command>
-              <CommandInput placeholder="Search subcategories..." />
+              <CommandInput placeholder="Search..." />
               <CommandList>
-                {availableSubcategories.map(sub => (
+                {availableItems.map(item => (
                   <CommandItem
-                    key={sub}
-                    onSelect={() => handleSubcategorySelect(sub)}
-                    disabled={selectedSubcategories.includes(sub)}
+                    key={item}
+                    onSelect={() => handleItemSelect(item)}
+                    disabled={selectedItems.includes(item)}
                     className="cursor-pointer"
                   >
-                    {sub}
+                    {item}
                   </CommandItem>
                 ))}
               </CommandList>
@@ -166,11 +203,11 @@ const ProductCategoryStep: React.FC<StepProps> = ({
           </PopoverContent>
         </Popover>
         <div className="mt-2 flex flex-wrap gap-2">
-          {selectedSubcategories.map(sub => (
-            <Badge key={sub} variant="secondary">
-              {sub}
+          {selectedItems.map(item => (
+            <Badge key={item} variant="secondary">
+              {item}
               <button
-                onClick={() => handleSubcategoryRemove(sub)}
+                onClick={() => handleItemRemove(item)}
                 className="ml-2 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
               >
                 <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
@@ -180,8 +217,18 @@ const ProductCategoryStep: React.FC<StepProps> = ({
         </div>
         {!productData.primaryCategory && (
           <p className="text-xs text-muted-foreground mt-1">
-            Please select a primary category to see available subcategories.
+            Please select a primary category to see available sub-categories.
           </p>
+        )}
+        {productData.primaryCategory && !selectedSubCategory && (
+          <p className="text-xs text-muted-foreground mt-1">
+            Please select a sub-category to see available specialisms.
+          </p>
+        )}
+        {selectedSubCategory && availableItems.length === 0 && (
+            <p className="text-xs text-muted-foreground mt-1">
+                No specialisms available for this sub-category.
+            </p>
         )}
       </div>
     </div>

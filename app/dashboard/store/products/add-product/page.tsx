@@ -43,6 +43,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+  } from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Textarea } from '@/components/ui/textarea';
 import {
   Card,
@@ -54,6 +63,7 @@ import {
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
+import { businessCategories } from '@/lib/business-categories';
 
 interface Listing {
   id: string;
@@ -1203,7 +1213,7 @@ export default function AddProductPage() {
                       control={form.control}
                       name="category"
                       render={({ field, fieldState: { error } }) => (
-                        <FormItem>
+                        <FormItem className="flex flex-col">
                           <FormLabel
                             className={cn(
                               'text-2xl font-semibold',
@@ -1212,39 +1222,47 @@ export default function AddProductPage() {
                           >
                             Category
                           </FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger className="text-base py-6 w-full">
-                                <SelectValue placeholder="Select a category" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem
-                                value="uncategorized"
-                                className="text-base"
-                              >
-                                Uncategorized
-                              </SelectItem>
-                              <SelectItem
-                                value="electronics"
-                                className="text-base"
-                              >
-                                Electronics
-                              </SelectItem>
-                              <SelectItem
-                                value="clothing"
-                                className="text-base"
-                              >
-                                Clothing
-                              </SelectItem>
-                              <SelectItem value="books" className="text-base">
-                                Books
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant="outline"
+                                  role="combobox"
+                                  className={cn(
+                                    'w-full justify-between text-base py-6',
+                                    !field.value && 'text-muted-foreground'
+                                  )}
+                                >
+                                  {field.value
+                                    ? businessCategories.find(
+                                        (cat) => cat.name === field.value
+                                      )?.name
+                                    : 'Select a category'}
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                              <Command>
+                                <CommandInput placeholder="Search category..." />
+                                <CommandList>
+                                  <CommandEmpty>No category found.</CommandEmpty>
+                                  <CommandGroup>
+                                    {businessCategories.map((cat) => (
+                                      <CommandItem
+                                        value={cat.name}
+                                        key={cat.name}
+                                        onSelect={() => {
+                                          form.setValue('category', cat.name);
+                                        }}
+                                      >
+                                        {cat.name}
+                                      </CommandItem>
+                                    ))}
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
                           <FormMessage className="text-red-500 text-base font-medium" />
                         </FormItem>
                       )}

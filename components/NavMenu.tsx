@@ -47,7 +47,7 @@ const BusinessCategoryMenu = () => {
   };
 
   const currentCategory = businessCategories.find(
-    c => c.category === activeCategory
+    c => c.name === activeCategory
   );
   const currentSubCategory = currentCategory?.subCategories.find(
     sc => sc.name === activeSubCategory
@@ -59,12 +59,12 @@ const BusinessCategoryMenu = () => {
       <div className="w-64 border-r border-gray-200 p-4">
         <ul className="space-y-2">
           {businessCategories.map(category => (
-            <li key={category.category}>
+            <li key={category.name}>
               <button
                 className="flex w-full items-center justify-between rounded-md p-2 text-left font-semibold text-gray-800 hover:bg-gray-100"
-                onMouseEnter={() => handleCategoryHover(category.category)}
+                onMouseEnter={() => handleCategoryHover(category.name)}
               >
-                <span>{category.category}</span>
+                <span>{category.name}</span>
                 <ChevronDown className="h-4 w-4 -rotate-90" />
               </button>
             </li>
@@ -82,7 +82,7 @@ const BusinessCategoryMenu = () => {
             className="w-64 border-r border-gray-200 p-4"
           >
             <h3 className="mb-4 text-lg font-bold text-gray-900">
-              {currentCategory.category}
+              {currentCategory.name}
             </h3>
             <ul className="space-y-2">
               {currentCategory.subCategories.map(subCategory => (

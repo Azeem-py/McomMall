@@ -258,6 +258,7 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
     }
     if (businessTypes.includes('Service') && !initialData.serviceData) {
       initialData.serviceData = {
+        primaryCategory: '',
         tradeCategory: '',
         serviceLocation: {
           atBusinessLocation: false,
@@ -589,6 +590,9 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
       socialLinks,
       categoryIds: [
         data.productData?.primaryCategory,
+        data.productData?.subCategory,
+        ...(data.productData?.subCategories || []),
+        data.serviceData?.primaryCategory,
         data.serviceData?.tradeCategory,
       ]
         .filter((id): id is string => !!id)
