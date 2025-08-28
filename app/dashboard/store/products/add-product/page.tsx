@@ -1161,9 +1161,8 @@ export default function AddProductPage() {
                                 <Image
                                   src={URL.createObjectURL(value[0])}
                                   alt="Product preview"
-                                  layout="fill"
-                                  objectFit="cover"
-                                  className="rounded-lg"
+                                  fill
+                                  className="object-cover rounded-lg"
                                 />
                               ) : (
                                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
