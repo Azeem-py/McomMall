@@ -22,7 +22,7 @@ import { toast } from 'sonner';
 
 import { useGetProductById, useUpdateProduct } from '@/service/store/products/hook';
 import { UpdateSuccessDialog } from '../../components/UpdateSuccessDialog';
-import { CreateProductDto, Product } from '@/service/store/products/types';
+import { CreateProductDto } from '@/service/store/products/types';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -53,7 +53,6 @@ import {
 } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { cn } from '@/lib/utils';
-import { useRouter } from 'next/navigation';
 
 interface Listing {
   id: string;
@@ -236,10 +235,12 @@ const customResolver = (data: ProductFormValues) => {
   };
 };
 
-export default function EditProductPage({ params }: { params: { id: string } }) {
-  const router = useRouter();
+import { useParams } from 'next/navigation';
+
+export default function EditProductPage() {
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
-  const { id } = params;
+  const params = useParams();
+  const id = params.id as string;
 
   const { data: product, isLoading: isLoadingProduct } = useGetProductById(id);
 
@@ -252,7 +253,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     if (product) {
       form.reset({
         title: product.title,
-        productType: product.productType as any,
+        productType: product.productType as 'physical' | 'downloadable' | 'virtual',
         category: product.category,
         price: product.price,
         discountedPrice: product.salePrice,
@@ -276,8 +277,8 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
         downloadLimit: product.downloadLimit,
         downloadExpiry: product.downloadExpiry,
         productUrl: product.productUrl,
-        productStatus: product.productStatus as any,
-        visibility: product.visibility as any,
+        productStatus: product.productStatus as 'draft' | 'published' | 'archived',
+        visibility: product.visibility as 'public' | 'private' | 'password-protected',
         purchaseNote: product.purchaseNote,
         enableReviews: product.enableReviews,
         businessId: product.bussinessId,
@@ -701,7 +702,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                             <FormField
                               control={form.control}
                               name="allowSingleOrder"
-                              render={({ field }).
+                              render={({ field }) => (
                                 <FormItem className="flex flex-row items-center space-x-3 space-y-0 mt-4">
                                   <FormControl>
                                     <Checkbox
