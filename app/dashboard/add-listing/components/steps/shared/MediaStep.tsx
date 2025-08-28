@@ -12,6 +12,7 @@ import { Info, UploadCloud } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { z } from 'zod';
+import { cn } from '@/lib/utils';
 
 interface StepProps {
   formData: ListingFormData;
@@ -19,18 +20,6 @@ interface StepProps {
   errors: Record<string, string>;
   schema?: z.ZodSchema<unknown>;
 }
-
-const isFieldOptional = (schema: z.ZodSchema<unknown>, fieldName: string) => {
-  if (!schema || !('shape' in schema)) {
-    return true; // Default to optional if schema is not as expected
-  }
-  const fieldSchema = (schema as z.ZodObject<z.ZodRawShape>).shape[fieldName];
-  if (!fieldSchema) {
-    return true;
-  }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (fieldSchema as any)._def.typeName === 'ZodOptional';
-};
 
 interface ImageUploadProps {
   id: 'logo' | 'banner';
@@ -40,6 +29,7 @@ interface ImageUploadProps {
   onChange: (id: 'logo' | 'banner', value: Media | null) => void;
   error?: string;
   isOptional: boolean;
+  isBanner?: boolean;
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({
@@ -50,37 +40,50 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   onChange,
   error,
   isOptional,
+  isBanner = false,
 }) => {
-  const [preview, setPreview] = React.useState<string | null>(
-    value?.file ? URL.createObjectURL(value.file) : null
-  );
+  const [preview, setPreview] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (value?.file) {
+      const newPreview = URL.createObjectURL(value.file);
+      setPreview(newPreview);
+      return () => URL.revokeObjectURL(newPreview);
+    } else if (value?.url) {
+      setPreview(value.url);
+    } else {
+      setPreview(null);
+    }
+  }, [value]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const newPreview = URL.createObjectURL(file);
-      setPreview(newPreview);
       onChange(id, { file, altText: value?.altText || '' });
     }
   };
 
   const handleAltTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (value) {
-      onChange(id, { ...value, altText: e.target.value });
-    }
+    onChange(id, {
+      file: value?.file,
+      url: value?.url,
+      altText: e.target.value,
+    });
   };
 
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
   return (
-    <div className="space-y-2">
+    <div className="space-y-4">
       <div className="flex items-center space-x-2">
         <Label htmlFor={`${id}-alt`}>
-            {label}
-            {isOptional && (
-                <span className="text-muted-foreground font-normal text-sm">
-                    {' '}
-                    (optional)
-                </span>
-            )}
+          {label}
+          {isOptional && (
+            <span className="text-muted-foreground font-normal text-sm">
+              {' '}
+              (optional)
+            </span>
+          )}
         </Label>
         <TooltipProvider>
           <Tooltip>
@@ -93,8 +96,19 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
           </Tooltip>
         </TooltipProvider>
       </div>
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="relative w-48 h-48 border-2 border-dashed rounded-lg flex items-center justify-center bg-muted/50">
+      <div
+        className={cn(
+          'flex flex-col gap-4',
+          isBanner ? 'w-full' : 'md:flex-row'
+        )}
+      >
+        <div
+          className={cn(
+            'relative border-2 border-dashed rounded-lg flex items-center justify-center bg-muted/50 cursor-pointer hover:border-orange-700 transition-colors',
+            isBanner ? 'w-full h-64' : 'w-48 h-48 flex-shrink-0'
+          )}
+          onClick={() => fileInputRef.current?.click()}
+        >
           {preview ? (
             <Image
               src={preview}
@@ -104,22 +118,29 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
               className="rounded-lg"
             />
           ) : (
-            <div className="text-center text-muted-foreground">
-              <UploadCloud className="mx-auto w-8 h-8" />
-              <p className="text-xs mt-1">Click button to upload</p>
+            <div className="text-center text-muted-foreground p-4">
+              <UploadCloud className="mx-auto w-10 h-10" />
+              <p className="mt-2 text-sm">
+                Click to upload an image
+              </p>
             </div>
           )}
-        </div>
-        <div className="flex-grow space-y-2">
-          <Label htmlFor={`${id}-file-upload`}>Image File</Label>
           <Input
+            ref={fileInputRef}
             id={`${id}-file-upload`}
             type="file"
             accept="image/png, image/jpeg, image/webp"
             onChange={handleFileChange}
-            className="cursor-pointer"
+            className="sr-only"
           />
-          <Label htmlFor={`${id}-alt`}>Alt Text</Label>
+        </div>
+        <div className="flex-grow space-y-2">
+          <Label htmlFor={`${id}-alt`}>
+            Alt Text{' '}
+            <span className="text-muted-foreground font-normal text-sm">
+              (optional)
+            </span>
+          </Label>
           <Input
             id={`${id}-alt`}
             value={value?.altText || ''}
@@ -133,7 +154,11 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   );
 };
 
-const MediaStep: React.FC<StepProps> = ({ formData, setFormData, errors, schema }) => {
+const MediaStep: React.FC<StepProps> = ({
+  formData,
+  setFormData,
+  errors,
+}) => {
   const handleMediaChange = (id: 'logo' | 'banner', value: Media | null) => {
     setFormData(prev => ({ ...prev, [id]: value }));
   };
@@ -147,7 +172,7 @@ const MediaStep: React.FC<StepProps> = ({ formData, setFormData, errors, schema 
         value={formData.logo}
         onChange={handleMediaChange}
         error={errors.logo}
-        isOptional={isFieldOptional(schema!, 'logo')}
+        isOptional={true}
       />
       <ImageUpload
         id="banner"
@@ -156,7 +181,8 @@ const MediaStep: React.FC<StepProps> = ({ formData, setFormData, errors, schema 
         value={formData.banner}
         onChange={handleMediaChange}
         error={errors.banner}
-        isOptional={isFieldOptional(schema!, 'banner')}
+        isOptional={true}
+        isBanner={true}
       />
     </div>
   );
