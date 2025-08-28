@@ -55,7 +55,7 @@ export const useUpdateProduct = () => {
 };
 
 const deleteProduct = async (id: string) => {
-  const { data } = await api.delete(`/product/delete`, { data: { id } });
+  const { data } = await api.delete(`/product/${id}`);
   return data;
 };
 
