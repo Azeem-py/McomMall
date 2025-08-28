@@ -100,7 +100,7 @@ export const useDeleteListing = () => {
     mutationFn: remove,
     onSuccess: data => {
       toast.success(data.message || 'Listing deleted successfully!');
-      queryClient.invalidateQueries(['FETCH_USER_LISTINGS']);
+      queryClient.invalidateQueries({ queryKey: ['FETCH_USER_LISTINGS'] });
     },
     onError: (error: Error) => {
       toast.error(error.message);

@@ -20,7 +20,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { useAddListing } from '@/service/listings/hook';
+import { useAddListing, useEditListing } from '@/service/listings/hook';
 import {
   type BookingMethod,
   type BusinessHourPayload,
@@ -63,6 +63,8 @@ import CredentialsStep from './steps/service/CredentialsStep';
 interface MultiStepListingFormProps {
   businessTypes: string[];
   onBack: () => void;
+  listingId?: string;
+  initialData?: Partial<ListingFormData>;
 }
 
 // Validation rules definition
@@ -222,6 +224,8 @@ const StepIndicator = ({
 const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
   businessTypes,
   onBack,
+  listingId,
+  initialData: propInitialData,
 }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<ListingFormData>(() => {
@@ -234,8 +238,9 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
       socials: { website: '' },
       logo: null,
       banner: null,
+      ...propInitialData,
     };
-    if (businessTypes.includes('Product')) {
+    if (businessTypes.includes('Product') && !initialData.productData) {
       initialData.productData = {
         primaryCategory: '',
         subCategories: [],
@@ -251,7 +256,7 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
         storefrontLinks: {},
       };
     }
-    if (businessTypes.includes('Service')) {
+    if (businessTypes.includes('Service') && !initialData.serviceData) {
       initialData.serviceData = {
         tradeCategory: '',
         serviceLocation: {
@@ -268,7 +273,9 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const router = useRouter();
-  const { mutate: addListing, isPending } = useAddListing();
+  const { mutate: addListing, isPending: isAdding } = useAddListing();
+  const { mutate: editListing, isPending: isEditing } = useEditListing();
+  const isPending = isAdding || isEditing;
 
   const steps = useMemo(() => {
     const sharedInitial = [
@@ -649,8 +656,11 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
     const { isValid, firstErrorStep } = validateAllSteps();
     if (isValid) {
       const payload = transformFormDataToPayload(formData);
-      console.log('Submitting Payload:', JSON.stringify(payload, null, 2));
-      addListing(payload);
+      if (listingId) {
+        editListing({ listingId, payload });
+      } else {
+        addListing(payload);
+      }
     } else if (firstErrorStep !== null) {
       setCurrentStep(firstErrorStep);
     }

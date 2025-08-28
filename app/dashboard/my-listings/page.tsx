@@ -50,6 +50,7 @@ type SearchBarProps = {
 type ListingCardProps = {
   listing: Listing;
   onVerifyClick: (listingId: string) => void;
+  onDeleteClick: (listingId: string) => void;
 };
 
 type PaginationProps = {
@@ -448,7 +449,7 @@ export default function MyListingsPage() {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleConfirmDelete}>
-              Yes, I'm sure
+              Yes, I&apos;m sure
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
