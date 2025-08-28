@@ -543,8 +543,19 @@ const MultiStepListingForm: React.FC<MultiStepListingFormProps> = ({
     // --- Service Provider Profile ---
     let serviceProviderProfile: ServiceProviderProfilePayload | undefined;
     if (data.serviceData) {
+      const bookingMethodMap: {
+        [key: string]: BookingMethod;
+      } = {
+        call: 'call_to_book',
+        quote: 'request_a_quote',
+        online: 'book_online',
+      };
+      const apiBookingMethod =
+        bookingMethodMap[data.serviceData.bookingMethod || ''] ||
+        'call_to_book';
+
       serviceProviderProfile = {
-        bookingMethod: data.serviceData.bookingMethod as BookingMethod,
+        bookingMethod: apiBookingMethod,
         bookingUrl: data.serviceData.bookingURL,
         quoteOnly: data.serviceData.pricingVisibility === 'quote',
         hasPublicLiabilityInsurance: false, // This is not in the form data
