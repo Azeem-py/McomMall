@@ -1,17 +1,22 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { TimerIcon } from 'lucide-react';
+import { TimerIcon, PlayIcon, PauseIcon } from 'lucide-react';
+import { usePauseOrPlay } from '@/service/payments/hook';
+import { Button } from './ui/button';
 
 interface TrialCountdownTimerProps {
   trialEndDate: string;
+  isPaused: boolean;
 }
 
 const TrialCountdownTimer: React.FC<TrialCountdownTimerProps> = ({
   trialEndDate,
+  isPaused,
 }) => {
-  const calculateTimeLeft = () => {
+  const { mutate: pauseOrPlay, isPending } = usePauseOrPlay();
+  const calculateTimeLeft = useCallback(() => {
     const difference = +new Date(trialEndDate) - +new Date();
     let timeLeft = {};
 
@@ -25,17 +30,20 @@ const TrialCountdownTimer: React.FC<TrialCountdownTimerProps> = ({
     }
 
     return timeLeft;
-  };
+  }, [trialEndDate]);
 
   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
 
   useEffect(() => {
+    if (isPaused) {
+      return;
+    }
     const timer = setTimeout(() => {
       setTimeLeft(calculateTimeLeft());
     }, 1000);
 
     return () => clearTimeout(timer);
-  });
+  }, [isPaused, calculateTimeLeft]);
 
   const timerComponents = Object.entries(timeLeft).map(([interval, value]) => {
     if ((value as number) < 0) {
@@ -66,6 +74,19 @@ const TrialCountdownTimer: React.FC<TrialCountdownTimerProps> = ({
         <h3 className="text-lg font-semibold">Trial Period Ends In:</h3>
         <div className="flex space-x-2">{timerComponents}</div>
       </div>
+      <Button
+        onClick={() => pauseOrPlay()}
+        disabled={isPending}
+        variant="ghost"
+        size="icon"
+        className="rounded-full"
+      >
+        {isPaused ? (
+          <PlayIcon className="w-6 h-6" />
+        ) : (
+          <PauseIcon className="w-6 h-6" />
+        )}
+      </Button>
     </motion.div>
   );
 };

@@ -34,4 +34,5 @@ export interface SubscriptionStatusResponse {
   planType: PlanType;
   paygOption: PaygOption | null;
   trialEndDate: string | null;
+  isPaused: boolean;
 }
