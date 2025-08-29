@@ -63,16 +63,24 @@ export function GiftCardForm({
           </Label>
           <div className="flex items-center gap-2 mt-2">
             <Select onValueChange={onAmountChange} value={amount}>
-              <SelectTrigger id="amount" className="w-full">
+              <SelectTrigger id="amount" className="w-[180px]">
                 <SelectValue placeholder="Select amount" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="25.00">$25.00</SelectItem>
-                <SelectItem value="50.00">$50.00</SelectItem>
-                <SelectItem value="100.00">$100.00</SelectItem>
-                <SelectItem value="250.00">$250.00</SelectItem>
+                <SelectItem value="25.00">£25.00</SelectItem>
+                <SelectItem value="50.00">£50.00</SelectItem>
+                <SelectItem value="100.00">£100.00</SelectItem>
+                <SelectItem value="250.00">£250.00</SelectItem>
               </SelectContent>
             </Select>
+            <Input
+              id="custom-amount"
+              type="number"
+              placeholder="Or enter custom amount"
+              value={amount}
+              onChange={e => onAmountChange(e.target.value)}
+              className="flex-1"
+            />
             <Button
               variant="ghost"
               className="text-purple-600 hover:text-purple-700"

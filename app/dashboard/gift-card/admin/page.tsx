@@ -152,8 +152,8 @@ const HeaderStats = ({ cards }: { cards: GiftCard[] }) => {
         </CardHeader>
         <CardContent>
           <div className="text-4xl font-bold">
-            $
-            {totalBalance.toLocaleString('en-US', {
+            £
+            {totalBalance.toLocaleString('en-GB', {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}
@@ -191,10 +191,10 @@ const ActivityLogTable = ({ activities }: { activities: ActivityLog[] }) => {
                   log.amount < 0 ? 'text-red-600' : 'text-gray-800'
                 )}
               >
-                ${log.amount.toFixed(2)}
+                £{log.amount.toFixed(2)}
               </TableCell>
               <TableCell className="text-right">
-                ${log.balance.toFixed(2)}
+                £{log.balance.toFixed(2)}
               </TableCell>
             </TableRow>
           ))}
@@ -321,7 +321,7 @@ export default function GiftCardDashboardPage() {
                         <TableCell className="font-mono text-sm">
                           {card.cardNumber}
                         </TableCell>
-                        <TableCell>${card.balance.toFixed(2)}</TableCell>
+                        <TableCell>£{card.balance.toFixed(2)}</TableCell>
                         <TableCell>
                           {card.expirationDate
                             ? new Date(card.expirationDate).toLocaleDateString()
