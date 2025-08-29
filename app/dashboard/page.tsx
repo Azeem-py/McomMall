@@ -1,6 +1,9 @@
 'use client';
 
 import type { FC } from 'react';
+import { useGetSubscriptionStatus } from '@/service/payments/hook';
+import TrialCountdownTimer from '@/components/TrialCountdownTimer';
+import { SubscriptionStatusEnum } from '@/service/payments/types';
 import {
   MapPin,
   BarChart2,
@@ -259,8 +262,16 @@ const ListingsViewsChart: FC<{ data: ChartData[] }> = ({ data }) => (
 // Assembles the entire dashboard page.
 
 const DashboardPage: FC = () => {
+  const { data: subscriptionStatus } = useGetSubscriptionStatus();
+
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+      {subscriptionStatus?.status === SubscriptionStatusEnum.TRIAL_ACTIVE &&
+        subscriptionStatus.trialEndDate && (
+          <TrialCountdownTimer
+            trialEndDate={subscriptionStatus.trialEndDate}
+          />
+        )}
       {/* Header */}
       <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Hello Tom !</h1>
