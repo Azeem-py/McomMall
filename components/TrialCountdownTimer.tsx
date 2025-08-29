@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { TimerIcon, PlayIcon, PauseIcon } from 'lucide-react';
 import { usePauseOrPlay } from '@/service/payments/hook';
+import { TrialAction } from '@/service/payments/types';
 import { Button } from './ui/button';
 
 interface TrialCountdownTimerProps {
@@ -75,7 +76,11 @@ const TrialCountdownTimer: React.FC<TrialCountdownTimerProps> = ({
         <div className="flex space-x-2">{timerComponents}</div>
       </div>
       <Button
-        onClick={() => pauseOrPlay()}
+        onClick={() =>
+          pauseOrPlay({
+            action: isPaused ? TrialAction.RESUME : TrialAction.PAUSE,
+          })
+        }
         disabled={isPending}
         variant="ghost"
         size="icon"

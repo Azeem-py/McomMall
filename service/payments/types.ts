@@ -36,3 +36,12 @@ export interface SubscriptionStatusResponse {
   trialEndDate: string | null;
   isPaused: boolean;
 }
+
+export enum TrialAction {
+  PAUSE = 'pause',
+  RESUME = 'resume',
+}
+
+export interface PauseResumeTrialDto {
+  action: TrialAction;
+}

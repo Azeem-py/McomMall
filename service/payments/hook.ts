@@ -1,7 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import api from '../api';
-import { RecordPaymentDto, SubscriptionStatusResponse } from './types';
+import {
+  PauseResumeTrialDto,
+  RecordPaymentDto,
+  SubscriptionStatusResponse,
+} from './types';
 import { ErrorResponse } from '../listings/hook';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
@@ -60,7 +64,8 @@ export const useRecordPayment = () => {
 export const usePauseOrPlay = () => {
   const queryClient = useQueryClient();
   const mutation = useMutation({
-    mutationFn: () => api.patch('/payments/trial'),
+    mutationFn: (payload: PauseResumeTrialDto) =>
+      api.patch('/payments/trial', payload),
     onSuccess: () => {
       toast.success('Trial status updated successfully');
       queryClient.invalidateQueries({ queryKey: ['FETCH_SUBSCRIPTION_STATUS'] });
