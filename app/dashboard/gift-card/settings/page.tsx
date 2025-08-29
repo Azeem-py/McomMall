@@ -389,7 +389,7 @@ export default function GiftCardPage() {
 
   const renderGiftCardSettings = () => (
     <CardContent className="space-y-6">
-      <FormRow label="Gift card amounts ($)">
+      <FormRow label="Gift card amounts (£)">
         <div className="flex flex-wrap items-center gap-2">
           <Input
             type="number"
@@ -415,7 +415,7 @@ export default function GiftCardPage() {
                 transition={{ duration: 0.2 }}
               >
                 <Badge onRemove={() => removeGiftCardAmount(amount)}>
-                  ${amount}
+                  £{amount}
                 </Badge>
               </motion.div>
             ))}
@@ -436,7 +436,7 @@ export default function GiftCardPage() {
       </FormRow>
 
       <FormRow
-        label="Minimum amount ($)"
+        label="Minimum amount (£)"
         tooltip="The minimum amount for a custom gift card."
       >
         <Input
@@ -448,7 +448,7 @@ export default function GiftCardPage() {
       </FormRow>
 
       <FormRow
-        label="Maximum amount ($)"
+        label="Maximum amount (£)"
         tooltip="The maximum amount for a custom gift card."
       >
         <Input
@@ -547,7 +547,7 @@ export default function GiftCardPage() {
             </label>
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Offering a bonus for purchasing gift cards is a great way to
-              incentivise customers. For example: Buy a $25 gift card, get a $5
+              incentivise customers. For example: Buy a £25 gift card, get a £5
               bonus card!
             </p>
           </div>
@@ -569,7 +569,7 @@ export default function GiftCardPage() {
                     transition={{ duration: 0.2 }}
                   >
                     <Badge onRemove={() => removeBonus(index)}>
-                      Buy a ${bonus.buy} gift card, get a ${bonus.get} bonus
+                      Buy a £{bonus.buy} gift card, get a £{bonus.get} bonus
                       card
                     </Badge>
                   </motion.div>

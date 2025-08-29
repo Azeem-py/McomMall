@@ -60,14 +60,14 @@ export function GiftCardPreview({ design, amount }: GiftCardPreviewProps) {
             <div className="text-right">
               <p className="font-semibold text-lg opacity-80">{design.name}</p>
               <p className="text-5xl font-bold tracking-tight">
-                ${amount || '0.00'}
+                £{amount || '0.00'}
               </p>
             </div>
           </div>
         </motion.div>
       </AnimatePresence>
       <div className="mt-4 text-center text-gray-500 text-sm">
-        <p>$1.00 – $999.00</p>
+        <p>£1.00 – £999.00</p>
       </div>
     </div>
   );
