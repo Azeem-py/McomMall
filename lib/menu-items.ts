@@ -122,6 +122,7 @@ export const pluginMenuItems: MenuItem[] = [
     icon: Settings,
     subMenu: [
       { title: 'Dashboard', href: '/dashboard/loyalty' },
+      { title: 'Customer view', href: '/dashboard/loyalty/customer' },
       { title: 'Members', href: '/dashboard/loyalty/members' },
       { title: 'Promotion', href: '/dashboard/loyalty/promotion' },
       { title: 'Offers', href: '/dashboard/loyalty/offers' },
