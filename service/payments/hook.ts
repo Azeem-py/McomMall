@@ -24,10 +24,11 @@ export const useGetSubscriptionStatus = () => {
     }
   };
 
+  console.log(userRole, 'userRole in hook');
   const query = useQuery({
     queryFn: fetch,
     queryKey: ['FETCH_SUBSCRIPTION_STATUS'],
-    enabled: userRole === UserRole.OWNER,
+    enabled: true,
   });
 
   return query;
