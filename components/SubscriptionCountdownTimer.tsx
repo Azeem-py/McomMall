@@ -33,48 +33,49 @@ const SubscriptionCountdownTimer: React.FC<SubscriptionCountdownTimerProps> = ({
     seconds: 0,
   });
 
-  useEffect(() => {
-    const calculateTimeLeft = () => {
-      const { startedAt, totalPausedDuration, isPaused, pausedAt, paygOption } =
-        subscription;
+  const calculateTimeLeft = useCallback(() => {
+    const { startedAt, totalPausedDuration, isPaused, pausedAt, paygOption } =
+      subscription;
 
-      const trialDuration = getTrialDurationInMs(paygOption);
-      const startTime = new Date(startedAt).getTime();
+    const trialDuration = getTrialDurationInMs(paygOption);
+    const startTime = new Date(startedAt).getTime();
 
-      let ongoingPauseDuration = 0;
-      if (isPaused && pausedAt) {
-        ongoingPauseDuration =
-          new Date().getTime() - new Date(pausedAt).getTime();
-      }
+    let ongoingPauseDuration = 0;
+    if (isPaused && pausedAt) {
+      ongoingPauseDuration =
+        new Date().getTime() - new Date(pausedAt).getTime();
+    }
 
-      const trialEndDate =
-        startTime + trialDuration + totalPausedDuration + ongoingPauseDuration;
-      const difference = trialEndDate - new Date().getTime();
+    const trialEndDate =
+      startTime + trialDuration + totalPausedDuration + ongoingPauseDuration;
+    const difference = trialEndDate - new Date().getTime();
 
-      if (difference <= 0) {
-        return { days: 0, hours: 0, minutes: 0, seconds: 0 };
-      }
+    if (difference <= 0) {
+      return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+    }
 
-      return {
-        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-        minutes: Math.floor((difference / 1000 / 60) % 60),
-        seconds: Math.floor((difference / 1000) % 60),
-      };
+    return {
+      days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+      hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+      minutes: Math.floor((difference / 1000 / 60) % 60),
+      seconds: Math.floor((difference / 1000) % 60),
     };
+  }, [subscription]);
 
+  useEffect(() => {
     setTimeLeft(calculateTimeLeft());
+  }, [calculateTimeLeft]);
 
+  useEffect(() => {
     if (subscription.isPaused) {
       return;
     }
-
     const timerId = setInterval(() => {
       setTimeLeft(calculateTimeLeft());
     }, 1000);
 
     return () => clearInterval(timerId);
-  }, [subscription]);
+  }, [subscription.isPaused, calculateTimeLeft]);
 
   const handleTogglePause = () => {
     const action = subscription.isPaused
