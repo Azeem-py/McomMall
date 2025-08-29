@@ -12,7 +12,7 @@ interface SubscriptionCountdownTimerProps {
   subscription: Subscription;
 }
 
-const getTrialDurationInMs = (paygOption: PaygOption): number => {
+function getTrialDurationInMs(paygOption: PaygOption): number {
   const daysMap: Record<PaygOption, number> = {
     [PaygOption.NINETY_DAYS]: 90,
     [PaygOption.ONE_EIGHTY_DAYS]: 180,
@@ -20,7 +20,7 @@ const getTrialDurationInMs = (paygOption: PaygOption): number => {
   };
   const days = daysMap[paygOption] || 0;
   return days * 24 * 60 * 60 * 1000;
-};
+}
 
 const SubscriptionCountdownTimer: React.FC<SubscriptionCountdownTimerProps> = ({
   subscription,
@@ -33,10 +33,13 @@ const SubscriptionCountdownTimer: React.FC<SubscriptionCountdownTimerProps> = ({
     seconds: 0,
   });
 
+  console.log(subscription.isPaused);
+
   useEffect(() => {
     const calculateTimeLeft = () => {
       const { startedAt, totalPausedDuration, isPaused, pausedAt, paygOption } =
         subscription;
+      console.log('in effect', isPaused);
 
       const trialDuration = getTrialDurationInMs(paygOption);
       const startTime = new Date(startedAt).getTime();
@@ -85,7 +88,9 @@ const SubscriptionCountdownTimer: React.FC<SubscriptionCountdownTimerProps> = ({
 
   const timerComponents = Object.entries(timeLeft).map(([interval, value]) => (
     <div key={interval} className="flex flex-col items-center">
-      <span className="text-2xl font-bold">{String(value).padStart(2, '0')}</span>
+      <span className="text-2xl font-bold">
+        {String(value).padStart(2, '0')}
+      </span>
       <span className="text-xs uppercase">{interval}</span>
     </div>
   ));

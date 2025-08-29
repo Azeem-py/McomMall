@@ -36,14 +36,13 @@ const TrialCountdownTimer: React.FC<TrialCountdownTimerProps> = ({
   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
 
   useEffect(() => {
-    if (isPaused) {
-      return;
-    }
-    const timer = setTimeout(() => {
+    if (isPaused) return;
+
+    const interval = setInterval(() => {
       setTimeLeft(calculateTimeLeft());
     }, 1000);
 
-    return () => clearTimeout(timer);
+    return () => clearInterval(interval);
   }, [isPaused, calculateTimeLeft]);
 
   const timerComponents = Object.entries(timeLeft).map(([interval, value]) => {
@@ -53,7 +52,9 @@ const TrialCountdownTimer: React.FC<TrialCountdownTimerProps> = ({
 
     return (
       <div key={interval} className="flex flex-col items-center">
-        <span className="text-2xl font-bold">{String(value).padStart(2, '0')}</span>
+        <span className="text-2xl font-bold">
+          {String(value).padStart(2, '0')}
+        </span>
         <span className="text-xs uppercase">{interval}</span>
       </div>
     );
