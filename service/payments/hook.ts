@@ -40,22 +40,17 @@ export const useRecordPayment = () => {
       return response.data;
     } catch (error: unknown) {
       const err = error as ErrorResponse;
-      throw new Error(
+      const errorMessage =
         err.response?.data?.message ||
-          err.message ||
-          'Failed to record payment'
-      );
+        err.message ||
+        'Failed to record payment';
+      toast.error(errorMessage);
+      throw new Error(errorMessage);
     }
   };
 
   const mutation = useMutation({
     mutationFn: create,
-    onSuccess: () => {
-      toast.success('Payment recorded successfully');
-    },
-    onError: (error: Error) => {
-      toast.error(error.message);
-    },
   });
 
   return mutation;

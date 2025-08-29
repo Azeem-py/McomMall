@@ -54,11 +54,13 @@ function CheckoutForm({
   isTrial,
   planName,
   planPrice,
+  isLoading,
 }: {
   onSuccess: (paymentGateway: PaymentGateway) => void;
   isTrial: boolean;
   planName: string;
   planPrice: string;
+  isLoading: boolean;
 }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -101,12 +103,18 @@ function CheckoutForm({
     <form onSubmit={handleSubmit}>
       <CardElement />
       {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
-      <Button type="submit" disabled={!stripe || processing} className="mt-4 w-full">
-        {processing ? 'Processing...' : 'Pay Now'}
+      <Button
+        type="submit"
+        disabled={!stripe || processing || isLoading}
+        className="mt-4 w-full"
+      >
+        {processing || isLoading ? 'Processing...' : 'Pay Now'}
       </Button>
     </form>
   );
 }
+
+import PaymentSuccessDialog from './PaymentSuccessDialog';
 
 function PaymentGatewayDialogComponent({
   isOpen,
@@ -119,7 +127,9 @@ function PaymentGatewayDialogComponent({
 }: PaymentGatewayDialogProps) {
   const router = useRouter();
   const [paymentMethod, setPaymentMethod] = useState('stripe');
-  const { mutate: recordPayment } = useRecordPayment();
+  const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
+  const { mutate: recordPayment, isPending: isRecordingPayment } =
+    useRecordPayment();
 
   const getPaygOption = (name: string): PaygOption | undefined => {
     if (name.includes('90')) return PaygOption.NINETY_DAYS;
@@ -137,13 +147,25 @@ function PaymentGatewayDialogComponent({
     const amountValue = isTrial ? 1 : 1 + numericPrice;
     const amount = amountValue.toFixed(2);
 
-    recordPayment({
-      amount,
-      planType: isPayg ? PlanType.PAYG : PlanType.CO_BRANDED,
-      paygOption: isPayg ? getPaygOption(planName) : undefined,
-      isTrial,
-      paymentGateway,
-    });
+    recordPayment(
+      {
+        amount,
+        planType: isPayg ? PlanType.PAYG : PlanType.CO_BRANDED,
+        paygOption: isPayg ? getPaygOption(planName) : undefined,
+        isTrial,
+        paymentGateway,
+      },
+      {
+        onSuccess: () => {
+          onClose(); // Close the payment dialog
+          setIsSuccessDialogOpen(true); // Open the success dialog
+        },
+      }
+    );
+  };
+
+  const handleRedirect = () => {
+    setIsSuccessDialogOpen(false);
     router.push('/dashboard/my-listings');
   };
 
@@ -152,73 +174,84 @@ function PaymentGatewayDialogComponent({
   const paypalAmount = isTrial ? '1.00' : (1 + numericPrice).toFixed(2);
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Confirm Your Purchase</DialogTitle>
-          <DialogDescription>
-            {isTrial
-              ? `You are starting a trial for the ${planName} plan. You will be charged a £1 verification fee now. The plan price will be deferred until after the trial period.`
-              : `You are purchasing the ${planName} plan. You will be charged a £1 verification fee plus the plan price.`}
-          </DialogDescription>
-        </DialogHeader>
-        <div className="py-4">
-          <div className="flex justify-between">
-            <span>Verification Fee:</span>
-            <span>£1.00</span>
-          </div>
-          {!isTrial && (
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Confirm Your Purchase</DialogTitle>
+            <DialogDescription>
+              {isTrial
+                ? `You are starting a trial for the ${planName} plan. You will be charged a £1 verification fee now. The plan price will be deferred until after the trial period.`
+                : `You are purchasing the ${planName} plan. You will be charged a £1 verification fee plus the plan price.`}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
             <div className="flex justify-between">
-              <span>{planName} Price:</span>
-              <span>{planPrice}</span>
+              <span>Verification Fee:</span>
+              <span>£1.00</span>
             </div>
+            {!isTrial && (
+              <div className="flex justify-between">
+                <span>{planName} Price:</span>
+                <span>{planPrice}</span>
+              </div>
+            )}
+            <div className="flex justify-between font-bold text-lg mt-4">
+              <span>Total:</span>
+              <span>£{total.toFixed(2)}</span>
+            </div>
+          </div>
+
+          <RadioGroup
+            defaultValue="stripe"
+            onValueChange={setPaymentMethod}
+            className="my-4"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="stripe" id="stripe" />
+              <Label htmlFor="stripe">Pay with Card (Stripe)</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="paypal" id="paypal" />
+              <Label htmlFor="paypal">Pay with PayPal</Label>
+            </div>
+          </RadioGroup>
+
+          {paymentMethod === 'stripe' && (
+            <Elements stripe={stripePromise}>
+              <CheckoutForm
+                onSuccess={handleSuccess}
+                isTrial={isTrial}
+                planName={planName}
+                planPrice={planPrice}
+                isLoading={isRecordingPayment}
+              />
+            </Elements>
           )}
-          <div className="flex justify-between font-bold text-lg mt-4">
-            <span>Total:</span>
-            <span>£{total.toFixed(2)}</span>
-          </div>
-        </div>
 
-        <RadioGroup
-          defaultValue="stripe"
-          onValueChange={setPaymentMethod}
-          className="my-4"
-        >
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="stripe" id="stripe" />
-            <Label htmlFor="stripe">Pay with Card (Stripe)</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="paypal" id="paypal" />
-            <Label htmlFor="paypal">Pay with PayPal</Label>
-          </div>
-        </RadioGroup>
+          {paymentMethod === 'paypal' &&
+            (isRecordingPayment ? (
+              <div className="text-center">Processing...</div>
+            ) : (
+              <PayPalButtonWrapper
+                paypalAmount={paypalAmount}
+                handleSuccess={() => handleSuccess(PaymentGateway.PAYPAL)}
+              />
+            ))}
 
-        {paymentMethod === 'stripe' && (
-          <Elements stripe={stripePromise}>
-            <CheckoutForm
-              onSuccess={handleSuccess}
-              isTrial={isTrial}
-              planName={planName}
-              planPrice={planPrice}
-            />
-          </Elements>
-        )}
-
-        {paymentMethod === 'paypal' && (
-          <PayPalButtonWrapper
-            paypalAmount={paypalAmount}
-            handleSuccess={() => handleSuccess(PaymentGateway.PAYPAL)}
-          />
-        )}
-
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          <DialogFooter>
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <PaymentSuccessDialog
+        isOpen={isSuccessDialogOpen}
+        onClose={() => setIsSuccessDialogOpen(false)}
+        onRedirect={handleRedirect}
+      />
+    </>
   );
 }
 
