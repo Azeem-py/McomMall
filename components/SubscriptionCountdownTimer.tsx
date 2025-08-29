@@ -55,21 +55,26 @@ const SubscriptionCountdownTimer: React.FC<SubscriptionCountdownTimerProps> = ({
     };
   }, [subscription]);
 
-  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+  const [timeLeft, setTimeLeft] = useState(() => calculateTimeLeft());
 
   useEffect(() => {
+    // Immediately update the time left whenever the subscription state changes.
+    setTimeLeft(calculateTimeLeft());
+
+    // If the subscription is paused, we don't need to set up an interval.
+    // The time is now frozen until the subscription is resumed.
     if (subscription.isPaused) {
-      // When paused, we need to update the time left once to show the frozen time
-      setTimeLeft(calculateTimeLeft());
       return;
     }
 
-    const timer = setInterval(() => {
+    // Set up an interval to tick down the timer every second.
+    const timerId = setInterval(() => {
       setTimeLeft(calculateTimeLeft());
     }, 1000);
 
-    return () => clearInterval(timer);
-  }, [subscription.isPaused, calculateTimeLeft]);
+    // Clean up the interval when the component unmounts or the subscription changes.
+    return () => clearInterval(timerId);
+  }, [subscription, calculateTimeLeft]);
 
   const handleTogglePause = () => {
     const action = subscription.isPaused
