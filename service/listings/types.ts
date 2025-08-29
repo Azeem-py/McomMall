@@ -364,6 +364,7 @@ export interface InHouseBusiness {
   status: BusinessStatus;
   googlePlaceId?: string;
   isGoogleVerified: boolean;
+  isClaimed: boolean;
   location: Location;
   categories: Category[];
   socialLinks: SocialLink[];
