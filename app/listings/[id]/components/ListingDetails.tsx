@@ -106,7 +106,7 @@ export default function ClientListingDetail({
                   <Bookmark className="mr-2 h-4 w-4" />
                   Bookmark this listing
                 </Button>
-                {listing.isGoogleVerified ? (
+                {listing?.isClaimed ? (
                   <div className="flex items-center space-x-2">
                     <CheckCircle className="h-5 w-5 text-green-500" />
                     <span className="font-semibold text-green-600">

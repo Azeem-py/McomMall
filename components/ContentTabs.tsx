@@ -17,12 +17,27 @@ function isGoogleResult(
 }
 
 // You would create more detailed components for each tab
+import { useState } from 'react';
+
 function OverviewSection({
   listing,
 }: {
   listing: GooglePlaceResult | InHouseBusiness;
 }) {
+  const [isCopied, setIsCopied] = useState(false);
   const isGoogle = isGoogleResult(listing);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(window.location.href).then(
+      () => {
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000); // Reset after 2 seconds
+      },
+      err => {
+        console.error('Failed to copy: ', err);
+      }
+    );
+  };
 
   const formatTime = (timeString: string) => {
     if (!timeString) return '';
@@ -70,6 +85,23 @@ function OverviewSection({
   // InHouseBusiness
   return (
     <div className="space-y-6">
+      {!isGoogle && !(listing as InHouseBusiness).isClaimed && (
+        <div className="border-t pt-6">
+          <h3 className="text-xl font-bold">
+            Do you know the owner of this business?
+          </h3>
+          <p className="text-gray-700 mt-2">
+            Tell them to claim this listing to unlock more features and manage
+            their business information.
+          </p>
+          <Button
+            onClick={handleCopy}
+            className="mt-4 bg-red-500 hover:bg-red-600 text-white"
+          >
+            {isCopied ? 'Copied!' : 'Copy Listing URL'}
+          </Button>
+        </div>
+      )}
       <div>
         <h3 className="text-xl font-bold">
           About {listing.businessName}

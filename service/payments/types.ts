@@ -34,4 +34,14 @@ export interface SubscriptionStatusResponse {
   planType: PlanType;
   paygOption: PaygOption | null;
   trialEndDate: string | null;
+  isPaused: boolean;
+}
+
+export enum TrialAction {
+  PAUSE = 'pause',
+  RESUME = 'resume',
+}
+
+export interface PauseResumeTrialDto {
+  action: TrialAction;
 }
