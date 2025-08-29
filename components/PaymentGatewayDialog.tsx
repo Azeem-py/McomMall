@@ -122,9 +122,9 @@ function PaymentGatewayDialogComponent({
   const { mutate: recordPayment } = useRecordPayment();
 
   const getPaygOption = (name: string): PaygOption | undefined => {
-    if (name.includes('90')) return PaygOption.DAYS_90;
-    if (name.includes('180')) return PaygOption.DAYS_180;
-    if (name.includes('270')) return PaygOption.DAYS_270;
+    if (name.includes('90')) return PaygOption.NINETY_DAYS;
+    if (name.includes('180')) return PaygOption.ONE_EIGHTY_DAYS;
+    if (name.includes('270')) return PaygOption.TWO_SEVENTY_DAYS;
     return undefined;
   };
 
@@ -138,7 +138,7 @@ function PaymentGatewayDialogComponent({
 
     recordPayment({
       amount,
-      planType: isPayg ? PlanType.PAYG : PlanType.COBRANDED,
+      planType: isPayg ? PlanType.PAYG : PlanType.CO_BRANDED,
       paygOption: isPayg ? getPaygOption(planName) : undefined,
       isTrial,
       paymentGateway,

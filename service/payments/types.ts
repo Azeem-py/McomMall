@@ -1,17 +1,17 @@
 export enum PlanType {
-  PAYG = 'payg',
-  COBRANDED = 'cobranded',
+  PAYG = 'PAYG',
+  CO_BRANDED = 'CO_BRANDED',
 }
 
 export enum PaygOption {
-  DAYS_90 = '90_days',
-  DAYS_180 = '180_days',
-  DAYS_270 = '270_days',
+  NINETY_DAYS = 'NINETY_DAYS',
+  ONE_EIGHTY_DAYS = 'ONE_EIGHTY_DAYS',
+  TWO_SEVENTY_DAYS = 'TWO_SEVENTY_DAYS',
 }
 
 export enum PaymentGateway {
-  STRIPE = 'stripe',
-  PAYPAL = 'paypal',
+  STRIPE = 'STRIPE',
+  PAYPAL = 'PAYPAL',
 }
 
 export interface RecordPaymentDto {
@@ -29,20 +29,9 @@ export enum SubscriptionStatusEnum {
   INACTIVE = 'INACTIVE',
 }
 
-export enum PlanTypeEnum {
-  CO_BRANDED = 'CO_BRANDED',
-  PAYG = 'PAYG',
-}
-
-export enum PaygOptionEnum {
-  NINETY_DAYS = 'NINETY_DAYS',
-  ONE_EIGHTY_DAYS = 'ONE_EIGHTY_DAYS',
-  TWO_SEVENTY_DAYS = 'TWO_SEVENTY_DAYS',
-}
-
 export interface SubscriptionStatusResponse {
   status: SubscriptionStatusEnum;
-  planType: PlanTypeEnum;
-  paygOption: PaygOptionEnum | null;
+  planType: PlanType;
+  paygOption: PaygOption | null;
   trialEndDate: string | null;
 }
