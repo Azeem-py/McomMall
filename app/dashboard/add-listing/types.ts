@@ -9,7 +9,8 @@ export interface Socials {
 }
 
 export interface Media {
-  file: File | null;
+  file?: File | null;
+  url?: string;
   altText: string;
 }
 

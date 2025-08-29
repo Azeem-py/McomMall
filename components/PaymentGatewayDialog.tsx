@@ -1,5 +1,7 @@
 'use client';
 
+'use client';
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -21,6 +23,12 @@ import {
   useElements,
 } from '@stripe/react-stripe-js';
 import dynamic from 'next/dynamic';
+import { useRecordPayment } from '@/service/payments/hook';
+import {
+  PaymentGateway,
+  PlanType,
+  PaygOption,
+} from '@/service/payments/types';
 
 const stripePromise = loadStripe(
   'pk_test_51RyiHq7EcmCfbEvlg70VZQdMUXMWKfFVfOctc73nAzdllQcdH41v4sdX8dyPBGWnM91uHheLoih73OnOeQOOecGO00o5ZZ6oTr'
@@ -38,6 +46,7 @@ interface PaymentGatewayDialogProps {
   planPrice: string;
   listingId: string | null;
   isTrial: boolean;
+  isPayg?: boolean;
 }
 
 function CheckoutForm({
@@ -46,7 +55,7 @@ function CheckoutForm({
   planName,
   planPrice,
 }: {
-  onSuccess: () => void;
+  onSuccess: (paymentGateway: PaymentGateway) => void;
   isTrial: boolean;
   planName: string;
   planPrice: string;
@@ -79,7 +88,7 @@ function CheckoutForm({
       // For this simulation, we'll just assume the payment is successful.
       console.log('Simulating Stripe payment for amount:', amount);
       setTimeout(() => {
-        onSuccess();
+        onSuccess(PaymentGateway.STRIPE);
         setProcessing(false);
       }, 1000);
     } else {
@@ -106,16 +115,35 @@ function PaymentGatewayDialogComponent({
   planPrice,
   listingId,
   isTrial,
+  isPayg,
 }: PaymentGatewayDialogProps) {
   const router = useRouter();
   const [paymentMethod, setPaymentMethod] = useState('stripe');
+  const { mutate: recordPayment } = useRecordPayment();
 
-  const handleSuccess = () => {
-    router.push('/dashboard/my-listings');
+  const getPaygOption = (name: string): PaygOption | undefined => {
+    if (name.includes('90')) return PaygOption.DAYS_90;
+    if (name.includes('180')) return PaygOption.DAYS_180;
+    if (name.includes('270')) return PaygOption.DAYS_270;
+    return undefined;
   };
 
   const getPriceAsNumber = (price: string) => {
     return parseFloat(price.replace('£', '').split(' ')[0]);
+  };
+
+  const handleSuccess = (paymentGateway: PaymentGateway) => {
+    const numericPrice = getPriceAsNumber(planPrice);
+    const amount = isTrial ? 1 : 1 + numericPrice;
+
+    recordPayment({
+      amount,
+      planType: isPayg ? PlanType.PAYG : PlanType.COBRANDED,
+      paygOption: isPayg ? getPaygOption(planName) : undefined,
+      isTrial,
+      paymentGateway,
+    });
+    router.push('/dashboard/my-listings');
   };
 
   const numericPrice = getPriceAsNumber(planPrice);
@@ -179,7 +207,7 @@ function PaymentGatewayDialogComponent({
         {paymentMethod === 'paypal' && (
           <PayPalButtonWrapper
             paypalAmount={paypalAmount}
-            handleSuccess={handleSuccess}
+            handleSuccess={() => handleSuccess(PaymentGateway.PAYPAL)}
           />
         )}
 
