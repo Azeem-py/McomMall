@@ -66,10 +66,13 @@ const TrialCountdownTimer: React.FC<TrialCountdownTimerProps> = ({
 
   return (
     <motion.div
+      drag
+      dragMomentum={false}
       initial={{ opacity: 0, y: -50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-orange-600 text-white p-4 rounded-lg shadow-lg flex items-center space-x-4"
+      className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-orange-600 text-white p-4 rounded-lg shadow-lg flex items-center space-x-4 cursor-grab"
+      whileTap={{ cursor: 'grabbing' }}
     >
       <TimerIcon className="w-8 h-8" />
       <div className="flex items-center space-x-2">
