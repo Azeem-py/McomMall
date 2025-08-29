@@ -36,7 +36,7 @@ const TrialCountdownTimer: React.FC<TrialCountdownTimerProps> = ({
   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
 
   useEffect(() => {
-    if (!isPaused) {
+    if (isPaused) {
       return;
     }
     const timer = setTimeout(() => {
