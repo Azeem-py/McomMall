@@ -118,14 +118,14 @@ const validationRules = {
   },
   media: {
     'logo.altText': {
-      validate: isNotEmpty,
-      message: 'Logo alt text is required when an image is uploaded.',
-      // This validation is conditional, handled in validateStep
+      validate: () => true, // Always valid
+      message: '',
+      optional: true,
     },
     'banner.altText': {
-      validate: isNotEmpty,
-      message: 'Banner alt text is required when an image is uploaded.',
-      // This validation is conditional, handled in validateStep
+      validate: () => true, // Always valid
+      message: '',
+      optional: true,
     },
   },
   productCategory: {

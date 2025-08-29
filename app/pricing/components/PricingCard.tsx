@@ -178,6 +178,7 @@ export default function PricingCard({
         planPrice={tier.price}
         listingId={listingId}
         isTrial={isTrial}
+        isPayg={isPayg}
       />
     </motion.div>
   );
