@@ -15,7 +15,7 @@ export enum PaymentGateway {
 }
 
 export interface RecordPaymentDto {
-  amount: number;
+  amount: string;
   planType: PlanType;
   paygOption?: PaygOption;
   isTrial: boolean;

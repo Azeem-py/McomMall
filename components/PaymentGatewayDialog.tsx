@@ -134,7 +134,8 @@ function PaymentGatewayDialogComponent({
 
   const handleSuccess = (paymentGateway: PaymentGateway) => {
     const numericPrice = getPriceAsNumber(planPrice);
-    const amount = isTrial ? 1 : 1 + numericPrice;
+    const amountValue = isTrial ? 1 : 1 + numericPrice;
+    const amount = amountValue.toFixed(2);
 
     recordPayment({
       amount,
