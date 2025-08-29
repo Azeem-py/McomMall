@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { TimerIcon, PlayIcon, PauseIcon } from 'lucide-react';
 import { Subscription } from '@/service/payments/subscription.types';
@@ -26,55 +26,55 @@ const SubscriptionCountdownTimer: React.FC<SubscriptionCountdownTimerProps> = ({
   subscription,
 }) => {
   const { mutate: pauseOrPlay, isPending } = usePauseOrPlay();
-
-  const calculateTimeLeft = useCallback(() => {
-    const { startedAt, totalPausedDuration, isPaused, pausedAt, paygOption } =
-      subscription;
-
-    const trialDuration = getTrialDurationInMs(paygOption);
-    const startTime = new Date(startedAt).getTime();
-
-    let ongoingPauseDuration = 0;
-    if (isPaused && pausedAt) {
-      ongoingPauseDuration = new Date().getTime() - new Date(pausedAt).getTime();
-    }
-
-    const trialEndDate =
-      startTime + trialDuration + totalPausedDuration + ongoingPauseDuration;
-    const difference = trialEndDate - new Date().getTime();
-
-    if (difference <= 0) {
-      return { days: 0, hours: 0, minutes: 0, seconds: 0 };
-    }
-
-    return {
-      days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-      hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-      minutes: Math.floor((difference / 1000 / 60) % 60),
-      seconds: Math.floor((difference / 1000) % 60),
-    };
-  }, [subscription]);
-
-  const [timeLeft, setTimeLeft] = useState(() => calculateTimeLeft());
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
 
   useEffect(() => {
-    // Immediately update the time left whenever the subscription state changes.
+    const calculateTimeLeft = () => {
+      const { startedAt, totalPausedDuration, isPaused, pausedAt, paygOption } =
+        subscription;
+
+      const trialDuration = getTrialDurationInMs(paygOption);
+      const startTime = new Date(startedAt).getTime();
+
+      let ongoingPauseDuration = 0;
+      if (isPaused && pausedAt) {
+        ongoingPauseDuration =
+          new Date().getTime() - new Date(pausedAt).getTime();
+      }
+
+      const trialEndDate =
+        startTime + trialDuration + totalPausedDuration + ongoingPauseDuration;
+      const difference = trialEndDate - new Date().getTime();
+
+      if (difference <= 0) {
+        return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+      }
+
+      return {
+        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((difference / 1000 / 60) % 60),
+        seconds: Math.floor((difference / 1000) % 60),
+      };
+    };
+
     setTimeLeft(calculateTimeLeft());
 
-    // If the subscription is paused, we don't need to set up an interval.
-    // The time is now frozen until the subscription is resumed.
     if (subscription.isPaused) {
       return;
     }
 
-    // Set up an interval to tick down the timer every second.
     const timerId = setInterval(() => {
       setTimeLeft(calculateTimeLeft());
     }, 1000);
 
-    // Clean up the interval when the component unmounts or the subscription changes.
     return () => clearInterval(timerId);
-  }, [subscription, calculateTimeLeft]);
+  }, [subscription]);
 
   const handleTogglePause = () => {
     const action = subscription.isPaused
