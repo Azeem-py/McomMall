@@ -89,6 +89,7 @@ const validationRules = {
     'socials.website': {
       validate: isValidUrl,
       message: 'A valid website URL is required.',
+      optional: true,
     },
     'socials.facebook': {
       validate: isValidUrl,
